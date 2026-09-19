@@ -7,7 +7,7 @@
 
 const URL_BASE = "https://cjhwxjznuleyfcbwwvtb.supabase.co";
 const ANON = "sb_publishable_acxKbtekhqwFZwI0EUtArg_3FSj5AHh";
-const APP_URL = "https://remarkable-tapioca-57d352.netlify.app";
+const APP_URL = "https://kimbs4560.github.io/daynua";
 const K_MAIL = "daynua.email", K_PASS = "daynua.pw", K_REFRESH = "daynua.refresh";
 const CACHE = FileManager.local().joinPath(FileManager.local().cacheDirectory(), "daynua.json");
 
