@@ -1,0 +1,233 @@
+// Daynua 위젯 (Scriptable)
+// 잠금 화면 · 홈 화면 위젯으로 '오늘 남은 할 일'을 보여준다.
+// 비밀번호는 이 파일이 아니라 iOS 키체인에만 저장된다.
+//
+// 처음 한 번: Scriptable 앱에서 이 스크립트를 실행 → 이메일·비밀번호 입력
+// 그 다음: 홈 화면/잠금 화면에 Scriptable 위젯을 올리고 이 스크립트를 고르면 끝
+
+const URL_BASE = "https://cjhwxjznuleyfcbwwvtb.supabase.co";
+const ANON = "sb_publishable_acxKbtekhqwFZwI0EUtArg_3FSj5AHh";
+const APP_URL = "https://remarkable-tapioca-57d352.netlify.app";
+const K_MAIL = "daynua.email", K_PASS = "daynua.pw", K_REFRESH = "daynua.refresh";
+const CACHE = FileManager.local().joinPath(FileManager.local().cacheDirectory(), "daynua.json");
+
+const pad = n => String(n).padStart(2, "0");
+const todayKey = () => { const d = new Date();
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`; };
+
+async function post(path, body) {
+  const r = new Request(`${URL_BASE}/auth/v1/${path}`);
+  r.method = "POST";
+  r.headers = { apikey: ANON, "Content-Type": "application/json" };
+  r.body = JSON.stringify(body);
+  return r.loadJSON();
+}
+
+/* 저장해 둔 refresh 토큰을 먼저 쓰고, 안 되면 이메일·비밀번호로 다시 받는다 */
+async function token() {
+  if (Keychain.contains(K_REFRESH)) {
+    try {
+      const j = await post("token?grant_type=refresh_token", { refresh_token: Keychain.get(K_REFRESH) });
+      if (j.access_token) { Keychain.set(K_REFRESH, j.refresh_token); return j.access_token; }
+    } catch (e) {}
+  }
+  if (!Keychain.contains(K_MAIL)) return null;
+  const j = await post("token?grant_type=password",
+    { email: Keychain.get(K_MAIL), password: Keychain.get(K_PASS) });
+  if (!j.access_token) return null;
+  Keychain.set(K_REFRESH, j.refresh_token);
+  return j.access_token;
+}
+
+async function fetchDoc(tok) {
+  const r = new Request(`${URL_BASE}/rest/v1/state?select=doc`);
+  r.headers = { apikey: ANON, Authorization: `Bearer ${tok}` };
+  const rows = await r.loadJSON();
+  return Array.isArray(rows) && rows[0] ? rows[0].doc : null;
+}
+
+/* 남은 일의 정의는 앱과 같다: 완료·건너뜀·기다리는 중은 빼고 센다.
+   큰 위젯에서는 분류별로 묶어 보여주므로 분류 이름과 색도 같이 실어 보낸다. */
+function summarize(doc) {
+  const list = (doc && doc.todos && doc.todos[todayKey()]) || [];
+  const cats = (doc && doc.cats) || [];
+  const catOf = id => cats.filter(c => c.id === id)[0];
+  const open = list.filter(t => !t.d && !t.sk && !t.w);
+  const order = [...open.filter(t => t.s), ...open.filter(t => !t.s)];   // 오늘 꼭 이 먼저
+
+  // 앱의 분류 순서를 그대로 따르고, 분류 없는 것은 맨 뒤에 둔다
+  const groups = [];
+  const push = (key, name, color, t) => {
+    let g = groups.filter(x => x.key === key)[0];
+    if (!g) { g = { key, name, color, items: [] }; groups.push(g); }
+    g.items.push(t.t);
+  };
+  for (const c of cats) {
+    for (const t of order) if (t.c === c.id) push(c.id, c.n, c.c, t);
+  }
+  for (const t of order) if (!catOf(t.c)) push('', '분류 없음', null, t);
+
+  return {
+    n: open.length, done: list.filter(t => t.d).length,
+    titles: order.map(t => t.t),
+    groups: groups
+  };
+}
+
+async function load() {
+  try {
+    const tok = await token();
+    if (!tok) return null;
+    const s = summarize(await fetchDoc(tok));
+    FileManager.local().writeString(CACHE, JSON.stringify({ ...s, at: Date.now() }));
+    return s;
+  } catch (e) {
+    try { return JSON.parse(FileManager.local().readString(CACHE)); } catch (e2) { return null; }
+  }
+}
+
+// ── 그리기 ───────────────────────────────────────────────────────────────────
+const ACCENT = new Color("#c9502f");
+
+function inline(w, s) {
+  w.addText(s ? `남은 ${s.n}` : "Daynua");
+}
+
+function circular(w, s) {
+  const st = w.addStack(); st.layoutVertically(); st.centerAlignContent();
+  const n = st.addText(s ? String(s.n) : "–");
+  n.font = Font.boldSystemFont(20); n.centerAlignText();
+}
+
+function rectangular(w, s) {
+  const head = w.addText(s ? `오늘 남은 ${s.n}` : "Daynua");
+  head.font = Font.boldSystemFont(13);
+  if (!s) return;
+  w.addSpacer(2);
+  for (const t of s.titles.slice(0, 2)) {
+    const line = w.addText(t);
+    line.font = Font.systemFont(11); line.lineLimit = 1; line.textOpacity = 0.75;
+  }
+  if (!s.titles.length) { const e = w.addText("다 끝냈어요"); e.font = Font.systemFont(11); e.textOpacity = .75; }
+}
+
+function home(w, s, big) {
+  w.setPadding(14, 14, 14, 14);
+  const top = w.addStack(); top.centerAlignContent();
+  const brand = top.addText("Daynua");
+  brand.font = Font.boldSystemFont(11); brand.textColor = ACCENT;
+  top.addSpacer();
+  const d = new Date();
+  const dt = top.addText(`${d.getMonth() + 1}월 ${d.getDate()}일`);
+  dt.font = Font.mediumSystemFont(11); dt.textOpacity = 0.5;
+  w.addSpacer(8);
+
+  if (!s) { const e = w.addText("Scriptable 앱에서\n한 번 실행해주세요");
+            e.font = Font.systemFont(12); e.textOpacity = .6; return; }
+
+  const row = w.addStack(); row.centerAlignContent();
+  const n = row.addText(String(s.n));
+  n.font = Font.boldSystemFont(34);
+  row.addSpacer(6);
+  const lab = row.addText("남은 할 일");
+  lab.font = Font.mediumSystemFont(12); lab.textOpacity = 0.55;
+  w.addSpacer(8);
+
+  const max = big ? 9 : 3;      // 큰 위젯은 줄이 더 들어간다 (분류 제목도 한 줄씩 먹는다)
+  if (!s.titles.length) {
+    const e = w.addText(s.done ? "오늘 계획한 일을 다 끝냈어요" : "아직 이 날의 계획이 없어요");
+    e.font = Font.systemFont(12); e.textOpacity = 0.6;
+    return;
+  }
+
+  const line = (t, color) => {
+    const row = w.addStack(); row.centerAlignContent();
+    const dot = row.addText("·");
+    dot.font = Font.boldSystemFont(12); dot.textColor = color || ACCENT;
+    row.addSpacer(5);
+    const tx = row.addText(t);
+    tx.font = Font.systemFont(12.5); tx.lineLimit = 1;
+    w.addSpacer(3);
+  };
+
+  /* 큰 위젯에서만 분류별로 묶는다. 중간·잠금 화면은 자리가 없어 그냥 줄줄이 보여준다 —
+     분류 제목이 실제 할 일만큼 자리를 먹으면 위젯이 아니라 목차가 된다. */
+  const grouped = big && s.groups && s.groups.length > 1;
+  if (!grouped) {
+    for (const t of s.titles.slice(0, max)) line(t, ACCENT);
+    if (s.titles.length > max) {
+      const more = w.addText(`+${s.titles.length - max}`);
+      more.font = Font.mediumSystemFont(11); more.textOpacity = 0.45;
+    }
+    return;
+  }
+
+  let left = max, shown = 0;
+  for (const g of s.groups) {
+    if (left <= 1) break;                      // 제목만 넣고 끝나면 의미가 없다
+    const h = w.addStack(); h.centerAlignContent();
+    const sq = h.addText("■");
+    sq.font = Font.systemFont(8);
+    sq.textColor = g.color ? new Color(g.color) : new Color("#8a877f");
+    h.addSpacer(5);
+    const nm = h.addText(g.name);
+    nm.font = Font.boldSystemFont(10.5); nm.textOpacity = 0.75; nm.lineLimit = 1;
+    h.addSpacer();
+    const cnt = h.addText(String(g.items.length));
+    cnt.font = Font.boldSystemFont(10.5); cnt.textOpacity = 0.45;
+    w.addSpacer(3);
+    left--;
+    for (const t of g.items) {
+      if (left <= 0) break;
+      line(t, g.color ? new Color(g.color) : null);
+      left--; shown++;
+    }
+    w.addSpacer(2);
+  }
+  if (shown < s.titles.length) {
+    const more = w.addText(`+${s.titles.length - shown}`);
+    more.font = Font.mediumSystemFont(11); more.textOpacity = 0.45;
+  }
+}
+
+// ── 실행 ─────────────────────────────────────────────────────────────────────
+if (config.runsInApp && !Keychain.contains(K_MAIL)) {
+  const a = new Alert();
+  a.title = "Daynua 연결";
+  a.message = "앱에 로그인한 계정을 입력하세요.\n비밀번호는 이 아이폰의 키체인에만 저장됩니다.";
+  a.addTextField("이메일");
+  a.addSecureTextField("비밀번호");
+  a.addAction("연결"); a.addCancelAction("취소");
+  if (await a.presentAlert() === 0) {
+    Keychain.set(K_MAIL, a.textFieldValue(0));
+    Keychain.set(K_PASS, a.textFieldValue(1));
+    if (Keychain.contains(K_REFRESH)) Keychain.remove(K_REFRESH);
+  }
+}
+
+const s = await load();
+const w = new ListWidget();
+w.url = APP_URL;
+
+switch (config.widgetFamily) {
+  case "accessoryInline":      inline(w, s); break;
+  case "accessoryCircular":    circular(w, s); break;
+  case "accessoryRectangular": rectangular(w, s); break;
+  case "large":                home(w, s, true); break;
+  default:                     home(w, s, false);
+}
+
+if (config.runsInWidget) Script.setWidget(w);
+else {
+  if (!s) {
+    const a = new Alert();
+    a.title = "연결 실패";
+    a.message = "이메일·비밀번호를 확인해주세요. 다시 입력하려면 '초기화'를 누르세요.";
+    a.addAction("초기화"); a.addCancelAction("닫기");
+    if (await a.presentAlert() === 0)
+      for (const k of [K_MAIL, K_PASS, K_REFRESH]) if (Keychain.contains(k)) Keychain.remove(k);
+  } else {
+    w.presentMedium();
+  }
+}
+Script.complete();

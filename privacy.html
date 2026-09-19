@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Daynua · 개인정보처리방침 / Privacy</title>
+<style>
+:root{--bg:#faf9f6;--card:#fff;--ink:#1b1b20;--sub:#6f6e78;--line:#e3e0d9;--accent:#c9502f}
+@media (prefers-color-scheme:dark){
+  :root{--bg:#131316;--card:#1c1c21;--ink:#edece8;--sub:#a2a1ac;--line:#33333c;--accent:#e8714d}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);line-height:1.75;
+  font-family:-apple-system,BlinkMacSystemFont,"Pretendard","Apple SD Gothic Neo","Malgun Gothic",sans-serif}
+main{max-width:720px;margin:0 auto;padding:44px 20px 80px}
+h1{font-size:26px;letter-spacing:-.5px;margin:0 0 4px}
+h1 b{color:var(--accent)}
+.date{color:var(--sub);font-size:13px;margin-bottom:28px}
+h2{font-size:17px;margin:34px 0 8px;padding-top:18px;border-top:1px solid var(--line)}
+p,li{font-size:14.5px;color:var(--ink)}
+ul{padding-left:20px}
+.sub{color:var(--sub);font-size:13.5px}
+a{color:var(--accent)}
+.box{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin:14px 0}
+table{width:100%;border-collapse:collapse;font-size:14px;margin:10px 0}
+th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--sub);font-size:12px;font-weight:700}
+.en{margin-top:60px;padding-top:30px;border-top:2px solid var(--line)}
+</style>
+</head>
+<body>
+<main>
+<h1>Day<b>nua</b> 개인정보처리방침</h1>
+<div class="date">최종 수정일: 2026년 9월 17일</div>
+
+<div class="box">
+Daynua는 <b>할 일 내용을 광고나 분석에 쓰지 않습니다.</b> 계정을 만들지 않으면 아무것도 서버로 보내지 않고,
+계정을 만들면 기기 간 동기화를 위해서만 저장합니다. 앱 안에서 언제든 계정과 데이터를 완전히 지울 수 있습니다.
+</div>
+
+<h2>1. 수집하는 정보</h2>
+<table>
+<tr><th>항목</th><th>언제</th><th>왜</th></tr>
+<tr><td>이메일 주소</td><td>회원가입할 때</td><td>로그인, 비밀번호 재설정</td></tr>
+<tr><td>할 일·카테고리·메모·완료 기록</td><td>로그인 상태로 사용할 때</td><td>기기 간 동기화</td></tr>
+<tr><td>알림 구독 정보<br><span class="sub">(브라우저가 발급한 주소, 알림 시각, 시간대)</span></td><td>알림을 켤 때</td><td>지정한 시각에 알림을 보내기 위해</td></tr>
+</table>
+<p class="sub">비밀번호는 Supabase가 해시로 보관하며 Daynua는 원문을 저장하거나 볼 수 없습니다.
+위치, 연락처, 광고 식별자, 사용 기록 추적은 수집하지 않습니다.</p>
+
+<h2>2. 로그인하지 않으면</h2>
+<p>모든 데이터는 <b>기기 안에만</b> 저장됩니다(브라우저 저장소). 서버로 전송되지 않습니다.</p>
+
+<h2>3. 알림에 대해</h2>
+<p>앱이 꺼져 있어도 알림이 오도록 서버가 정해진 시각에 <b>내용 없는 신호</b>만 보냅니다.
+알림에 표시되는 할 일 문구는 기기 안에 저장된 요약으로 <b>기기에서 만들어집니다</b>.
+할 일 내용이 알림 전송 경로를 거치지 않습니다.</p>
+<p class="sub">서버는 "보낼지 말지"를 정하기 위해 그 시각에 남은 할 일의 <b>개수</b>만 확인합니다.</p>
+
+<h2>4. 보관과 위탁</h2>
+<ul>
+<li>데이터베이스·인증·알림 발송: <b>Supabase</b> (AWS ap-northeast-2, 서울)</li>
+<li>웹 호스팅: <b>Netlify</b></li>
+<li>공휴일 정보: <b>Nager.Date</b> — 국가 코드와 연도만 보내며, 개인정보는 보내지 않습니다</li>
+</ul>
+<p>제3자에게 판매하거나 광고 목적으로 제공하지 않습니다.</p>
+
+<h2>5. 보관 기간</h2>
+<p>계정이 살아 있는 동안 보관하며, 계정을 삭제하면 <b>즉시 함께 삭제</b>됩니다.</p>
+
+<h2>6. 삭제 방법 · 이용자의 권리</h2>
+<ul>
+<li><b>계정 삭제</b>: 앱에서 계정 아이콘 → <b>계정 삭제</b>. 이메일·할 일·완료 기록·알림 구독이 모두 즉시 삭제되며 되돌릴 수 없습니다.</li>
+<li><b>데이터 내려받기</b>: 설정 → 데이터 → 내보내기 (JSON)</li>
+<li><b>알림 끄기</b>: 설정 → 알림 → 끄기 (구독 정보가 서버에서 삭제됩니다)</li>
+<li>열람·정정·처리정지 요청은 아래 연락처로 보내주세요.</li>
+</ul>
+
+<h2>7. 만 14세 미만</h2>
+<p>만 14세 미만 아동을 대상으로 하지 않으며, 의도적으로 개인정보를 수집하지 않습니다.</p>
+
+<h2>8. 연락처</h2>
+<p>kimbs4560@pusan.ac.kr</p>
+
+<h2>9. 변경 고지</h2>
+<p>내용이 바뀌면 이 페이지의 최종 수정일을 갱신하고, 중요한 변경은 앱 안에서 알립니다.</p>
+
+<div class="en">
+<h1>Day<b>nua</b> Privacy Policy</h1>
+<div class="date">Last updated: 17 September 2026</div>
+
+<div class="box">Daynua never uses your task content for advertising or analytics. Without an account nothing
+leaves your device; with an account it is stored only to sync across your devices. You can delete your
+account and all data from inside the app at any time.</div>
+
+<h2>What we collect</h2>
+<ul>
+<li><b>Email address</b> — to sign in and reset your password.</li>
+<li><b>Tasks, categories, notes and completion history</b> — only while signed in, only to sync your devices.</li>
+<li><b>Push subscription</b> (browser endpoint, reminder time, time zone) — only if you turn reminders on.</li>
+</ul>
+<p class="sub">No location, contacts, advertising identifiers or usage tracking. Passwords are hashed by
+Supabase; we never see them.</p>
+
+<h2>Reminders</h2>
+<p>To reach you with the app closed, our server sends an <b>empty</b> push at your chosen time. The text you
+see is composed <b>on your device</b> from a local summary, so task content never travels through the push
+service. The server only checks how many tasks remain, to decide whether to send at all.</p>
+
+<h2>Processors</h2>
+<p>Supabase (database, auth, push · AWS ap-northeast-2), Netlify (hosting), Nager.Date (public holidays —
+receives only a country code and year). We do not sell or share your data.</p>
+
+<h2>Retention &amp; your rights</h2>
+<p>Data is kept while your account exists and is deleted immediately when you delete it
+(Account → <b>Delete account</b>). Export your data any time from Settings → Data → Export.
+Contact: kimbs4560@pusan.ac.kr</p>
+
+<h2>Children</h2>
+<p>Daynua is not directed at children under 14 and does not knowingly collect their data.</p>
+</div>
+</main>
+</body>
+</html>
