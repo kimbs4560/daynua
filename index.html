@@ -191,6 +191,9 @@ input,select,textarea{font:inherit;color:inherit}
    (✓ 는 다시 그릴 때마다 튀면 안 된다 — 끝낸 그 순간에만 animate 가 .pop 을 붙인다) */
 .chk{position:absolute;right:-1px;top:2px;width:17px;height:17px;padding:3.5px;
   border-radius:50%;background:var(--accent);color:var(--on-accent)}
+/* 온전히 끝낸 날은 꽉 찬 배지, 미룬 게 있어 '남은 것만 없는' 날은 테두리만.
+   둘을 같은 모양으로 그리면 ✓ 가 거짓말이 되고, 하나만 그리면 며칠씩 아무 표시도 안 남는다. */
+.fin.soft .chk{background:none;border:2px solid var(--accent);color:var(--accent-ink)}
 /* 폰에서는 '남은 개수'가 서던 줄이 완료한 날엔 비어 있다 — 그 자리를 쓴다.
    달력 배경을 완료율로 칠하던 방식은 예전에 없앴다(색은 '분류'의 몫). 자리만 빌린다. */
 @media (max-width:899px){
@@ -831,7 +834,7 @@ dialog input:focus,dialog select:focus{border-color:var(--accent)}
 const SUPABASE_URL = 'https://cjhwxjznuleyfcbwwvtb.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_acxKbtekhqwFZwI0EUtArg_3FSj5AHh';
 const VAPID_PUBLIC = 'BItluVUoPAOjdIacpE7-6Ko45leNKobu8SbCNP1L6zdozMUrtFBNjh7ncFVZGSvwdHf4vNkYQKj5BarWq01G0hE';
-const BUILD = '2026-09-19.17';
+const BUILD = '2026-09-19.18';
 const $ = s => document.querySelector(s);
 
 for(const k of ['doc','doneOpen','countries']){           // 하루칸 → Daynua 키 이관
@@ -962,7 +965,7 @@ const I18N = {
   movedN:(n,s)=>`${n}개를 ${s}로 옮겼습니다`, movedLater:n=>`${n}개를 나중에로 보냈습니다`,
   copyDay:'이 날 계획 복사', copiedN:(n,s)=>`${n}개를 ${s}로 복사했습니다`,
   allDoneDay:'모두 완료한 날입니다',
-  aTasks:n=>`할 일 ${n}개`, aAllDone:'모두 완료',
+  aTasks:n=>`할 일 ${n}개`, aAllDone:'모두 완료', aCleared:'남은 일 없음 (일부는 미룸)',
   aSomeDone:(n,d)=>`할 일 ${n}개 중 ${d}개 완료`,
   firstHint:'할 일을 적고 Enter 만 누르면 됩니다. 날짜와 분류는 나중에 정해도 돼요.',
   allTime:'전체', thisYear:'올해', recent:'최근 했던 일', activity:'활동',
@@ -1090,7 +1093,7 @@ const I18N = {
   movedN:(n,s)=>`Moved ${n} to ${s}`, movedLater:n=>`Moved ${n} to Someday`,
   copyDay:'Copy this day’s plan', copiedN:(n,s)=>`Copied ${n} to ${s}`,
   allDoneDay:'Everything here is done',
-  aTasks:n=>`${n} tasks`, aAllDone:'all completed',
+  aTasks:n=>`${n} tasks`, aAllDone:'all completed', aCleared:'nothing left (some moved)',
   aSomeDone:(n,d)=>`${d} of ${n} completed`,
   firstHint:'Type and press Enter. Dates and categories can wait.',
   allTime:'All time', thisYear:'This year', recent:'Recently done', activity:'Activity',
@@ -1198,6 +1201,10 @@ function daySummary(list, miss = 0){
   }
   return {done, actionable, waiting, skipped, missed:miss|0,
           total: done + actionable + (miss|0), all: list.length,
+          /* cleared = 이 날에 더 할 게 남지 않았다 (날짜 패널이 '다 끝냈어요' 라고 말하는 기준).
+             complete = 거기에 더해 다른 날로 미룬 것도 없다 — 온전히 끝낸 날.
+             달력은 둘 다 표시하되 무게를 달리한다. 그래야 ✓ 가 거짓말을 하지 않는다. */
+          cleared: actionable === 0 && done > 0,
           complete: actionable === 0 && done > 0 && !miss};
 }
 const dayComplete = (list, miss = 0) => daySummary(list, miss).complete;
@@ -1420,6 +1427,10 @@ if(location.hash === '#test'){
   console.assert(daySummary([{d:true}], 1).complete === false, '놓친 게 있으면 완료가 아니다');
   console.assert(daySummary([{w:true}]).complete === false, '한 것이 없으면 완료가 아니다');
   console.assert(daySummary([]).complete === false, '빈 날은 완료가 아니다');
+  console.assert(daySummary([{d:true}], 2).cleared === true, '미뤘어도 남은 게 없으면 정리된 날');
+  console.assert(daySummary([{d:true}], 2).complete === false, '미룬 게 있으면 온전한 완료는 아니다');
+  console.assert(daySummary([{d:true},{}]).cleared === false, '남은 게 있으면 정리된 날이 아니다');
+  console.assert(daySummary([]).cleared === false, '빈 날은 정리된 날이 아니다');
 
   /* ── 미룬 횟수의 뜻 ── */
   console.assert(isPostpone('2026-09-17','2026-09-20') === true,  '뒤로 미루면 센다');
@@ -1928,7 +1939,7 @@ function stripColor(h, target = 3){
 /* 한 칸에 필요한 것만 한 번에 계산한다 */
 function cellData(k){
   const list = bucket(k), s = sumOf(k);
-  return {list, complete:s.complete, left:s.actionable,
+  return {list, complete:s.complete, cleared:s.cleared, left:s.actionable,
           dist:catDist(list, doc.cats), visible:cellOrder(list).slice(0,3)};
 }
 let monthHasComplete = false;
@@ -1943,19 +1954,21 @@ function renderMonth(tk){
     if(s.complete && d.getMonth() === cur.getMonth()) monthHasComplete = true;
     const hn = holName(k), dn = doc.notes[k], w = d.getDay();
     const cls = ['cell', d.getMonth()!==cur.getMonth()?'out':'',
-      k===tk?'today':'', k===sel?'sel':'', s.complete?'fin':''].join(' ');
+      k===tk?'today':'', k===sel?'sel':'',
+      s.cleared ? (s.complete ? 'fin' : 'fin soft') : ''].join(' ');
     const nc = hn || w===0 ? 'var(--sun)' : w===6 ? 'var(--sat)' : '';
     const ev = s.visible.map(evHTML).join('')
       + (s.list.length>3 ? `<span class="more">${T('more')(s.list.length-3)}</span>` : '');
     const label = !s.list.length ? fmtDay.format(d)
       : s.complete ? `${fmtDay.format(d)}, ${T('aTasks')(s.list.length)}, ${T('aAllDone')}`
+      : s.cleared ? `${fmtDay.format(d)}, ${T('aTasks')(s.list.length)}, ${T('aCleared')}`
       : `${fmtDay.format(d)}, ${T('aSomeDone')(s.list.length, s.list.filter(t=>t.d).length)}`;
     return `<div class="${cls}" data-k="${k}" role="button" tabindex="0"
         aria-pressed="${k===sel}" aria-label="${esc(label)}">
-      <div class="cellTop"><span class="n mono" ${nc?`style="color:${nc}"`:''}>${d.getDate()}</span>${s.complete?CHK:''}</div>
+      <div class="cellTop"><span class="n mono" ${nc?`style="color:${nc}"`:''}>${d.getDate()}</span>${s.cleared?CHK:''}</div>
       ${hn?`<div class="hn" title="${esc(hn)}">${esc(hn)}</div>`:''}
       ${!hn && dn?`<div class="dn" title="${esc(dn)}">${esc(dn)}</div>`:''}
-      ${!s.complete && s.left?`<span class="left">${s.left}</span>`:''}
+      ${!s.cleared && s.left?`<span class="left">${s.left}</span>`:''}
       <div class="ev">${ev}</div>
       ${s.dist.length?`<div class="strip">${s.dist.map(x=>
         `<i class="${x.color?'':'none'}" style="--c:${x.color?stripColor(x.color):'var(--faint)'};flex:${x.ratio}"></i>`).join('')}</div>`:''}
@@ -1980,14 +1993,16 @@ function renderWeek(tk){
     const ord = cellOrder(list);
     const label = !list.length ? fmtDay.format(d)
       : s.complete ? `${fmtDay.format(d)}, ${T('aTasks')(list.length)}, ${T('aAllDone')}`
+      : s.cleared ? `${fmtDay.format(d)}, ${T('aTasks')(list.length)}, ${T('aCleared')}`
       : `${fmtDay.format(d)}, ${T('aSomeDone')(list.length, s.done)}`;
     const restD = Math.max(0, ord.length - MAX), restM = Math.max(0, ord.length - MOBILE);
-    return `<div class="wcard${k===tk?' today':''}${k===sel?' sel':''}" data-k="${k}" role="button"
+    return `<div class="wcard${k===tk?' today':''}${k===sel?' sel':''}${
+        s.cleared ? (s.complete ? ' fin' : ' fin soft') : ''}" data-k="${k}" role="button"
         tabindex="0" aria-pressed="${k===sel}" aria-label="${esc(label)}">
       <div class="wh"><span class="wd">${esc(wdS.format(d))}</span>
         <span class="wn mono" ${nc?`style="color:${nc}"`:''}>${d.getDate()}</span>
         <span class="wsp"></span>
-        ${s.complete ? CHK : s.actionable ? `<span class="wleft">${s.actionable}</span>` : ''}</div>
+        ${s.cleared ? CHK : s.actionable ? `<span class="wleft">${s.actionable}</span>` : ''}</div>
       ${dist.length?`<div class="strip">${dist.map(x=>
         `<i class="${x.color?'':'none'}" style="--c:${x.color?stripColor(x.color):'var(--faint)'};flex:${x.ratio}"></i>`).join('')}</div>`:''}
       <div class="wl">${ord.slice(0, MAX).map(evHTML).join('')}
