@@ -401,6 +401,9 @@ ul{list-style:none;margin:0;padding:0}
 li{display:flex;align-items:center;gap:9px;padding:6px 2px;border-radius:8px;flex-wrap:wrap;
   transition:background var(--mo-fast) var(--ease),opacity var(--mo-fast) var(--ease)}
 li.drag{opacity:.6}
+/* 끌어서 순서를 바꿀 때 어디에 놓이는지 — 줄 위/아래에 선 하나 */
+li.dropA{box-shadow:inset 0 2px 0 var(--accent)}
+li.dropB{box-shadow:inset 0 -2px 0 var(--accent)}
 /* 휴대폰에서 할 일을 꾹 누르면 iOS 가 글자 선택(돋보기·복사 메뉴)을 먼저 띄워
    앱의 꾹 누르기를 가로챈다. 달력 칸에는 있던 보호가 할 일 줄에는 없었다.
    글자를 직접 고치는 중일 때만 선택할 수 있게 둔다. */
@@ -834,7 +837,7 @@ dialog input:focus,dialog select:focus{border-color:var(--accent)}
 const SUPABASE_URL = 'https://cjhwxjznuleyfcbwwvtb.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_acxKbtekhqwFZwI0EUtArg_3FSj5AHh';
 const VAPID_PUBLIC = 'BItluVUoPAOjdIacpE7-6Ko45leNKobu8SbCNP1L6zdozMUrtFBNjh7ncFVZGSvwdHf4vNkYQKj5BarWq01G0hE';
-const BUILD = '2026-09-19.18';
+const BUILD = '2026-09-21.19';
 const $ = s => document.querySelector(s);
 
 for(const k of ['doc','doneOpen','countries']){           // 하루칸 → Daynua 키 이관
@@ -956,6 +959,7 @@ const I18N = {
   tipMobile:'할 일이나 날짜를 길게 누르면 옮기기·분류·삭제 메뉴가 열려요.',
   remainN:n=>`남은 할 일 ${n}개`, moveAllTo:s=>`${s}로 모두 이동`, pickDate2:'다른 날짜로 이동',
   allLater:'모두 나중에', delAll:'남은 일정 모두 삭제',
+  moveUp:'위로 올리기', moveDown:'아래로 내리기',
   showAllN:n=>`나머지 ${n}개 더 보기`,
   delDay:'이 날 기록 지우기',
   delDayAsk:n=>`완료한 일까지 포함해 이 날의 ${n}개를 지웁니다. 계속할까요?`,
@@ -1084,6 +1088,7 @@ const I18N = {
   tipMobile:'Press and hold a task or a date to move, categorise or delete it.',
   remainN:n=>`${n} left`, moveAllTo:s=>`Move all to ${s}`, pickDate2:'Move all to another date',
   allLater:'All to Someday', delAll:'Delete what is left',
+  moveUp:'Move up', moveDown:'Move down',
   showAllN:n=>`Show ${n} more`,
   delDay:'Clear this day',
   delDayAsk:n=>`This erases all ${n} items on this day, completed ones included. Continue?`,
@@ -1431,6 +1436,28 @@ if(location.hash === '#test'){
   console.assert(daySummary([{d:true}], 2).complete === false, '미룬 게 있으면 온전한 완료는 아니다');
   console.assert(daySummary([{d:true},{}]).cleared === false, '남은 게 있으면 정리된 날이 아니다');
   console.assert(daySummary([]).cleared === false, '빈 날은 정리된 날이 아니다');
+  /* 순서 바꾸기 — 배열만 손대므로 순수 함수로 확인한다 */
+  {
+    const ids = l => l.map(x=>x.id).join('');
+    const mk = (id, c) => ({id, c});
+    const move = (l, id, toId, before) => {      // reorderTo 의 알맹이
+      const t = l.find(x=>x.id===id), g = l.find(x=>x.id===toId);
+      l.splice(l.indexOf(t),1); const j = l.indexOf(g); l.splice(before?j:j+1,0,t); return l;
+    };
+    console.assert(ids(move([mk('a'),mk('b'),mk('c')],'c','a',true))==='cab','위에 놓기');
+    console.assert(ids(move([mk('a'),mk('b'),mk('c')],'a','c',false))==='bca','아래에 놓기');
+    console.assert(ids(move([mk('a'),mk('b'),mk('c')],'a','b',true))==='abc','제자리는 그대로');
+    const step = (l, id, dir) => {               // nudgeOrder 의 알맹이 (같은 분류만)
+      const t = l.find(x=>x.id===id);
+      const same = l.filter(x=>(x.c||'')===(t.c||''));
+      const q = same.indexOf(t)+dir; if(q<0||q>=same.length) return l;
+      const o = same[q]; l.splice(l.indexOf(t),1);
+      const j = l.indexOf(o); l.splice(dir>0?j+1:j,0,t); return l;
+    };
+    console.assert(ids(step([mk('a','x'),mk('b','y'),mk('c','x')],'c',-1))==='cab','다른 분류는 건너뛴다');
+    console.assert(ids(step([mk('a','x'),mk('b','x')],'a',-1))==='ab','맨 위에서 위로는 무해');
+    console.assert(ids(step([mk('a','x'),mk('b','x')],'b',1))==='ab','맨 아래에서 아래로는 무해');
+  }
 
   /* ── 미룬 횟수의 뜻 ── */
   console.assert(isPostpone('2026-09-17','2026-09-20') === true,  '뒤로 미루면 센다');
@@ -2308,6 +2335,43 @@ function renderSearch(){
   el.focus(); el.setSelectionRange(query.length, query.length);
 }
 
+/* ─── 순서 바꾸기 ───
+   같은 날 안에서 배열 순서를 바꾼다. 화면의 순서가 곧 배열 순서이기 때문에
+   (분류로 나눠 보여줄 뿐 정렬 규칙은 '끝낸 것만 뒤로') 배열만 손대면 된다. */
+function reorderTo(from, id, toId, before){
+  const list = doc.todos[from]; if(!list) return;
+  const t = list.find(x => x.id === id), tgt = list.find(x => x.id === toId);
+  if(!t || !tgt || t === tgt) return;
+  list.splice(list.indexOf(t), 1);
+  const j = list.indexOf(tgt);
+  list.splice(before ? j : j + 1, 0, t);
+  /* 다른 분류의 줄 위에 놓았다면 그 분류로 간다 — 놓은 자리가 곧 뜻이다 */
+  if((t.c || '') !== (tgt.c || '')){ if(tgt.c) t.c = tgt.c; else delete t.c; }
+  touch();
+}
+/* 한 칸씩 — 손가락으로는 끌어놓기가 안 되므로 메뉴에서 이걸 쓴다.
+   같은 분류 안에서만 움직인다. 분류를 넘나드는 건 '분류' 메뉴의 몫. */
+function nudgeOrder(from, id, dir){
+  const list = doc.todos[from]; if(!list) return;
+  const t = list.find(x => x.id === id); if(!t) return;
+  const same = list.filter(x => (x.c || '') === (t.c || '') && !x.d && !x.sk);
+  const p = same.indexOf(t), q = p + dir;
+  if(p < 0 || q < 0 || q >= same.length) return;
+  const other = same[q];
+  list.splice(list.indexOf(t), 1);
+  const j = list.indexOf(other);
+  list.splice(dir > 0 ? j + 1 : j, 0, t);
+  touch();
+}
+/* 이 줄이 제 분류 안에서 몇 번째인지 — 메뉴에 위/아래를 보여줄지 정한다 */
+function orderSpot(from, id){
+  const list = doc.todos[from] || [];
+  const t = list.find(x => x.id === id);
+  if(!t || t.d || t.sk) return null;
+  const same = list.filter(x => (x.c || '') === (t.c || '') && !x.d && !x.sk);
+  return {i: same.indexOf(t), n: same.length};
+}
+
 /* ─── 달력 클릭 & 드롭 ─── */
 $('#cal').addEventListener('click', e=>{
   if(Date.now() - lpFired < 700){ lpFired = 0; return; }     // 길게 누른 직후 따라오는 클릭만 무시
@@ -2370,12 +2434,26 @@ $('#side').addEventListener('dragstart', e=>{
   e.dataTransfer.setData('text/plain', JSON.stringify({from:li.dataset.from, id:li.dataset.id}));
   e.dataTransfer.effectAllowed = 'move';
   li.classList.add('drag');
+  dragRow = {from: li.dataset.from, id: li.dataset.id};   // dragover 에서는 내용을 못 읽는다
 });
+let dragRow = null;
+const clearDropLine = () =>
+  document.querySelectorAll('#side .dropA,#side .dropB')
+    .forEach(x => x.classList.remove('dropA','dropB'));
 $('#side').addEventListener('dragend', e=>{
+  dragRow = null;
+  clearDropLine();
   e.target.closest('li')?.classList.remove('drag');
   document.querySelectorAll('#side .drag').forEach(x=>x.classList.remove('drag'));
   document.querySelectorAll('#side .over').forEach(x=>x.classList.remove('over'));
 });
+/* 끌고 있는 줄이 같은 날의 다른 줄 위에 있으면 '순서 바꾸기' — 위/아래 어디에 놓을지 선으로 */
+const dropRow = e => {
+  if(!dragRow) return null;
+  const row = e.target.closest('li[data-from]');
+  if(!row || row.dataset.id === dragRow.id || row.dataset.from !== dragRow.from) return null;
+  return row;
+};
 /* 분류 영역(머리글 + 그 아래 목록) 어디에 놓아도, 위쪽 분류 칩에 놓아도 그 분류로 옮긴다 */
 const dropCat = e => {
   const chip = e.target.closest('#qcat button[data-q]');
@@ -2383,6 +2461,16 @@ const dropCat = e => {
   return e.target.closest('.cat');
 };
 $('#side').addEventListener('dragover', e=>{
+  const row = dropRow(e);
+  if(row){                                     // 줄 위 — 순서 바꾸기가 먼저다
+    e.preventDefault();
+    clearDropLine();
+    document.querySelectorAll('#side .over').forEach(x=>x.classList.remove('over'));
+    const r = row.getBoundingClientRect();
+    row.classList.add(e.clientY < r.top + r.height / 2 ? 'dropA' : 'dropB');
+    return;
+  }
+  clearDropLine();
   const el = dropCat(e); if(!el) return;
   e.preventDefault();
   document.querySelectorAll('#side .over').forEach(x=>x.classList.remove('over'));
@@ -2390,6 +2478,14 @@ $('#side').addEventListener('dragover', e=>{
 });
 $('#side').addEventListener('dragleave', e=>dropCat(e)?.classList.remove('over'));
 $('#side').addEventListener('drop', e=>{
+  const row = dropRow(e);
+  if(row){
+    e.preventDefault();
+    const before = row.classList.contains('dropA');
+    const src = dragRow;
+    clearDropLine(); dragRow = null;
+    return reorderTo(src.from, src.id, row.dataset.id, before);
+  }
   const el = dropCat(e); if(!el) return;
   e.preventDefault();
   el.classList.remove('over');
@@ -2697,6 +2793,7 @@ function openMenu(x, y, from, id){
   menuAt = [x, y];
   const t = bucket(from).find(v=>v.id===id) || {};
   const tk = todayKey();
+  const spot = orderSpot(from, id);            // 제 분류 안에서 몇 번째인가
   const opts = [
     ['today',    T('today'),     tk],
     ['tomorrow', T('tomorrow'),  shift(tk,1)],
@@ -2718,6 +2815,8 @@ function openMenu(x, y, from, id){
      <button data-a="cats">${T('category')}<span class="k">${esc(catOf(t.c)?.n || T('noCat'))}</span></button>
      <button data-a="sub">${T('subs')}</button>
      <button data-a="note">${T('note')}</button>
+     ${spot && spot.i > 0 ? `<button data-a="up">${T('moveUp')}</button>` : ''}
+     ${spot && spot.i >= 0 && spot.i < spot.n - 1 ? `<button data-a="down">${T('moveDown')}</button>` : ''}
      ${t.d ? '' : `<button data-a="wait">${t.w ? T('waitOff') : T('waitOn')}</button>`}
      ${t.r && !t.d ? `<button data-a="skip">${T('skip')}</button>` : ''}
      <div class="sep"></div>
@@ -2767,6 +2866,10 @@ const onTodoAction = e=>{
     if(!t) return;
     if(btn.dataset.cat) t.c = btn.dataset.cat; else delete t.c;
     return touch();
+  }
+  if(a === 'up' || a === 'down'){             // 시트는 그대로 두고 순서만 바꾼다 — 연달아 누르게
+    nudgeOrder(from, id, a === 'up' ? -1 : 1);
+    return openMenu(menuAt[0], menuAt[1], from, id);
   }
   if(a === 'cats'){ menuCats = true; return openMenu(menuAt[0], menuAt[1], from, id); }
   if(a === 'back'){ menuCats = false; return openMenu(menuAt[0], menuAt[1], from, id); }
