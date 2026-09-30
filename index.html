@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#fff8f1">
 <title>Daynua</title>
 <link rel="manifest" href="manifest.json">
@@ -57,10 +58,13 @@ li.out,.subs .s.out{opacity:0;transform:scale(.985);
 .toast.out{opacity:0;transform:translate(-50%,6px);
   transition:opacity var(--mo-fast) var(--ease),transform var(--mo-fast) var(--ease)}
 
+/* 빠르게 두 번 눌러도 화면이 확대되지 않게 (체크·별을 연달아 누를 때) */
+html{touch-action:manipulation}
+/* 설치해서 쓸 때는 화면을 아래로 당겨 새로고침되는 일이 없게 — 끌기·쓸기와 겹치고 쓰던 글이 날아간다 */
+@media (display-mode:standalone){ html{overscroll-behavior-y:contain} }
 input[type=date]::-webkit-calendar-picker-indicator,
 input[type=time]::-webkit-calendar-picker-indicator{opacity:.75;cursor:pointer}
-input[type=date]:hover::-webkit-calendar-picker-indicator,
-input[type=time]:hover::-webkit-calendar-picker-indicator{opacity:1}
+@media (hover:hover){input[type=date]:hover::-webkit-calendar-picker-indicator,input[type=time]:hover::-webkit-calendar-picker-indicator{opacity:1}}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:var(--bg);color:var(--ink);font-size:16px;
   font-family:-apple-system,BlinkMacSystemFont,"Pretendard","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
@@ -101,13 +105,13 @@ input,select,textarea{font:inherit;color:inherit}
 /* 눌렸다는 것만 알려주면 된다. 달력 칸이나 할 일 줄 전체에는 쓰지 않는다 — 화면이 들썩인다 */
 .iconbtn:active,.nav:active,.chip:active,.acct:active,.vseg button:active,
 .dnbtn:active,.row button:active,#sheet button:active,.days button:active{transform:scale(.97)}
-.iconbtn:hover{background:var(--fill);color:var(--ink)}
+@media (hover:hover){.iconbtn:hover{background:var(--fill);color:var(--ink)}}
 .iconbtn.on{background:var(--ink);color:var(--bg)}
 .iconbtn .cnt{position:absolute;top:1px;right:1px;min-width:15px;height:15px;border-radius:8px;
   background:var(--accent);color:var(--on-accent);font-size:9.5px;font-weight:800;line-height:15px;padding:0 3px}
 .acct{display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:700;color:var(--sub);
   border:1px solid var(--line);border-radius:999px;padding:5px 12px 5px 5px;max-width:170px;flex:none}
-.acct:hover{border-color:var(--faint)}
+@media (hover:hover){.acct:hover{border-color:var(--faint)}}
 .acct .av{width:22px;height:22px;border-radius:50%;background:var(--accent);color:var(--on-accent);flex:none;
   display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800}
 .acct .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -123,8 +127,15 @@ input,select,textarea{font:inherit;color:inherit}
   box-shadow:0 8px 24px rgba(0,0,0,.22);line-height:0;color:var(--bg);
   display:flex;align-items:center;justify-content:center;z-index:5;transition:transform .18s}
 #fab svg{width:23px;height:23px}
-#fab:hover{transform:rotate(45deg) scale(1.06)}
+@media (hover:hover){#fab:hover{transform:rotate(45deg) scale(1.06)}}
 #fab:active{transform:scale(.96)}
+/* 폰에서는 설정 단추를 위로 올린다. 오른쪽 아래에 떠 있던 톱니가 목록 줄의 ☆·⋯ 바로 위에 올라앉아
+   그 줄의 ⋯ 를 누르면 메뉴 대신 설정이 열렸다. 자주 쓰는 동작도 아니라 목록 위에 떠 있을 이유가 없다. */
+#btnCfg{display:none}
+@media (max-width:899px){ #btnCfg{display:flex} #fab{display:none} }
+/* 아주 좁은 화면(폴드 바깥 화면 등)에서는 윗줄이 넘치지 않게 여백부터 줄인다 */
+@media (max-width:359px){ .top{gap:3px} .brand{letter-spacing:1.5px} }
+@media (max-width:340px){ .acct.out .nm{display:none} .acct.out{padding:4px} }
 
 .bar2{display:flex;align-items:center;gap:8px;row-gap:8px;flex-wrap:wrap;margin-bottom:12px}
 /* '오늘'과 보기 선택기는 한 덩어리로 오른쪽 끝. 자리가 모자라면 둘이 함께 아랫줄로 내려가고,
@@ -143,9 +154,9 @@ input,select,textarea{font:inherit;color:inherit}
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:0 1 auto;min-width:92px}
 .bar2 h1 small{font-size:.54em;color:var(--sub);font-weight:600;letter-spacing:0;margin-left:5px}
 .nav{width:30px;height:32px;border-radius:9px;color:var(--sub);font-size:19px;line-height:1;flex:none}
-.nav:hover{background:var(--fill)}
+@media (hover:hover){.nav:hover{background:var(--fill)}}
 .chip{font-size:12px;font-weight:700;color:var(--sub);border:1px solid var(--line);border-radius:9px;padding:6px 10px;flex:none}
-.chip:hover{border-color:var(--faint)}
+@media (hover:hover){.chip:hover{border-color:var(--faint)}}
 .chip.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 /* 주 · 월 · 년 — 지금 보고 있는 것만 강조. '오늘'과 역할이 다르므로 생김새도 다르다.
    (설정 안의 토글도 .seg 를 쓰므로 이름을 따로 둔다 — 스타일이 새지 않게) */
@@ -154,7 +165,7 @@ input,select,textarea{font:inherit;color:inherit}
   border-right:1px solid var(--line);white-space:nowrap}
 .vseg button:first-child{border-radius:8px 0 0 8px}
 .vseg button:last-child{border-right:0;border-radius:0 8px 8px 0}
-.vseg button:hover{background:var(--fill);color:var(--ink)}
+@media (hover:hover){.vseg button:hover{background:var(--fill);color:var(--ink)}}
 .vseg button.on{background:var(--accent);color:var(--on-accent)}
 @media (max-width:359px){ .vseg button{padding:6px 5px;font-size:11.5px} .chip{padding:6px 6px;font-size:11.5px} }
 
@@ -178,7 +189,7 @@ input,select,textarea{font:inherit;color:inherit}
   cursor:pointer;border:1.5px solid transparent;display:flex;flex-direction:column;
   padding:4px 4px 5px;
   transition:border-color var(--mo) var(--ease),background var(--mo-fast) var(--ease)}
-.cell:hover{background:var(--line)}
+@media (hover:hover){.cell:hover{background:var(--line)}}
 /* 폰에서는 달력이 첫 화면의 절반을 먹어 할 일이 한 줄도 안 보였다 */
 @media (max-width:899px){ .cell{min-height:52px} }
 /* 길게 누르기 — 500ms 동안 아무 반응이 없으면 이상하다. 살짝 눌린 티만 낸다 */
@@ -203,8 +214,8 @@ input,select,textarea{font:inherit;color:inherit}
 }
 /* 숫자 색은 건드리지 않는다. 지금도 일요일·공휴일·오늘이 강조색을 쓰고 있어서
    완료까지 같은 색을 쓰면 무엇을 뜻하는 색인지 알 수 없게 된다 — 뜻은 배지 하나로 족하다. */
-.cell.out{background:none}                     /* 다른 달은 '옅게'가 아니라 '비워서' 구분 */
-.cell.out:hover{background:var(--fill)}
+.cell.out{background:none}                     @media (hover:hover){/* 다른 달은 '옅게'가 아니라 '비워서' 구분 */
+.cell.out:hover{background:var(--fill)}}
 .cell.out .n{color:var(--sub)}                 /* 흐려 보여도 며칠인지는 읽혀야 한다 */
 .cell.out .left,.cell.out .strip{display:none} /* 다른 달 잔여 개수·구성 막대는 군더더기 */
 .cell.out .e,.cell.out .more{opacity:.7}
@@ -247,7 +258,7 @@ input,select,textarea{font:inherit;color:inherit}
   padding:7px 10px;display:grid;grid-template-columns:auto 1fr;gap:2px 10px;align-items:center;
   min-height:46px;user-select:none;-webkit-touch-callout:none;
   transition:border-color var(--mo) var(--ease),background var(--mo-fast) var(--ease)}
-.wcard:hover{background:var(--line)}
+@media (hover:hover){.wcard:hover{background:var(--line)}}
 .wcard.over{border-color:var(--accent);border-style:dashed}
 .wh{display:flex;align-items:center;gap:5px;min-width:74px}
 .wh .wd{font-size:11px;font-weight:700;color:var(--sub)}
@@ -292,7 +303,7 @@ input,select,textarea{font:inherit;color:inherit}
 .ym{min-width:0}
 .ymt{display:block;width:100%;text-align:left;font-size:13px;font-weight:800;padding:0 2px 5px;
   color:var(--ink);border-radius:6px}
-.ymt:hover{color:var(--accent-ink)}
+@media (hover:hover){.ymt:hover{color:var(--accent-ink)}}
 .ywd,.yg{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
 .ywd span{text-align:center;font-size:9px;font-weight:700;color:var(--sub);padding-bottom:2px}
 .yd{position:relative;aspect-ratio:1;display:flex;align-items:center;justify-content:center;
@@ -307,7 +318,7 @@ input,select,textarea{font:inherit;color:inherit}
 .yd.a1,.yd.a2{color:var(--ink)}
 .yd.a3{color:var(--on-accent)}
 .yd{transition:box-shadow var(--mo-fast) var(--ease),color var(--mo-slow) var(--ease)}
-.yd[data-k]:hover{box-shadow:0 0 0 1.5px var(--faint)}
+@media (hover:hover){.yd[data-k]:hover{box-shadow:0 0 0 1.5px var(--faint)}}
 .yd.today{box-shadow:0 0 0 2px var(--accent);font-weight:800}
 @media (min-width:600px){ .year{grid-template-columns:repeat(3,1fr);gap:20px 24px} }
 @media (min-width:900px){
@@ -337,9 +348,10 @@ input,select,textarea{font:inherit;color:inherit}
 .daynote input{flex:1;border:0;outline:none;background:none;font-size:12.5px;font-style:italic;padding:3px 0}
 .daynote input::placeholder{color:var(--faint);font-style:normal}
 .daynote.ro{font-style:italic;cursor:pointer}
-.daynote.ro:hover{color:var(--ink)}
+@media (hover:hover){.daynote.ro:hover{color:var(--ink)}}
 .dnbtn{font-size:12px;color:var(--faint);padding:0 4px;line-height:1}
-.dnbtn.on,.dnbtn:hover{color:var(--accent-ink)}
+.dnbtn.on{color:var(--accent-ink)}
+@media (hover:hover){.dnbtn:hover{color:var(--accent-ink)}}
 .qadd.main{background:none;border:1.5px dashed var(--line);border-radius:12px;margin:0 0 2px;padding:2px 13px}
 .qadd.main input{font-size:15.5px;padding:12px 0;font-weight:500}
 .qadd.main{transition:border-color var(--mo) var(--ease),background var(--mo) var(--ease)}
@@ -357,11 +369,11 @@ input,select,textarea{font:inherit;color:inherit}
 .qcat button{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:700;
   color:var(--sub);background:var(--fill);border-radius:999px;padding:5px 11px;line-height:1.3}
 .qcat button i{width:7px;height:7px;border-radius:50%;display:block;flex:none}
-.qcat button:hover{color:var(--ink)}
+@media (hover:hover){.qcat button:hover{color:var(--ink)}}
 .qcat button.on{background:var(--ink);color:var(--bg)}
 .qcat button.on i{box-shadow:0 0 0 1px var(--bg)}
 .qcat button.newc{background:none;border:1px dashed var(--line);color:var(--faint)}
-.qcat button.newc:hover{border-color:var(--accent);color:var(--accent-ink)}
+@media (hover:hover){.qcat button.newc:hover{border-color:var(--accent);color:var(--accent-ink)}}
 @media (min-width:1600px){ .qcat button{font-size:12.5px;padding:6px 13px} }
 .tip{display:flex;align-items:center;gap:12px;background:var(--fill);border-radius:11px;
   padding:10px 13px;margin:8px 0 2px;font-size:12.5px;color:var(--sub);line-height:1.5}
@@ -382,11 +394,11 @@ input,select,textarea{font:inherit;color:inherit}
 .nudge .acts{display:flex;gap:6px;flex-wrap:wrap}
 .nudge .acts button{font-size:11.5px;font-weight:700;color:var(--sub);background:var(--card);
   border:1px solid var(--line);border-radius:8px;padding:5px 9px}
-.nudge .acts button:hover{border-color:var(--faint);color:var(--ink)}
+@media (hover:hover){.nudge .acts button:hover{border-color:var(--faint);color:var(--ink)}}
 
 .cat{margin-top:12px}
 .ch{display:flex;align-items:center;gap:7px;border-radius:8px;cursor:pointer;margin:0 -4px;padding:4px 6px 5px}
-.ch:hover{background:var(--fill)}
+@media (hover:hover){.ch:hover{background:var(--fill)}}
 .ch .sq{width:9px;height:9px;border-radius:3px;flex:none}
 .ch .nm{font-size:12.5px;font-weight:700}
 .cat.over{outline:1.5px dashed var(--accent);outline-offset:5px;border-radius:10px}
@@ -395,12 +407,22 @@ input,select,textarea{font:inherit;color:inherit}
 .qcat button[draggable]{cursor:grab}
 .ch .edit{margin-left:auto;color:var(--faint);font-size:14px;line-height:1;opacity:0;
   transition:opacity var(--mo-fast) var(--ease)}
-.ch:hover .edit{opacity:1}
+@media (hover:hover){.ch:hover .edit{opacity:1}}
 @media (hover:none){.ch .edit{opacity:1}}
 ul{list-style:none;margin:0;padding:0}
 li{display:flex;align-items:center;gap:9px;padding:6px 2px;border-radius:8px;flex-wrap:wrap;
   transition:background var(--mo-fast) var(--ease),opacity var(--mo-fast) var(--ease)}
 li.drag{opacity:.6}
+/* 손가락으로 들어 올린 줄 — 원래 자리는 흐리게 남기고, 손가락을 따라오는 사본을 띄운다 */
+li.lifted{opacity:.3}
+li.ghost .tx{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;word-break:normal}
+li.ghost{position:fixed;z-index:60;margin:0;pointer-events:none;background:var(--card);
+  border:1px solid var(--line);border-radius:12px;padding:8px 10px;opacity:.97;
+  box-shadow:0 12px 30px rgba(0,0,0,.4);will-change:transform;transform:scale(1.03);transition:none}
+/* 끄는 동안에는 화면이 같이 밀리지 않게 하고(스크롤은 가장자리에 대면 저절로), 글자 선택도 막는다 */
+html.td{overflow:hidden}
+html.td *{user-select:none;-webkit-user-select:none}
+html.td #fab{opacity:0;pointer-events:none}
 /* 끌어서 순서를 바꿀 때 어디에 놓이는지 — 줄 위/아래에 선 하나 */
 li.dropA{box-shadow:inset 0 2px 0 var(--accent)}
 li.dropB{box-shadow:inset 0 -2px 0 var(--accent)}
@@ -452,12 +474,11 @@ li .rp,li .wi{color:var(--faint);flex:none;display:flex;align-items:center;line-
 li .st,li .mv{color:var(--faint);font-size:15px;padding:0 4px;flex:none;line-height:1;
   transition:color var(--mo-fast) var(--ease)}
 li .st.on{color:var(--accent-ink)}
-li .st:hover,li .mv:hover{color:var(--accent-ink)}
+@media (hover:hover){li .st:hover,li .mv:hover{color:var(--accent-ink)}}
 li .mv{opacity:0;font-weight:800;transition:opacity var(--mo-fast) var(--ease)}
-/* 손가락으로 쓸 때는 줄마다 점 세 개가 떠 있을 이유가 없다 — 꾹 누르면 같은 메뉴가 나온다.
-   (iOS 의 할 일 앱들이 쓰는 방식. 대신 아래 안내가 그 동작을 한 번 가르쳐준다) */
-@media (hover:none){ li .mv{display:none} }
-li:hover .mv{opacity:1}
+@media (hover:hover){/* 폰에서도 점 세 개(⋯)는 보인다. 꾹 누르기는 '끌어 옮기기'에 쓰고, 메뉴는 이 단추로 연다.
+   (꾹 누르기에 메뉴까지 얹으면 우클릭처럼 떠서 끌려던 손이 메뉴를 만난다) */
+li:hover .mv{opacity:1}}
 @media (hover:none){li .mv{opacity:1}}
 .note{flex-basis:100%;margin-left:27px;font-size:11.5px;color:var(--sub);outline:none;
   padding:1px 0 2px;min-height:15px;text-decoration:none!important}
@@ -465,7 +486,7 @@ li:hover .mv{opacity:1}
 .note:focus{color:var(--ink)}
 li .subn{font-size:10.5px;font-weight:800;color:var(--sub);background:var(--fill);
   border-radius:5px;padding:2px 6px;flex:none;text-decoration:none!important}
-li .subn:hover{color:var(--ink)}
+@media (hover:hover){li .subn:hover{color:var(--ink)}}
 .subs{flex-basis:100%;margin:2px 0 4px 27px;text-decoration:none!important}
 .subs .s{display:flex;align-items:center;gap:8px;padding:3px 0;font-size:13px;color:var(--ink)}
 .subs .s.d span{color:var(--sub);text-decoration:line-through}
@@ -475,7 +496,7 @@ li .subn:hover{color:var(--ink)}
 .subs .s.d button.sck::after{content:"✓";color:var(--card);font-size:9px;font-weight:800;line-height:1}
 .subs .s span{flex:1;outline:none;word-break:break-all}
 .subs .s .sx{color:var(--faint);font-size:13px;padding:0 3px}
-.subs .s .sx:hover{color:var(--accent-ink)}
+@media (hover:hover){.subs .s .sx:hover{color:var(--accent-ink)}}
 .subs input{width:100%;border:0;outline:none;background:none;font-size:13px;padding:4px 0 4px 22px;color:var(--ink)}
 .subs input::placeholder{color:var(--faint)}
 .add{width:100%;border:0;outline:none;background:none;font-size:15px;padding:6px 2px 6px 27px}
@@ -487,12 +508,12 @@ li .subn:hover{color:var(--ink)}
 .fold{width:100%;display:flex;align-items:center;gap:8px;font-size:11.5px;font-weight:800;
   letter-spacing:.3px;color:var(--sub);padding:11px 4px 10px;margin-top:10px;
   border-top:1px solid var(--line);border-radius:0 0 8px 8px}
-.fold:hover{color:var(--ink);background:var(--fill)}
+@media (hover:hover){.fold:hover{color:var(--ink);background:var(--fill)}}
 .fold .ar{line-height:0;display:flex;transition:transform var(--mo) var(--ease)}
 .fold.open .ar{transform:rotate(180deg)}      /* 펼치면 위를 가리킨다 (접기) */
 .fold .k{margin-left:auto;font-weight:800;color:var(--faint);
   background:var(--fill);border-radius:6px;padding:1px 7px;line-height:1.6}
-.fold:hover .k{color:var(--sub)}
+@media (hover:hover){.fold:hover .k{color:var(--sub)}}
 
 .qadd{display:flex;align-items:center;gap:8px;background:var(--fill);border-radius:11px;padding:2px 12px;margin-bottom:6px}
 .qadd input{flex:1;border:0;outline:none;background:none;font-size:15px;padding:11px 0}
@@ -513,12 +534,12 @@ li .took{font-size:10.5px;font-weight:700;color:var(--sub);background:var(--fill
 .res .hist{font-size:11.5px;color:var(--sub);margin-top:6px;display:flex;flex-direction:column;gap:3px}
 .res .hist div{display:flex;gap:8px}
 .res .hist b{font-weight:700;cursor:pointer;flex:none}
-.res .hist b:hover{color:var(--accent-ink);text-decoration:underline}
+@media (hover:hover){.res .hist b:hover{color:var(--accent-ink);text-decoration:underline}}
 .res .hist i{font-style:normal;color:var(--faint);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .res .open{font-size:11.5px;color:var(--sub);margin-top:4px}
 .res .again{font-size:11.5px;font-weight:700;color:var(--accent-ink);margin-top:7px;
   border:1px solid var(--line);border-radius:8px;padding:5px 9px}
-.res .again:hover{border-color:var(--accent)}
+@media (hover:hover){.res .again:hover{border-color:var(--accent)}}
 
 .tiles{display:flex;gap:8px;margin:8px 0 4px}
 .tile{flex:1;background:var(--fill);border-radius:12px;padding:12px 10px;text-align:center}
@@ -539,7 +560,7 @@ li .took{font-size:10.5px;font-weight:700;color:var(--sub);background:var(--fill
   transition:opacity 110ms var(--ease),transform 110ms var(--ease)}
 #menu button{display:flex;width:100%;align-items:center;gap:9px;padding:9px 10px;border-radius:9px;
   font-size:13.5px;font-weight:600;text-align:left}
-#menu button:hover{background:var(--fill)}
+@media (hover:hover){#menu button:hover{background:var(--fill)}}
 #menu button .k{margin-left:auto;font-size:11px;color:var(--sub);font-weight:700}
 #menu .sep{height:1px;background:var(--line);margin:5px 4px}
 #menu input[type=date]{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:9px;
@@ -608,7 +629,7 @@ dialog input:focus,dialog select:focus{border-color:var(--accent)}
 .sw{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .sw button{width:28px;height:28px;border-radius:9px;border:2.5px solid transparent;
   transition:transform var(--mo-fast) var(--ease),border-color var(--mo-fast) var(--ease)}
-.sw button:hover{transform:scale(1.12)}
+@media (hover:hover){.sw button:hover{transform:scale(1.12)}}
 .sw button.on{border-color:var(--ink)}
 .sw.big{gap:9px;margin-bottom:6px}
 .sw.big button{width:34px;height:34px;border-radius:11px;position:relative}
@@ -663,14 +684,14 @@ dialog input:focus,dialog select:focus{border-color:var(--accent)}
 .rt .t{flex:1;font-size:14px}
 .rt .d{font-size:11px;color:var(--sub);flex:none}
 .rt .x{color:var(--faint);padding:0 4px}
-.rt .x:hover{color:var(--accent-ink)}
+@media (hover:hover){.rt .x:hover{color:var(--accent-ink)}}
 .days{display:flex;gap:5px;margin-bottom:9px}
 .days button{flex:1;padding:8px 0;border-radius:8px;background:var(--fill);font-size:12px;
   font-weight:700;color:var(--sub)}
 .days button.on{background:var(--accent);color:var(--on-accent)}
 .impbox{border:1px dashed var(--line);border-radius:12px;padding:18px;text-align:center;
   color:var(--sub);font-size:13px;cursor:pointer;line-height:1.7}
-.impbox:hover{border-color:var(--accent);color:var(--ink)}
+@media (hover:hover){.impbox:hover{border-color:var(--accent);color:var(--ink)}}
 .impstat{background:var(--fill);border-radius:12px;padding:14px;margin:12px 0;font-size:13px;line-height:1.9}
 .impstat b{font-size:16px}
 
@@ -679,7 +700,7 @@ dialog input:focus,dialog select:focus{border-color:var(--accent)}
   border-radius:12px;font-size:13px;font-weight:700;box-shadow:0 8px 24px rgba(0,0,0,.25);
   animation:moToast var(--mo) var(--ease);max-width:min(90vw,420px)}
 .toast button{color:var(--bg);text-decoration:underline;font-weight:800;flex:none;opacity:.9}
-.toast button:hover{opacity:1}
+@media (hover:hover){.toast button:hover{opacity:1}}
 /* 화면이 넓어지면 여백만 늘리지 말고 글자·칸도 같이 키운다 */
 @media (min-width:1280px){
   #app{max-width:1320px;grid-template-columns:1fr 430px;gap:0 24px}
@@ -714,6 +735,26 @@ dialog input:focus,dialog select:focus{border-color:var(--accent)}
   .acct{font-size:13.5px;max-width:200px}
   #fab{width:58px;height:58px;font-size:23px;right:26px;bottom:26px}
 }
+/* ── 손가락용 터치 크기 ──
+   CSS 는 같은 강도면 뒤에 있는 것이 이긴다. 그래서 앞에서 정한 '눌리는 범위'를 고치는 규칙은
+   반드시 스타일시트 끝에 둔다 (앞에 두었더니 조용히 덮여서 아무 일도 하지 않았다).
+   보이는 크기는 그대로, 눌리는 범위만 바꾼다. */
+@media (hover:none){
+  /* 줄 오른쪽의 ☆ 와 ⋯ 는 딱 붙어 있다. 같은 크기로 사방을 넓히면 뒤에 있는 ⋯ 가 ☆ 의 오른쪽 반을 가져간다.
+     그래서 각자 '바깥쪽'으로만 넓히고 세로는 44px 근처까지 키운다. */
+  html li .ck::before{inset:-14px -10px -14px -14px}
+  html li .st::before{inset:-14px 0 -14px -14px}
+  html li .mv::before{inset:-14px -14px -14px 0}
+  li{padding-top:7px;padding-bottom:7px}
+  .nav::after{left:-7px;right:-7px}                      /* ‹ › 는 좌우가 좁았다 */
+  .ymt{position:relative}
+  .ymt::after{content:"";position:absolute;left:0;right:0;top:-8px;bottom:-4px}   /* 1년 화면의 월 이름 */
+  .tip button{padding:10px 6px}                          /* '알겠어요' 는 높이 18px 였다 */
+  .sw button{width:34px;height:34px}                     /* 강조색 견본 */
+  input[type=range]{height:32px}                         /* 불투명도 슬라이더 */
+  #accHex{padding:10px 9px!important}
+}
+
 /* 움직임을 줄여달라고 설정한 사람에게는 주지 않는다. 기능은 하나도 달라지지 않는다. */
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{
@@ -736,6 +777,7 @@ dialog input:focus,dialog select:focus{border-color:var(--accent)}
     <button class="iconbtn" id="btnStats">📊</button>
     <button class="iconbtn" id="btnSearch">🔍</button>
     <button class="iconbtn" id="btnIdeas">💡</button>
+    <button class="iconbtn" id="btnCfg"></button>
     <button id="acct" class="acct"></button>
   </div>
   <div class="bar2">
@@ -837,7 +879,18 @@ dialog input:focus,dialog select:focus{border-color:var(--accent)}
 const SUPABASE_URL = 'https://cjhwxjznuleyfcbwwvtb.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_acxKbtekhqwFZwI0EUtArg_3FSj5AHh';
 const VAPID_PUBLIC = 'BItluVUoPAOjdIacpE7-6Ko45leNKobu8SbCNP1L6zdozMUrtFBNjh7ncFVZGSvwdHf4vNkYQKj5BarWq01G0hE';
-const BUILD = '2026-09-21.19';
+const BUILD = '2026-09-30.20';
+/* 크롬·삼성 인터넷이 '설치할 수 있다'고 알려주는 이벤트. 동기화 라이브러리를 기다리는 동안
+   지나가 버리지 않게 모듈 맨 위에서 받는다. */
+let installEvt = null;
+addEventListener('beforeinstallprompt', e => {
+  e.preventDefault(); installEvt = e;
+  if(document.getElementById('cfg')?.open) renderCfg();
+});
+addEventListener('appinstalled', () => {
+  installEvt = null; flash(T('installedOk'));
+  if(document.getElementById('cfg')?.open) renderCfg();
+});
 const $ = s => document.querySelector(s);
 
 for(const k of ['doc','doneOpen','countries']){           // 하루칸 → Daynua 키 이관
@@ -956,7 +1009,11 @@ const I18N = {
   ideasHint:'떠오른 일 = 아직 정리하지 않은 것 · 나중에 = 언젠가 할 것',
   calHint:'달력의 ✓ 는 그날 계획한 일을 다 끝냈다는 뜻이고, 아래 얇은 띠는 그날의 분류 구성입니다.',
   tipPC:'날짜를 우클릭하면 그날 남은 일정을 한꺼번에 정리할 수 있어요. 할 일을 달력으로 끌어 놓아도 이동됩니다.',
-  tipMobile:'할 일이나 날짜를 길게 누르면 옮기기·분류·삭제 메뉴가 열려요.',
+  tipMobile:'할 일을 꾹 눌렀다가 끌면 다른 날로 옮길 수 있어요. ⋯ 를 누르면 더 많은 메뉴가 열려요.',
+  secApp:'앱', installBtn:'홈 화면에 설치',
+  installHint:'설치하면 주소창 없이 앱처럼 열리고, 앱 서랍에도 나타납니다.',
+  installAndroid:'브라우저 메뉴(⋮ 또는 ≡) → ‘앱 설치’ 또는 ‘홈 화면에 추가’',
+  installIos:'공유 버튼 → ‘홈 화면에 추가’', installedOk:'설치했어요',
   remainN:n=>`남은 할 일 ${n}개`, moveAllTo:s=>`${s}로 모두 이동`, pickDate2:'다른 날짜로 이동',
   allLater:'모두 나중에', delAll:'남은 일정 모두 삭제',
   moveUp:'위로 올리기', moveDown:'아래로 내리기',
@@ -1085,7 +1142,11 @@ const I18N = {
   ideasHint:'Ideas = not sorted yet · Someday = one day, no date',
   calHint:'✓ on a day means you finished everything you planned. The thin bar below shows what kinds of tasks it held.',
   tipPC:'Right-click a date to clear out what is left that day. You can also drag a task onto the calendar.',
-  tipMobile:'Press and hold a task or a date to move, categorise or delete it.',
+  tipMobile:'Press and hold a task, then drag it to move it to another day. Tap ⋯ for more.',
+  secApp:'App', installBtn:'Install to Home screen',
+  installHint:'Opens like an app without the address bar, and shows up in your app drawer.',
+  installAndroid:'Browser menu (⋮ or ≡) → Install app / Add to Home screen',
+  installIos:'Share → Add to Home Screen', installedOk:'Installed',
   remainN:n=>`${n} left`, moveAllTo:s=>`Move all to ${s}`, pickDate2:'Move all to another date',
   allLater:'All to Someday', delAll:'Delete what is left',
   moveUp:'Move up', moveDown:'Move down',
@@ -1805,9 +1866,11 @@ function applyUI(){
   const [a,b] = T('brand');
   $('#brand').innerHTML = `${a}<b>${b}</b>`;
   $('#today').textContent = T('today');
-  $('#fab').title = T('settings');
-  $('#fab').innerHTML = ICON.gear;
-  $('#fab').setAttribute('aria-label', T('settings'));
+  for(const b of [$('#fab'), $('#btnCfg')]){
+    b.title = T('settings');
+    b.innerHTML = ICON.gear;
+    b.setAttribute('aria-label', T('settings'));
+  }
   $('#btnSearch').title = T('search');
   $('#btnIdeas').title = T('archive');
   $('#btnStats').title = T('stats');
@@ -2372,6 +2435,19 @@ function orderSpot(from, id){
   return {i: same.indexOf(t), n: same.length};
 }
 
+/* 마우스로 끌어놓든 손가락으로 끌든 같은 결과가 나오도록 한 곳에 둔다 */
+function moveToDay(from, id, k){
+  if(!id || from === k) return;
+  snapshot();                                  // 잘못 놓아도 한 번은 되돌릴 수 있게
+  moveTodo(from, id, k);
+}
+function moveToCat(from, id, cid){
+  const t = bucket(from).find(x => x.id === id); if(!t) return;
+  if((t.c || '') === (cid || '')) return;
+  if(cid) t.c = cid; else delete t.c;
+  touch();
+}
+
 /* ─── 달력 클릭 & 드롭 ─── */
 $('#cal').addEventListener('click', e=>{
   if(Date.now() - lpFired < 700){ lpFired = 0; return; }     // 길게 누른 직후 따라오는 클릭만 무시
@@ -2415,9 +2491,7 @@ $('#cal').addEventListener('drop', e=>{
   e.preventDefault(); cell.classList.remove('over');
   try{
     const {from, id} = JSON.parse(e.dataTransfer.getData('text/plain'));
-    if(!id || from === cell.dataset.k) return;
-    snapshot();                                  // 잘못 놓아도 한 번은 되돌릴 수 있게
-    moveTodo(from, id, cell.dataset.k);
+    moveToDay(from, id, cell.dataset.k);
   }catch{}
 });
 
@@ -2501,36 +2575,139 @@ $('#side').addEventListener('drop', e=>{
       doc.cats.splice(j, 0, c);
       return touch();
     }
-    const t = bucket(p.from).find(x => x.id === p.id); if(!t) return;
     const cid = el.classList.contains('cat') ? el.dataset.c : el.dataset.q;
-    if((t.c || '') === (cid || '')) return;
-    if(cid) t.c = cid; else delete t.c;
-    touch();
+    moveToCat(p.from, p.id, cid);
   }catch{}
 });
 
-/* 휴대폰에서 할 일 메뉴로 가는 길이 15px 짜리 점 세 개 하나뿐이었다.
-   날짜처럼 줄을 길게 눌러도 같은 시트가 열린다. */
-let rowLp = null, rowLpFired = 0;
+/* ─── 휴대폰: 꾹 눌러서 끌어 옮기기 ───
+   마우스의 끌어놓기(HTML5 drag)는 손가락으로는 아예 일어나지 않는다. 그래서 포인터 이벤트로 직접 만든다.
+   · 할 일 줄을 TD_HOLD ms 누르고 있으면 줄이 '들려서' 손가락을 따라온다
+   · 달력 칸 위에서 놓으면 그 날로 · 다른 줄 위에서 놓으면 그 자리로(순서) · 분류 위에서 놓으면 그 분류로
+   · 화면 위·아래 끝에 대면 저절로 스크롤된다 — 달력이 화면 밖에 있어도 닿을 수 있게
+   점 세 개(⋯)는 그대로 있다. 끌기가 안 되는 손에도 길이 하나는 있어야 한다. */
+let tdrag = null, tdTimer = null, rowLpFired = 0;
+const TD_HOLD = 380;
+const tdBlock = e => { if(e.cancelable) e.preventDefault(); };        // 끄는 동안 화면이 같이 밀리지 않게
+
 $('#side').addEventListener('pointerdown', e=>{
-  if(e.pointerType === 'mouse') return;
-  const li = e.target.closest('li[data-from]'); if(!li) return;
+  if(e.pointerType === 'mouse' || tdrag) return;
+  const li = e.target.closest('li[data-from]');
+  if(!li?.querySelector('.ck')) return;                               // 통계의 '오래 묵은 일' 같은 읽기 전용 줄은 뺀다
+  if(li.classList.contains('done') || li.classList.contains('skip') || li.classList.contains('editing')) return;
+  if(li.querySelector('.subs')) return;                               // 하위 항목을 펼친 줄은 PC 와 같이 끌지 않는다
   if(e.target.closest('button, input, .subs, .note, [contenteditable]')) return;
   const at = {x:e.clientX, y:e.clientY};
   rowLpFired = 0;
-  rowLp = setTimeout(()=>{
-    rowLp = null; rowLpFired = Date.now();
-    openMenu(0, 0, li.dataset.from, li.dataset.id);
-  }, 520);
-  const cancel = ev => {
-    if(ev.type === 'pointermove' && Math.hypot(ev.clientX-at.x, ev.clientY-at.y) <= 10) return;
-    clearTimeout(rowLp); rowLp = null;
-    for(const n of ['pointermove','pointerup','pointercancel']) $('#side').removeEventListener(n, cancel);
-    removeEventListener('scroll', cancel, true);
+  clearTimeout(tdTimer);
+  tdTimer = setTimeout(()=>{ tdTimer = null; tdLift(li, at); }, TD_HOLD);
+  const pre = ev => {                                                  // 들어 올리기 전까지만 본다
+    if(!tdrag && ev.type === 'pointermove' && Math.hypot(ev.clientX-at.x, ev.clientY-at.y) <= 10) return;
+    if(!tdrag){ clearTimeout(tdTimer); tdTimer = null; }
+    for(const n of ['pointermove','pointerup','pointercancel']) $('#side').removeEventListener(n, pre);
+    removeEventListener('scroll', pre, true);
   };
-  for(const n of ['pointermove','pointerup','pointercancel']) $('#side').addEventListener(n, cancel);
-  addEventListener('scroll', cancel, true);      // 화면이 움직이기 시작하면 그건 넘기려던 손이다
+  for(const n of ['pointermove','pointerup','pointercancel']) $('#side').addEventListener(n, pre);
+  addEventListener('scroll', pre, true);      // 화면이 움직이기 시작하면 그건 넘기려던 손이다
 });
+// 꾹 누를 때 브라우저가 띄우는 기본 메뉴(복사·공유)가 끌기를 가로채지 않게
+$('#side').addEventListener('contextmenu', e=>{
+  if(!canDrag && e.target.closest('li[data-from]')) e.preventDefault();
+});
+
+function tdLift(li, at){
+  if(!li.isConnected || tdrag) return;
+  const r = li.getBoundingClientRect();
+  const g = li.cloneNode(true);
+  g.classList.remove('drag','in','ckd','edin');
+  g.classList.add('ghost');
+  g.querySelectorAll('.mv').forEach(x => x.remove());
+  /* 사본은 좁게 만들어 손가락 '위'에 띄운다 — 손가락 밑에 두면 놓을 칸을 가린다 */
+  Object.assign(g.style, {left:r.left+'px', top:r.top+'px', width:Math.min(r.width, 236)+'px'});
+  document.body.appendChild(g);
+  li.classList.add('lifted');
+  const gr = g.getBoundingClientRect();
+  tdrag = {from:li.dataset.from, id:li.dataset.id, li, g, x:at.x, y:at.y, hit:null, timer:0, x0:at.x, y0:at.y,
+           gl:r.left, gt:r.top, gw:gr.width, gh:gr.height};
+  rowLpFired = Date.now();                                             // 놓을 때 따라오는 클릭이 체크를 건드리지 않게
+  try{ navigator.vibrate?.(16); }catch{}                               // 들어 올렸다는 걸 손이 알게
+  document.documentElement.classList.add('td');
+  document.addEventListener('touchmove', tdBlock, {passive:false});
+  addEventListener('pointermove', tdMove);
+  addEventListener('pointerup', tdEnd);
+  addEventListener('pointercancel', tdEnd);
+  tdAuto(tdrag);
+  tdPaint(tdrag);
+}
+/* 손가락이 움직이는 즉시 사본을 붙이고 지금 어디 위에 있는지 본다 (한 프레임 늦게 따라오지 않게) */
+function tdPaint(d){
+  /* 손가락 위 14px 에 띄우되 화면 밖으로 나가지 않게 가둔다 */
+  const gx = Math.max(8, Math.min(d.x - d.gw/2, innerWidth - 8 - d.gw));
+  const gy = Math.max(4, d.y - d.gh - 14);
+  d.g.style.transform = `translate3d(${gx-d.gl}px,${gy-d.gt}px,0) scale(1.03)`;
+  tdHit(d);
+}
+function tdMove(e){ if(tdrag){ tdrag.x = e.clientX; tdrag.y = e.clientY; tdPaint(tdrag); } }
+/* 화면 위·아래 끝에 손가락을 대고 있으면 저절로 스크롤한다. 스크롤하면 손가락 밑의 것이 바뀌므로 다시 본다. */
+function tdAuto(d){
+  d.timer = setInterval(()=>{
+    const far = Math.hypot(d.x-d.x0, d.y-d.y0) > 12;                   // 들자마자 스크롤되지 않게
+    const Z = 84, H = innerHeight;
+    const v = d.y < Z ? -(Z-d.y)/Z : d.y > H-Z ? (d.y-(H-Z))/Z : 0;
+    if(far && v){ scrollBy(0, Math.round(v * 18)); tdPaint(d); }
+  }, 16);
+}
+function tdMark(h, on){
+  if(h.kind === 'row'){ h.el.classList.remove('dropA','dropB'); if(on) h.el.classList.add(h.before ? 'dropA' : 'dropB'); }
+  else h.el.classList.toggle('over', on);
+}
+function tdHit(d){
+  const el = document.elementFromPoint(d.x, d.y);                      // 사본은 pointer-events:none 이라 건너뛴다
+  let h = null;
+  const row = el?.closest('li[data-from]');
+  if(row && row !== d.li && row.dataset.id !== d.id && row.dataset.from === d.from){
+    const r = row.getBoundingClientRect();
+    h = {kind:'row', el:row, id:row.dataset.id, before: d.y < r.top + r.height/2};
+  }else{
+    const day = el?.closest('.cell[data-k], .wcard[data-k]');
+    if(day && day.dataset.k !== d.from) h = {kind:'day', el:day, k:day.dataset.k};
+    else{
+      const chip = el?.closest('#qcat button[data-q]');
+      const cat = chip || el?.closest('.cat');
+      if(chip && chip.dataset.q === '+') {}
+      else if(cat){
+        const cid = chip ? chip.dataset.q : cat.dataset.c;
+        const t = bucket(d.from).find(x => x.id === d.id);
+        if(t && (t.c || '') !== (cid || '')) h = {kind:'cat', el:cat, cid};
+      }
+    }
+  }
+  const p = d.hit;
+  if(p && h && p.el === h.el && p.before === h.before) return;
+  if(p) tdMark(p, false);
+  if(h) tdMark(h, true);
+  d.hit = h;
+}
+function tdEnd(e){
+  const d = tdrag; if(!d) return;
+  if(e.type === 'pointerup'){ d.x = e.clientX; d.y = e.clientY; tdHit(d); }
+  const h = d.hit, ok = e.type === 'pointerup';
+  clearInterval(d.timer);
+  d.g.remove(); d.li.classList.remove('lifted');
+  if(h) tdMark(h, false);
+  document.documentElement.classList.remove('td');
+  document.removeEventListener('touchmove', tdBlock);
+  removeEventListener('pointermove', tdMove);
+  removeEventListener('pointerup', tdEnd);
+  removeEventListener('pointercancel', tdEnd);
+  tdrag = null;
+  rowLpFired = Date.now();
+  if(!ok || !h) return;
+  try{ navigator.vibrate?.(8); }catch{}
+  if(h.kind === 'row') reorderTo(d.from, d.id, h.id, h.before);
+  else if(h.kind === 'day') moveToDay(d.from, d.id, h.k);
+  else moveToCat(d.from, d.id, h.cid);
+}
 $('#side').addEventListener('click', e=>{
   if(Date.now() - rowLpFired < 700){ rowLpFired = 0; return; }   // 길게 누른 뒤 따라오는 클릭은 무시
   const li = e.target.closest('li'), cat = e.target.closest('.cat'), nudge = e.target.closest('.nudge');
@@ -2832,7 +3009,7 @@ function openMenu(x, y, from, id){
       `<div class="sep"></div><button data-a="close" class="sclose">${T('close')}</button>`;
     clearTimeout(sheetHideT);
     $('#sheetWrap').classList.remove('closing');
-    $('#sheetWrap').hidden = false;
+    $('#sheetWrap').hidden = false; ovOpen();
     return;
   }
   const m = $('#menu');
@@ -2968,7 +3145,7 @@ function openDateMenu(x, y, k, sheet){
       `<div class="sep"></div><button data-da="close" class="sclose">${T('close')}</button>`;
     clearTimeout(sheetHideT);
     $('#sheetWrap').classList.remove('closing');
-    $('#sheetWrap').hidden = false;
+    $('#sheetWrap').hidden = false; ovOpen();
     return;
   }
   const m = $('#menu');
@@ -2979,10 +3156,28 @@ function openDateMenu(x, y, k, sheet){
   m.style.left = Math.max(8, Math.min(x, innerWidth - w - 8)) + 'px';
   m.style.top  = Math.max(8, Math.min(y, innerHeight - h - 8)) + 'px';
 }
+/* 시트가 열린 채로 뒤로 가기(갤럭시는 가장자리 쓸기)를 하면 앱이 통째로 꺼졌다.
+   시트를 열 때 기록을 하나 쌓고, 뒤로 가기가 오면 그 기록을 써서 시트만 닫는다. */
+let ovPushed = false, ovSkip = 0;
+function ovOpen(){
+  if(ovPushed) return;
+  try{ history.pushState({dnOv:1}, ''); ovPushed = true; }catch{}
+}
+function ovDone(){                              // 화면에서 직접 닫았을 때 — 쌓아둔 기록을 되감는다
+  if(!ovPushed) return;
+  ovPushed = false; ovSkip++;
+  history.back();
+}
+addEventListener('popstate', ()=>{
+  if(ovSkip){ ovSkip--; return; }
+  if(ovPushed){ ovPushed = false; closeMenu(); closeSheet(true); }   // 뒤로 가기로 닫힘 — 기록은 이미 되감겼다
+});
+
 let sheetHideT = null;
-function closeSheet(){
+function closeSheet(fromBack){
   const w = $('#sheetWrap');
   if(!w.hidden){
+    if(!fromBack) ovDone();
     if(reduceMo()) w.hidden = true;
     else {
       w.classList.add('closing');
@@ -3359,7 +3554,18 @@ async function renderCfg(){
   const when = at => new Intl.DateTimeFormat(loc(),
     {month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit'}).format(new Date(at));
 
-  $('#cfgBody').innerHTML = `<div class="cfgsec">${T('secLook')}</div><div class="grid2">
+  const standalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone;
+  /* 이미 설치해서 쓰는 중이면 보여줄 게 없다. 설치할 수 있으면 버튼, 터치 기기에서 이벤트가
+     없으면(삼성 인터넷·아이폰 등) 브라우저 메뉴로 가는 길을 글로 알려준다. */
+  const installBlock = standalone ? '' : installEvt
+    ? `<div class="cfgsec">${T('secApp')}</div><div class="grid2"><div class="grp wide">
+        <button class="chip" id="instBtn">${T('installBtn')}</button>
+        <div class="hint">${T('installHint')}</div></div></div>`
+    : !canDrag
+    ? `<div class="cfgsec">${T('secApp')}</div><div class="grid2"><div class="grp wide">
+        <div class="hint">${/iPhone|iPad/.test(navigator.userAgent) ? T('installIos') : T('installAndroid')}</div>
+        </div></div>` : '';
+  $('#cfgBody').innerHTML = `${installBlock}<div class="cfgsec">${T('secLook')}</div><div class="grid2">
     <div class="grp"><span class="lbl">${T('theme')}</span>
       <div class="seg" data-k="theme">
         ${['auto','light','dark'].map(v=>`<button data-v="${v}" class="${doc.ui.theme===v?'on':''}">${T(v)}</button>`).join('')}
@@ -3426,6 +3632,11 @@ async function renderCfg(){
     </div>
     <div class="ver">v${BUILD}</div>`;
 
+  $('#instBtn')?.addEventListener('click', async ()=>{
+    const ev = installEvt; installEvt = null;           // 이벤트는 한 번밖에 못 쓴다
+    try{ await ev.prompt(); await ev.userChoice; }catch{}
+    renderCfg();
+  });
   $('#cfgBody').querySelectorAll('[data-snap]').forEach(b => b.onclick = ()=>{
     const x = snaps[+b.dataset.snap]; if(!x?.doc) return;
     if(!confirm(T('restoreAsk'))) return;
@@ -3489,7 +3700,9 @@ async function renderCfg(){
   $('#impBtn').onclick = ()=>{ $('#cfg').close(); openImport(); };
   $('#undoImp')?.addEventListener('click', ()=>{ undoImport(); renderCfg(); });
 }
-$('#fab').onclick = ()=>{ renderCfg(); $('#cfg').showModal(); };
+const openCfg = ()=>{ renderCfg(); $('#cfg').showModal(); };
+$('#fab').onclick = openCfg;
+$('#btnCfg').onclick = openCfg;
 $('#cfgClose').onclick = ()=>$('#cfg').close();
 
 /* ─── 가져오기 ─── */
@@ -4044,6 +4257,18 @@ if(location.hash === '#test'){                     // 색 대비는 DOM 이 있�
   console.assert(ink('#c9502f') !== '#c9502f' || ratio('#c9502f', BASE) >= 4.5, '이미 충분하면 그대로');
   doc.ui.theme = was; applyUI(); render();
   console.log('색 대비 자가검사 끝');
+}
+/* 앱 아이콘을 꾹 눌렀을 때 나오는 바로가기(manifest 의 shortcuts)로 들어온 경우 */
+{
+  const a = new URLSearchParams(location.search).get('a');
+  if(a){
+    history.replaceState(null, '', location.pathname + location.hash);   // 새로고침해도 또 열리지 않게
+    if(a === 'search') $('#btnSearch').click();
+    else{
+      view = 'day'; cur = new Date(); sel = key(cur); render();
+      if(a === 'add') setTimeout(()=>{ const q = $('#qd'); q?.focus(); q?.scrollIntoView({block:'center'}); }, 250);
+    }
+  }
 }
 navigator.serviceWorker?.register('sw.js').then(()=>syncPush()).catch(()=>{}).finally(scheduleNotify);
 </script>
