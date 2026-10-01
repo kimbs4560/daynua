@@ -203,6 +203,8 @@ input,select,textarea{font:inherit;color:inherit}
 .mk{display:flex;gap:3px;justify-content:center;align-items:center;height:12px;margin-top:3px}
 .cell.fin .mk{height:auto;margin-top:2px}
 .mk i{display:block;width:5px;height:5px;border-radius:50%;background:var(--c)}
+.mk i.fd{opacity:.35}
+.mk b{font-size:9px;line-height:1;font-weight:700;color:var(--sub);margin-left:1px}
 /* ✓ 는 동그라미 없이 갈고리만 — 칸 크기에 맞춰 키운다 */
 .cell .chk{position:static;width:20px;height:20px;padding:0;flex:none;border:0;border-radius:0;background:none}
 .cell .chk path{stroke-width:2.6}
@@ -955,7 +957,7 @@ dialog input:focus,dialog select:focus{border-color:var(--accent)}
 const SUPABASE_URL = 'https://cjhwxjznuleyfcbwwvtb.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_acxKbtekhqwFZwI0EUtArg_3FSj5AHh';
 const VAPID_PUBLIC = 'BItluVUoPAOjdIacpE7-6Ko45leNKobu8SbCNP1L6zdozMUrtFBNjh7ncFVZGSvwdHf4vNkYQKj5BarWq01G0hE';
-const BUILD = '2026-10-01.26';
+const BUILD = '2026-10-01.27';
 /* 크롬·삼성 인터넷이 '설치할 수 있다'고 알려주는 이벤트. 동기화 라이브러리를 기다리는 동안
    지나가 버리지 않게 모듈 맨 위에서 받는다. */
 /* 설치한 PC 앱 창이 작게 열리는 경우 — 처음 한 번만 알맞은 크기로 키운다.
@@ -2150,6 +2152,17 @@ function cellData(k){
   return {list, complete:s.complete, cleared:s.cleared, left:s.actionable,
           dist:catDist(list, doc.cats)};
 }
+/* 날짜 아래 점 = 그날 일정 하나에 하나. 분류가 달라도 개수는 전체 개수 그대로.
+   색은 그 일의 분류, 끝낸/건너뛴 일은 옅게. 4개를 넘으면 3개 + '+N' */
+function dotsHTML(list){
+  if(!list.length) return '';
+  const ord = cellOrder(list), more = ord.length > 4 ? ord.length - 3 : 0;
+  const dots = (more ? ord.slice(0, 3) : ord).map(t => {
+    const c = catOf(t.c)?.c;
+    return `<i${t.d || t.sk ? ' class="fd"' : ''} style="--c:${c ? stripColor(c) : 'var(--faint)'}"></i>`;
+  }).join('');
+  return dots + (more ? `<b>+${more}</b>` : '');
+}
 let monthHasComplete = false;
 
 function renderMonth(tk){
@@ -2179,8 +2192,7 @@ function renderMonth(tk){
         aria-pressed="${k===sel}" aria-label="${esc(label)}">
       <span class="n mono" ${nc?`style="color:${nc}"`:''}>${d.getDate()}</span>
       ${hn?`<div class="hn" title="${esc(hn)}">${esc(hn)}</div>`:''}
-      <div class="mk">${s.cleared ? CHK : s.dist.slice(0,4).map(x=>
-        `<i style="--c:${x.color?stripColor(x.color):'var(--faint)'}"></i>`).join('')}</div>
+      <div class="mk">${s.cleared ? CHK : dotsHTML(s.list)}</div>
     </div>`;
   }).join('');
   $('#cal').innerHTML = `<div class="wk">${wdNames().map(w=>`<span>${w}</span>`).join('')}</div>

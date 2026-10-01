@@ -1,7 +1,7 @@
 /* Daynua — 설치형(PWA) + 오프라인 + 앱이 꺼져 있을 때의 알림.
    network-first, 실패하면 캐시. 알림 문구는 페이지가 남겨둔 로컬 요약으로 만든다
    (서버는 "울릴 시각"만 알고, 할 일 내용은 기기 밖으로 나가지 않는다). */
-const C = 'daynua-v24';
+const C = 'daynua-v25';
 const STATE = 'daynua-state';          // 페이지가 써 두는 오늘 요약 (지우지 않음)
 const SUMMARY = '/__summary';
 const SHELL = ['./', './index.html', './manifest.json', './privacy.html',
@@ -69,11 +69,16 @@ self.addEventListener('fetch', e => {
   }
   if (u.origin !== location.origin) return;                                // supabase 호출은 그대로
   if (u.pathname === SUMMARY) return;                                      // 내부 저장소
-  e.respondWith(
-    fetch(e.request, { cache: 'no-cache' }).then(r => {      // 열 때마다 최신 확인
+  /* 열 때마다 최신을 확인하되, 전파가 약해 3초 안에 못 받으면 저장해 둔 걸로 먼저 연다.
+     (지하철처럼 '연결은 됐는데 느린' 곳에서 앱이 하얗게 멈춰 있지 않게) */
+  e.respondWith(new Promise(resolve => {
+    let done = false;
+    const give = r => { if(!done && r){ done = true; clearTimeout(timer); resolve(r); } };
+    const timer = setTimeout(() => caches.match(e.request).then(give), 3000);
+    fetch(e.request, { cache: 'no-cache' }).then(r => {
       const copy = r.clone();
-      caches.open(C).then(c => c.put(e.request, copy));
-      return r;
-    }).catch(() => caches.match(e.request))
-  );
+      caches.open(C).then(c => c.put(e.request, copy));       // 늦게 와도 다음 번을 위해 저장
+      give(r);
+    }).catch(() => caches.match(e.request).then(r => { if(r) give(r); else if(!done){ done = true; clearTimeout(timer); resolve(Response.error()); } }));
+  }));
 });
