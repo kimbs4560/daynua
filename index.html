@@ -201,11 +201,14 @@ input,select,textarea{font:inherit;color:inherit}
 /* 칸에는 날짜와 표시 하나만 둔다 — 무엇이 있는지는 고른 날의 목록이 말한다 */
 .cell .n{font-size:13px;font-weight:600;line-height:22px;min-width:22px;height:22px;text-align:center;border-radius:50%}
 .mk{display:flex;gap:3px;justify-content:center;align-items:center;height:12px;margin-top:3px}
+.cell.fin .mk{height:auto;margin-top:2px}
 .mk i{display:block;width:5px;height:5px;border-radius:50%;background:var(--c)}
-.cell .chk{position:static;width:14px;height:14px;padding:3px;flex:none}
+/* ✓ 는 동그라미 없이 갈고리만 — 칸 크기에 맞춰 키운다 */
+.cell .chk{position:static;width:20px;height:20px;padding:0;flex:none;border:0;border-radius:0;background:none}
+.cell .chk path{stroke-width:2.6}
 /* 끝낸 날 — 칸을 그날 분류 색으로 은은하게 채우고(JS 가 --fill 대신 background 를 준다) ✓ 는 잉크색으로 또렷하게 */
-.cell.fin .chk{background:var(--ink);color:var(--bg)}
-.cell.fin.soft .chk{background:none;border:1.5px solid var(--ink);color:var(--ink)}
+.cell.fin .chk{background:none;color:var(--ink)}
+.cell.fin.soft .chk{border:0;color:var(--ink);opacity:.5}
 .cell.tint{border-color:transparent}
 .cell.tint.out{opacity:.5}
 /* ✓ 는 날짜를 밀어내지 않게 오른쪽 위에 얹는다 */
@@ -246,7 +249,7 @@ input,select,textarea{font:inherit;color:inherit}
   .cell .n{font-size:14px}
   .mk{margin-top:5px}
   .mk i{width:6px;height:6px}
-  .cell .chk{width:16px;height:16px;padding:3.5px}
+  .cell .chk{width:24px;height:24px}
   .cell .hn{display:block;font-size:9px;font-weight:700;color:var(--sun);max-width:100%;
     white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
   .ev{display:flex;flex-direction:column;gap:2px;margin-top:3px;align-items:stretch}
@@ -840,6 +843,7 @@ dialog input:focus,dialog select:focus{border-color:var(--accent)}
   #cal .cell{min-height:clamp(62px, min(calc((100dvh - 280px) / var(--rows,6) - 6px), calc((100cqw - 36px) / 7 * 1.2)), 168px)}
   #cal .cell .n{font-size:15px}
 }
+@media (min-width:1600px){ #cal .cell .chk{width:30px;height:30px} }
 </style>
 </head>
 <body>
@@ -951,7 +955,7 @@ dialog input:focus,dialog select:focus{border-color:var(--accent)}
 const SUPABASE_URL = 'https://cjhwxjznuleyfcbwwvtb.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_acxKbtekhqwFZwI0EUtArg_3FSj5AHh';
 const VAPID_PUBLIC = 'BItluVUoPAOjdIacpE7-6Ko45leNKobu8SbCNP1L6zdozMUrtFBNjh7ncFVZGSvwdHf4vNkYQKj5BarWq01G0hE';
-const BUILD = '2026-10-01.24';
+const BUILD = '2026-10-01.25';
 /* 크롬·삼성 인터넷이 '설치할 수 있다'고 알려주는 이벤트. 동기화 라이브러리를 기다리는 동안
    지나가 버리지 않게 모듈 맨 위에서 받는다. */
 /* 설치한 PC 앱 창이 작게 열리는 경우 — 처음 한 번만 알맞은 크기로 키운다.
@@ -959,12 +963,12 @@ const BUILD = '2026-10-01.24';
 (function(){
   try{
     if(!matchMedia('(display-mode: standalone)').matches || matchMedia('(hover:none)').matches) return;
-    if(localStorage.getItem('daynua.sized')) return;
-    localStorage.setItem('daynua.sized', '1');
-    if(outerWidth >= 1080 && outerHeight >= 720) return;                  // 이미 충분히 크다
+    if(sessionStorage.getItem('daynua.sized')) return;      // 이 창에서는 한 번만 — 새로고침해도 다시 줄이지 않는다
+    sessionStorage.setItem('daynua.sized', '1');
     const aw = screen.availWidth, ah = screen.availHeight;
-    const W = Math.min(1280, aw - 80), H = Math.min(860, ah - 60);
-    if(W < 720 || H < 560) return;                                        // 화면이 작으면 그대로
+    if(outerWidth >= aw - 16 && outerHeight >= ah - 16) return;   // 최대화 상태면 그대로
+    const W = Math.min(1320, aw - 40), H = Math.min(860, ah - 20);
+    if(W < 720 || H < 560) return;                                // 화면이 작으면 그대로
     resizeTo(W, H);
     moveTo((screen.availLeft || 0) + Math.round((aw - W) / 2), (screen.availTop || 0) + Math.round((ah - H) / 2));
   }catch{}
