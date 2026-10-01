@@ -911,6 +911,50 @@ html.gating body > :not(#gate):not(script){visibility:hidden}
 html.entering #app,html.entering #fab{animation:appIn .65s cubic-bezier(.2,.8,.2,1) both}
 @keyframes appIn{from{opacity:0;transform:translateY(12px) scale(.985)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){ .g-card,.g-logo,#gate{transition:none} html.entering #app,html.entering #fab{animation:none} }
+
+/* ── 월 달력 A안: 칸·틀 없이 숫자만. 끝낸 날은 분류 색으로 칠한 원 + 작은 ✓ ── */
+#cal{--disc:34px}
+#cal:has(> .grid){background:none;border:0;box-shadow:none;padding-left:2px;padding-right:2px}
+#cal .grid{gap:0}
+#cal .cell{background:none;border:0;border-radius:0;overflow:visible;min-height:52px;padding:4px 0 2px;justify-content:flex-start}
+#cal .cell .n{width:var(--disc);height:var(--disc);min-width:0;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:15px;font-weight:600;line-height:1;position:relative;transition:background var(--mo-fast) var(--ease)}
+#cal .cell.out .n{font-weight:500}
+#cal .cell.today .n{background:var(--accent)!important;color:var(--on-accent)!important;font-weight:800}
+#cal .cell.sel .n{outline:1.5px solid var(--ink);outline-offset:2px}
+#cal .cell.sel{border:0}
+@media (hover:hover){
+  #cal .cell:hover{background:none}
+  #cal .cell:not(.today):hover .n:not([style*="background"]){background:var(--fill)}
+}
+#cal .cell:active .n{transform:scale(.94)}
+#cal .cell.over{outline:2px dashed var(--accent);outline-offset:-3px;border-radius:12px;background:none}
+#cal .cell.fin .mk{display:none}
+#cal .cell .mk{height:8px;margin-top:3px}
+#cal .cell .mk i{width:4px;height:4px}
+/* ✓ — 숫자 원 오른쪽 아래의 작은 배지. 일부만 끝낸 날(미룬 것이 남은 날)은 옅게 */
+#cal .cell .n .chk{position:absolute;right:-3px;bottom:-3px;width:15px;height:15px;padding:3px;margin:0;
+  border:0;border-radius:50%;background:var(--ink);color:var(--bg)}
+#cal .cell .n .chk path{stroke-width:3.2}
+#cal .cell.fin.soft .n .chk{opacity:.55}
+#cal .cell.today .n .chk{background:var(--ink);color:var(--bg)}
+#cal .cell.tint.out{opacity:.5}
+@media (min-width:720px){
+  #cal{--disc:36px}
+  #cal .cell{min-height:clamp(56px, calc((100dvh - 300px) / var(--rows,6)), 112px);padding-top:6px}
+  #cal .cell .mk i{width:5px;height:5px}
+}
+@media (min-width:1000px){
+  #cal{--disc:40px}
+  #cal .cell .n{font-size:16px}
+  #cal .cell .n .chk{width:17px;height:17px;padding:3.5px}
+  #cal .cell .hn{font-size:9.5px;margin-top:2px}
+}
+@media (min-width:1600px){
+  #cal{--disc:46px}
+  #cal .cell .n{font-size:18px}
+  #cal .cell .n .chk{width:19px;height:19px}
+}
 </style>
 </head>
 <body>
@@ -1040,7 +1084,7 @@ html.entering #app,html.entering #fab{animation:appIn .65s cubic-bezier(.2,.8,.2
 const SUPABASE_URL = 'https://cjhwxjznuleyfcbwwvtb.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_acxKbtekhqwFZwI0EUtArg_3FSj5AHh';
 const VAPID_PUBLIC = 'BItluVUoPAOjdIacpE7-6Ko45leNKobu8SbCNP1L6zdozMUrtFBNjh7ncFVZGSvwdHf4vNkYQKj5BarWq01G0hE';
-const BUILD = '2026-10-01.35';
+const BUILD = '2026-10-01.36';
 /* Daynua 앱(Android 껍데기) 안이면 위젯·알림·내보내기를 앱에 맡긴다. 아니면 null */
 const APP = typeof DaynuaApp !== 'undefined' ? DaynuaApp : null;
 const ARRIVED_BY_LINK = /access_token|type=(signup|recovery|magiclink|invite)|[?&]code=/.test(location.hash + location.search);
@@ -2283,7 +2327,7 @@ function renderMonth(tk){
     const tint = s.cleared && s.dist.length ? (() => {
       const cs = s.dist.map(x => `color-mix(in srgb,${x.color ? stripColor(x.color) : 'var(--faint)'} 38%,transparent)`);
       const n = cs.length;
-      return n === 1 ? cs[0] : `linear-gradient(90deg,${cs.map((c,i)=>`${c} ${i*100/n}% ${(i+1)*100/n}%`).join(',')})`;
+      return n === 1 ? cs[0] : `conic-gradient(${cs.map((c,i)=>`${c} ${i*100/n}% ${(i+1)*100/n}%`).join(',')})`;   // 원을 n등분(파이)
     })() : '';
     const cls = ['cell', d.getMonth()!==cur.getMonth()?'out':'',
       k===tk?'today':'', k===sel?'sel':'',
@@ -2293,11 +2337,12 @@ function renderMonth(tk){
       : s.complete ? `${fmtDay.format(d)}, ${T('aTasks')(s.list.length)}, ${T('aAllDone')}`
       : s.cleared ? `${fmtDay.format(d)}, ${T('aTasks')(s.list.length)}, ${T('aCleared')}`
       : `${fmtDay.format(d)}, ${T('aSomeDone')(s.list.length, s.list.filter(t=>t.d).length)}`;
-    return `<div class="${cls}" data-k="${k}" role="button" tabindex="0"${tint?` style="background:${tint}"`:''}
+    const nst = (nc ? `color:${nc};` : '') + (tint ? `background:${tint}` : '');
+    return `<div class="${cls}" data-k="${k}" role="button" tabindex="0"
         aria-pressed="${k===sel}" aria-label="${esc(label)}">
-      <span class="n mono" ${nc?`style="color:${nc}"`:''}>${d.getDate()}</span>
+      <span class="n mono"${nst ? ` style="${nst}"` : ''}>${d.getDate()}${s.cleared ? CHK : ''}</span>
       ${hn?`<div class="hn" title="${esc(hn)}">${esc(hn)}</div>`:''}
-      <div class="mk">${s.cleared ? CHK : dotsHTML(s.list)}</div>
+      ${s.cleared ? '' : `<div class="mk">${dotsHTML(s.list)}</div>`}
     </div>`;
   }).join('');
   $('#cal').innerHTML = `<div class="wk">${wdNames().map(w=>`<span>${w}</span>`).join('')}</div>
