@@ -1040,7 +1040,7 @@ html.entering #app,html.entering #fab{animation:appIn .65s cubic-bezier(.2,.8,.2
 const SUPABASE_URL = 'https://cjhwxjznuleyfcbwwvtb.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_acxKbtekhqwFZwI0EUtArg_3FSj5AHh';
 const VAPID_PUBLIC = 'BItluVUoPAOjdIacpE7-6Ko45leNKobu8SbCNP1L6zdozMUrtFBNjh7ncFVZGSvwdHf4vNkYQKj5BarWq01G0hE';
-const BUILD = '2026-10-01.34';
+const BUILD = '2026-10-01.35';
 /* Daynua 앱(Android 껍데기) 안이면 위젯·알림·내보내기를 앱에 맡긴다. 아니면 null */
 const APP = typeof DaynuaApp !== 'undefined' ? DaynuaApp : null;
 const ARRIVED_BY_LINK = /access_token|type=(signup|recovery|magiclink|invite)|[?&]code=/.test(location.hash + location.search);
@@ -2016,7 +2016,7 @@ async function loadHolidays(year){
   if(holLoaded.has(ck)) return;
   holLoaded.add(ck);
   const cached = localStorage.getItem('daynua.hol.'+ck);
-  if(cached){ Object.assign(hol, JSON.parse(cached)); return render(); }
+  if(cached){ Object.assign(hol, JSON.parse(cached)); return renderKeepInput(); }
   try{
     const r = await fetch(`https://date.nager.at/api/v3/PublicHolidays/${year}/${c}`);
     if(!r.ok) throw new Error('http');
@@ -2024,7 +2024,7 @@ async function loadHolidays(year){
     for(const h of await r.json()) m[h.date] = [h.localName, h.name];
     localStorage.setItem('daynua.hol.'+ck, JSON.stringify(m));
     Object.assign(hol, m);
-    render();
+    renderKeepInput();
   }catch{ holLoaded.delete(ck); }
 }
 function resetHolidays(){
@@ -4395,6 +4395,24 @@ function setAcct(){
 }
 /* 서버 문서를 통째로 덮어쓰지 않는다. 합친다.
    한쪽에만 있는 할 일은 살아남고, 지운 것만 지운 채로 남는다. */
+/* 서버(jsonb)는 키 순서를 바꿔 돌려준다. 순서가 달라도 '같은 문서'로 읽어야 한다 —
+   그렇지 않으면 내가 쓴 것의 메아리가 올 때마다 화면을 다시 그려, 적던 입력칸이 끊긴다. */
+const canon = o => JSON.stringify(o, (k, v) => v && typeof v === 'object' && !Array.isArray(v)
+  ? Object.fromEntries(Object.entries(v).sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0)) : v);
+const sameDoc = (a, b) => canon({...a, rev:0, ts:0}) === canon({...b, rev:0, ts:0});
+/* 동기화가 화면을 다시 그려야 할 때도, 적던 칸(빠른 추가·검색)의 포커스·글자·커서는 그대로 둔다 */
+function renderKeepInput(){
+  const a = document.activeElement;
+  const keep = a && ['qd','qi','sq'].includes(a.id)
+    ? {id:a.id, v:a.value, s:a.selectionStart, e:a.selectionEnd} : null;
+  if(keep) a.value = '';                      // 사라지는 칸이 빠져나가며 반쯤 쓴 글을 할 일로 만들지 않게
+  render();
+  if(keep){
+    const n = document.getElementById(keep.id); if(!n) return;
+    n.value = keep.v; n.focus({preventScroll:true});
+    try{ n.setSelectionRange(keep.s, keep.e); }catch{}
+  }
+}
 async function pull(){
   if(!sb || !user || pulling) return;
   pulling = true;
@@ -4404,12 +4422,14 @@ async function pull(){
     syncAt = Date.now();
     const srv = data?.doc;
     if(!srv?.todos){ if(hasContent(doc)) push(); return; }
-    const before = JSON.stringify(doc);
     const merged = migrate(mergeDocs(doc, migrate(srv)));
-    if(JSON.stringify(merged) === before) return;
+    if(sameDoc(merged, doc)){                          // 내용이 같다 — 개정 번호만 맞추고 화면은 그대로
+      if((merged.rev|0) > (doc.rev|0)){ doc.rev = merged.rev; save(); }
+      return;
+    }
     if(hasContent(doc)) snapRing('sync');
     doc = merged;
-    save(); applyUI(); runRollover(); render();
+    save(); applyUI(); runRollover(); renderKeepInput();
     push();
   }catch(e){ console.warn(e); }
   finally{ pulling = false; }
@@ -4438,8 +4458,10 @@ async function pushNow(){
       if(srvRev > (doc.rev|0)) srv = (await full()).data?.doc;
     }
     if(srv?.todos && (srv.rev|0) > (doc.rev|0)){
-      doc = migrate(mergeDocs(doc, migrate(srv)));
-      save(); render();
+      const merged = migrate(mergeDocs(doc, migrate(srv)));
+      const changed = !sameDoc(merged, doc);
+      doc = merged;
+      save(); if(changed) renderKeepInput();
     }
     doc.rev = Math.max(doc.rev|0, srvRev) + 1;
     const { error } = await sb.from('state')
