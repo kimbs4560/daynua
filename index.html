@@ -957,7 +957,7 @@ dialog input:focus,dialog select:focus{border-color:var(--accent)}
 const SUPABASE_URL = 'https://cjhwxjznuleyfcbwwvtb.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_acxKbtekhqwFZwI0EUtArg_3FSj5AHh';
 const VAPID_PUBLIC = 'BItluVUoPAOjdIacpE7-6Ko45leNKobu8SbCNP1L6zdozMUrtFBNjh7ncFVZGSvwdHf4vNkYQKj5BarWq01G0hE';
-const BUILD = '2026-10-01.28';
+const BUILD = '2026-10-01.29';
 /* 크롬·삼성 인터넷이 '설치할 수 있다'고 알려주는 이벤트. 동기화 라이브러리를 기다리는 동안
    지나가 버리지 않게 모듈 맨 위에서 받는다. */
 /* 설치한 PC 앱 창이 작게 열리는 경우 — 처음 한 번만 알맞은 크기로 키운다.
@@ -1044,7 +1044,7 @@ const I18N = {
   rediscover:'다시 볼까요?', keepLater:'계속 나중에',
   tomorrow:'내일', dayAfter:'모레', pickDate:'날짜 변경',
   toIdeas:'떠오른 일로', del:'삭제', moveTo:'옮기기', edit:'수정',
-  moveUp:'앞으로', moveDown:'뒤로', catHint:'분류를 우클릭하면 수정·순서·삭제할 수 있어요.',
+  moveUp:'앞으로', moveDown:'뒤로', catHint:'분류를 우클릭(폰은 꾹 누르기)하면 수정·순서·삭제할 수 있어요.',
   thisOneOnly:'이번 항목만 수정됩니다. 반복 자체는 설정 → 반복 할 일에서 바꿉니다.',
   skip:'이번 회차 건너뛰기', waitOn:'기다리는 중으로', waitOff:'기다리기 해제',
   waiting:'기다리는 중',
@@ -1114,7 +1114,7 @@ const I18N = {
   installIos:'공유 버튼 → ‘홈 화면에 추가’', installedOk:'설치했어요',
   remainN:n=>`남은 할 일 ${n}개`, moveAllTo:s=>`${s}로 모두 이동`, pickDate2:'다른 날짜로 이동',
   allLater:'모두 나중에', delAll:'남은 일정 모두 삭제',
-  moveUp:'위로 올리기', moveDown:'아래로 내리기',
+  moveUp:'위로 올리기', moveDown:'아래로 내리기', menuMore:'더보기', menuLess:'접기',
   qtNoDate:'날짜 없이', pickDate:'날짜 선택', sheetMove:'날짜 옮기기', leftTag:'남음',
   showAllN:n=>`나머지 ${n}개 더 보기`,
   delDay:'이 날 기록 지우기',
@@ -1183,7 +1183,7 @@ const I18N = {
   rediscover:'Worth another look?', keepLater:'Keep for later',
   tomorrow:'Tomorrow', dayAfter:'In 2 days', pickDate:'Change date',
   toIdeas:'Move to Ideas', del:'Delete', moveTo:'Move', edit:'Edit',
-  moveUp:'Move up', moveDown:'Move down', catHint:'Right-click a category to edit, reorder or delete it.',
+  moveUp:'Move up', moveDown:'Move down', catHint:'Right-click (long-press on phones) a category to edit, reorder or delete it.',
   thisOneOnly:'Only this one changes. Edit the routine itself in Settings → Routines.',
   skip:'Skip this one', waitOn:'Mark as waiting', waitOff:'Not waiting',
   waiting:'Waiting',
@@ -1253,7 +1253,7 @@ const I18N = {
   installIos:'Share → Add to Home Screen', installedOk:'Installed',
   remainN:n=>`${n} left`, moveAllTo:s=>`Move all to ${s}`, pickDate2:'Move all to another date',
   allLater:'All to Someday', delAll:'Delete what is left',
-  moveUp:'Move up', moveDown:'Move down',
+  moveUp:'Move up', moveDown:'Move down', menuMore:'More', menuLess:'Less',
   qtNoDate:'No date', pickDate:'Pick date', sheetMove:'Move to', leftTag:'left',
   showAllN:n=>`Show ${n} more`,
   delDay:'Clear this day',
@@ -2345,8 +2345,7 @@ function renderDay(tk){
   const cats = groups.filter(g=>g.items.length).map(({c, items})=>`
     <div class="cat" data-c="${c?c.id:''}">
       ${c ? `<div class="ch"><span class="sq" style="background:${stripColor(c.c)}"></span>
-              <span class="nm" style="color:${ink(c.c)}">${esc(c.n)}</span>
-              <span class="edit">${ICON.pencil}</span></div>` : ''}
+              <span class="nm" style="color:${ink(c.c)}">${esc(c.n)}</span></div>` : ''}
       <ul>${items.map(t=>rowHTML(t, sel, {star:true})).join('')}</ul>
     </div>`).join('');
 
@@ -2947,7 +2946,6 @@ $('#side').addEventListener('click', e=>{
     chip.parentElement.querySelectorAll('button').forEach(b=>b.classList.toggle('on', b === chip));
     return $('#qd')?.focus();                 // 적던 내용을 잃지 않게 다시 그리지 않는다
   }
-  if(e.target.closest('.ch')) return openCat(cat.dataset.c);
   const jump = e.target.closest('[data-k]');
   if(jump){ sel = jump.dataset.k; cur = dOf(sel); view='day'; render(); }
 });
@@ -3104,7 +3102,7 @@ function flash(msg, canUndo){
 }
 
 /* ─── 빠른 이동 메뉴 ─── */
-let menuCtx = null, menuCats = false, menuAt = [0,0];
+let menuCtx = null, menuCats = false, menuMore = false, menuAt = [0,0];
 const md2 = k => { const d = dOf(k); return (d.getMonth()+1) + '/' + d.getDate(); };
 
 /* 폰의 ⋯ 시트. 위에서 아래로: 머리(무슨 할 일인가) → 날짜 옮기기 타일 → 항목 → 위/아래 → 삭제.
@@ -3131,10 +3129,15 @@ function todoSheetHTML(t, from, spot){
   const tiles = [];
   if(tk !== from)          tiles.push(['today',    T('today'),    md2(tk)]);
   if(shift(tk,1) !== from) tiles.push(['tomorrow', T('tomorrow'), md2(shift(tk,1))]);
-  if(shift(tk,2) !== from) tiles.push(['d2',       T('dayAfter'), md2(shift(tk,2))]);
   if(from !== 'later')     tiles.push(['later',    T('later'),    T('qtNoDate')]);
   const row = (a, icon, label, k, cls = '') =>
     `<button data-a="${a}" ${cls ? `class="${cls}"` : ''}>${icon}<span>${label}</span>${k ? `<span class="k">${k}</span>` : ''}</button>`;
+  /* 자주 쓰는 것만 위에 — 나머지는 '더보기' 안에. 순서 바꾸기는 꾹 눌러 끌면 되므로 뺐다. */
+  const more = (t.d ? '' : row('wait', SI.wait, t.w ? T('waitOff') : T('waitOn')))
+    + row('sub', SI.list, T('subs'))
+    + row('note', SI.note, T('note'))
+    + (t.r && !t.d ? row('skip', SI.skip, T('skip')) : '')
+    + (from !== 'ideas' ? row('ideas', SI.bulb, T('toIdeas')) : '');
 
   return head(t.t || '', where + (c ? ' · ' + esc(c.n) : ''), false)
     + `<div class="qlbl">${T('sheetMove')}</div>
@@ -3145,15 +3148,8 @@ function todoSheetHTML(t, from, spot){
        </div>`
     + row('edit', SI.edit, T('edit'))
     + row('cats', SI.tag, T('category'), `${esc(c?.n || T('noCat'))}${SI.chev}`)
-    + row('sub', SI.list, T('subs'))
-    + row('note', SI.note, T('note'))
-    + (t.d ? '' : row('wait', SI.wait, t.w ? T('waitOff') : T('waitOn')))
-    + (t.r && !t.d ? row('skip', SI.skip, T('skip')) : '')
-    + (from !== 'ideas' ? row('ideas', SI.bulb, T('toIdeas')) : '')
-    + (spot && spot.i >= 0 && spot.n > 1 ? `<div class="ogrid">
-        ${spot.i > 0 ? `<button class="ob" data-a="up">${SI.up}<span>${T('moveUp')}</span></button>` : ''}
-        ${spot.i < spot.n - 1 ? `<button class="ob" data-a="down">${SI.down}<span>${T('moveDown')}</span></button>` : ''}
-      </div>` : '')
+    + row('more', menuMore ? SI.up : SI.down, T(menuMore ? 'menuLess' : 'menuMore'))
+    + (menuMore ? more : '')
     + `<div class="sep"></div>` + row('del', SI.trash, T('del'), '', 'rm');
 }
 
@@ -3191,7 +3187,6 @@ function openMenu(x, y, from, id){
   const opts = [
     ['today',    T('today'),     tk],
     ['tomorrow', T('tomorrow'),  shift(tk,1)],
-    ['d2',       T('dayAfter'),  shift(tk,2)],
   ].filter(([,,k]) => k !== from);
   const body = menuCats
     ? `<button data-a="back">‹ ${T('category')}</button><div class="sep"></div>
@@ -3204,15 +3199,14 @@ function openMenu(x, y, from, id){
     opts.map(([a,label,k])=>`<button data-a="${a}">${label}<span class="k">${k.slice(5)}</span></button>`).join('') +
     `<input type="date" id="menuDate" value="${isDateKey(from)?from:tk}">
      ${from!=='later' ? `<button data-a="later">${T('later')}</button>` : ''}
-     ${from!=='ideas' ? `<button data-a="ideas">${T('toIdeas')}</button>` : ''}
      <div class="sep"></div>
      <button data-a="cats">${T('category')}<span class="k">${esc(catOf(t.c)?.n || T('noCat'))}</span></button>
-     <button data-a="sub">${T('subs')}</button>
-     <button data-a="note">${T('note')}</button>
-     ${spot && spot.i > 0 ? `<button data-a="up">${T('moveUp')}</button>` : ''}
-     ${spot && spot.i >= 0 && spot.i < spot.n - 1 ? `<button data-a="down">${T('moveDown')}</button>` : ''}
-     ${t.d ? '' : `<button data-a="wait">${t.w ? T('waitOff') : T('waitOn')}</button>`}
-     ${t.r && !t.d ? `<button data-a="skip">${T('skip')}</button>` : ''}
+     <button data-a="more">${T(menuMore ? 'menuLess' : 'menuMore')}<span class="k">${menuMore ? '▴' : '▾'}</span></button>
+     ${menuMore ? `${t.d ? '' : `<button data-a="wait">${t.w ? T('waitOff') : T('waitOn')}</button>`}
+       <button data-a="sub">${T('subs')}</button>
+       <button data-a="note">${T('note')}</button>
+       ${t.r && !t.d ? `<button data-a="skip">${T('skip')}</button>` : ''}
+       ${from!=='ideas' ? `<button data-a="ideas">${T('toIdeas')}</button>` : ''}` : ''}
      <div class="sep"></div>
      <button data-a="del" class="rm">${T('del')}</button>`;
 
@@ -3239,7 +3233,7 @@ function openMenu(x, y, from, id){
 let menuHideT = null, todoSheet = false;
 function closeMenu(){
   const mm = $('#menu');
-  menuCtx = null; menuCats = false; catCtx = null;
+  menuCtx = null; menuCats = false; menuMore = false; catCtx = null;
   if(todoSheet){ todoSheet = false; closeSheet(); }
   if(mm.hidden) return;
   if(reduceMo()) return void (mm.hidden = true);
@@ -3259,10 +3253,7 @@ const onTodoAction = e=>{
     if(btn.dataset.cat) t.c = btn.dataset.cat; else delete t.c;
     return touch();
   }
-  if(a === 'up' || a === 'down'){             // 시트는 그대로 두고 순서만 바꾼다 — 연달아 누르게
-    nudgeOrder(from, id, a === 'up' ? -1 : 1);
-    return openMenu(menuAt[0], menuAt[1], from, id);
-  }
+  if(a === 'more'){ menuMore = !menuMore; return openMenu(menuAt[0], menuAt[1], from, id); }
   if(a === 'cats'){ menuCats = true; return openMenu(menuAt[0], menuAt[1], from, id); }
   if(a === 'back'){ menuCats = false; return openMenu(menuAt[0], menuAt[1], from, id); }
   if(btn.dataset.cat === undefined && todoSheet && ['edit','newcat','sub','note'].includes(a)){
