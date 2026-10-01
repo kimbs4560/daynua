@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ko">
+<html lang="ko" class="gating">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -10,6 +10,10 @@
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
+<script>
+/* 첫 화면(gate)이 어떤 이유로든 12초 안에 시작되지 않으면 앱을 그냥 보여준다 — 빈 화면에 갇히지 않게 */
+setTimeout(function(){ if(!window.__gate) document.documentElement.classList.remove('gating'); }, 12000);
+</script>
 <style>
 :root{
   --bg:#faf9f6; --card:#fff; --ink:#1b1b20; --sub:#63626c; --faint:#8a877f;
@@ -846,9 +850,71 @@ dialog input:focus,dialog select:focus{border-color:var(--accent)}
   #cal .cell .n{font-size:15px}
 }
 @media (min-width:1600px){ #cal .cell .chk{width:30px;height:30px} }
+
+/* ── 첫 화면: 로고가 써지고 → 로그인 → 앱이 켜지듯 열린다 ── */
+html.gating body > :not(#gate):not(script){visibility:hidden}
+#gate{position:fixed;inset:0;z-index:3000;background:var(--bg);overflow-y:auto;
+  display:flex;transition:opacity .55s var(--ease)}
+#gate[hidden]{display:none}
+#gate.out{opacity:0;pointer-events:none}
+.g-in{margin:auto;width:100%;max-width:380px;padding:32px 24px calc(32px + env(safe-area-inset-bottom));
+  display:flex;flex-direction:column;align-items:center}
+.g-logo{width:min(78vw,340px);height:auto;overflow:visible;transition:width .7s var(--ease)}
+.g-logo text{font-family:inherit}
+.g-logo .a{color:var(--ink)} .g-logo .b{color:var(--accent)}
+.g-logo tspan{fill:transparent;stroke:currentColor;stroke-width:1.6;stroke-linejoin:round;
+  stroke-dasharray:480;stroke-dashoffset:480;
+  animation:gdraw .85s cubic-bezier(.4,.1,.3,1) forwards, gfill .55s ease forwards;
+  animation-delay:calc(var(--i) * .11s + .1s), calc(var(--i) * .11s + .85s)}
+@keyframes gdraw{to{stroke-dashoffset:0}}
+@keyframes gfill{to{fill:currentColor;stroke-width:.4}}
+#gate.static .g-logo tspan,
+#gate.reduce .g-logo tspan{animation:none;fill:currentColor;stroke-width:.4;stroke-dashoffset:0}
+#gate.show-card .g-logo{width:min(54vw,220px)}
+.g-card{width:100%;max-height:0;opacity:0;overflow:hidden;transform:translateY(8px);
+  transition:max-height .7s var(--ease),opacity .5s var(--ease) .1s,transform .6s var(--ease) .1s;
+  visibility:hidden}
+#gate.show-card .g-card{max-height:520px;opacity:1;transform:none;visibility:visible;margin-top:26px}
+.g-card input[type=email],.g-card input[type=password]{display:block;width:100%;box-sizing:border-box;
+  margin:0 0 10px;padding:14px 15px;font:inherit;font-size:16px;color:var(--ink);background:var(--card);
+  border:1.5px solid var(--line);border-radius:14px;outline:none;transition:border-color .15s var(--ease)}
+.g-card input:focus{border-color:var(--accent)}
+.g-err{font-size:13px;color:var(--danger);margin:0 2px 10px;line-height:1.45}
+.g-err.ok{color:var(--accent-ink)}
+.g-auto{display:flex;align-items:center;gap:9px;margin:4px 2px 14px;font-size:14px;color:var(--sub);cursor:pointer;user-select:none}
+.g-auto input{width:18px;height:18px;margin:0;accent-color:var(--accent);flex:none}
+.g-go{display:block;width:100%;padding:14px;font:inherit;font-size:16px;font-weight:700;border:0;border-radius:14px;
+  background:var(--accent);color:var(--on-accent);cursor:pointer;transition:transform .12s var(--ease),opacity .15s}
+.g-go:active{transform:scale(.98)} .g-go:disabled{opacity:.6}
+.g-alt{display:flex;justify-content:space-between;margin:14px 2px 0}
+.g-alt button,.g-guest{background:none;border:0;padding:8px 2px;font:inherit;font-size:14px;color:var(--sub);cursor:pointer}
+.g-guest{display:block;margin:6px auto 0;font-size:13px;color:var(--faint)}
+@media (hover:hover){.g-alt button:hover,.g-guest:hover{color:var(--ink)}}
+/* 앱이 '켜지듯' 열린다 */
+html.entering #app,html.entering #fab{animation:appIn .65s cubic-bezier(.2,.8,.2,1) both}
+@keyframes appIn{from{opacity:0;transform:translateY(12px) scale(.985)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){ .g-card,.g-logo,#gate{transition:none} html.entering #app,html.entering #fab{animation:none} }
 </style>
 </head>
 <body>
+<div id="gate" role="dialog" aria-label="Daynua">
+  <div class="g-in">
+    <svg class="g-logo" viewBox="0 0 300 84" role="img" aria-label="Daynua">
+      <text x="150" y="62" text-anchor="middle" font-size="68" font-weight="700" letter-spacing="3">
+        <tspan class="a" style="--i:0">D</tspan><tspan class="a" style="--i:1">a</tspan><tspan class="a" style="--i:2">y</tspan><tspan class="b" style="--i:3">n</tspan><tspan class="b" style="--i:4">u</tspan><tspan class="b" style="--i:5">a</tspan>
+      </text>
+    </svg>
+    <div class="g-card" id="gCard">
+      <div class="g-err" id="gErr" hidden></div>
+      <input id="gEmail" type="email" autocomplete="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore>
+      <input id="gPw" type="password" autocomplete="new-password" data-lpignore="true" data-1p-ignore>
+      <label class="g-auto" id="gAutoRow"><input type="checkbox" id="gAuto"><span id="gAutoTx"></span></label>
+      <button class="g-go" id="gGo"></button>
+      <div class="g-alt"><button id="gSwap"></button><button id="gReset"></button></div>
+      <button class="g-guest" id="gGuest"></button>
+    </div>
+  </div>
+</div>
 <div id="app">
   <div class="top">
     <div class="brand" id="brand">Day<b>nua</b></div>
@@ -919,8 +985,8 @@ dialog input:focus,dialog select:focus{border-color:var(--accent)}
   <h3 id="authTitle"></h3>
   <p id="authSub"></p>
   <div class="err" id="authErr" hidden></div>
-  <input id="email" type="email" autocomplete="email">
-  <input id="pw" type="password" autocomplete="current-password">
+  <input id="email" type="email" autocomplete="off" data-lpignore="true" data-1p-ignore>
+  <input id="pw" type="password" autocomplete="new-password" data-lpignore="true" data-1p-ignore>
   <div class="row">
     <button class="plain" id="authClose"></button>
     <button class="primary" id="authGo"></button>
@@ -957,7 +1023,8 @@ dialog input:focus,dialog select:focus{border-color:var(--accent)}
 const SUPABASE_URL = 'https://cjhwxjznuleyfcbwwvtb.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_acxKbtekhqwFZwI0EUtArg_3FSj5AHh';
 const VAPID_PUBLIC = 'BItluVUoPAOjdIacpE7-6Ko45leNKobu8SbCNP1L6zdozMUrtFBNjh7ncFVZGSvwdHf4vNkYQKj5BarWq01G0hE';
-const BUILD = '2026-10-01.29';
+const BUILD = '2026-10-01.30';
+const ARRIVED_BY_LINK = /access_token|type=(signup|recovery|magiclink|invite)|[?&]code=/.test(location.hash + location.search);
 /* 크롬·삼성 인터넷이 '설치할 수 있다'고 알려주는 이벤트. 동기화 라이브러리를 기다리는 동안
    지나가 버리지 않게 모듈 맨 위에서 받는다. */
 /* 설치한 PC 앱 창이 작게 열리는 경우 — 처음 한 번만 알맞은 크기로 키운다.
@@ -1031,6 +1098,7 @@ const I18N = {
   catNew:'새 분류', catEditT:'분류 수정', color:'색상', save:'저장', cancel:'취소',
   catPh:'이름 (예: 운동)', delCat:'이 분류 삭제', armed:'한 번 더 누르면 삭제됩니다',
   newCatName:'새 분류',
+  autoLogin:'자동 로그인', guestGo:'로그인 없이 시작', signedUp:'가입했어요. 이제 로그인해 주세요.',
   logoutAsk:'로그아웃할까요?', importAsk:'현재 데이터를 덮어씁니다. 계속할까요?',
   lag:n=>`${n}일째`, lagTip:'주말·공휴일은 빼고 센 미룬 날수',
   sent:'메일을 보냈습니다. 받은 편지함을 확인하세요.',
@@ -1170,6 +1238,7 @@ const I18N = {
   catNew:'New category', catEditT:'Edit category', color:'Color', save:'Save', cancel:'Cancel',
   catPh:'Name (e.g. Workout)', delCat:'Delete this category', armed:'Tap again to delete',
   newCatName:'New category',
+  autoLogin:'Keep me logged in', guestGo:'Continue without an account', signedUp:'You are signed up. Now log in.',
   logoutAsk:'Log out?', importAsk:'This overwrites your current data. Continue?',
   lag:n=>`${n}d late`, lagTip:'Working days late (weekends & holidays excluded)',
   sent:'Email sent. Check your inbox.',
@@ -4205,7 +4274,7 @@ try{
     sb.auth.onAuthStateChange(async (ev, ses)=>{
       const was = user;
       user = ses?.user || null;
-      if(ev === 'PASSWORD_RECOVERY') openPw('recover');
+      if(ev === 'PASSWORD_RECOVERY'){ gateEnter(); openPw('recover'); }
       if((was?.id || '') !== (user?.id || '')) await useSlot();
       setAcct();
       watch();
@@ -4342,6 +4411,7 @@ function renderAcct(){
     doc.ui.notify = false; await syncPush();
     save();                                   // 계정 칸을 제대로 닫고 나간다
     await sb.auth.signOut(); $('#acctDlg').close();
+    gateReopen();
   });
   $('#pwBtn')?.addEventListener('click', ()=>{ $('#acctDlg').close(); openPw('change'); });
   $('#delAcct')?.addEventListener('click', async ()=>{
@@ -4361,6 +4431,7 @@ function renderAcct(){
     delArmed = false;
     $('#acctDlg').close(); applyUI(); save(); render();
     flash(T('delAcctDone'));
+    gateReopen();
   });
   $('#inBtn')?.addEventListener('click', ()=>{ $('#acctDlg').close(); openAuth('in'); });
   $('#upBtn')?.addEventListener('click', ()=>{ $('#acctDlg').close(); openAuth('up'); });
@@ -4419,7 +4490,7 @@ function renderAuth(){
   $('#authReset').textContent = T('forgot');
   $('#email').placeholder = T('emailPh');
   $('#pw').placeholder = T('pwPh');
-  $('#pw').autocomplete = up ? 'new-password' : 'current-password';
+  $('#pw').autocomplete = 'new-password';
 }
 $('#authSwap').onclick = ()=>{ authMode = authMode==='up' ? 'in' : 'up'; authMsg(''); renderAuth(); };
 $('#authClose').onclick = ()=>$('#auth').close();
@@ -4434,6 +4505,7 @@ $('#authGo').onclick = async ()=>{
   $('#authGo').disabled = false;
   if(error) return authMsg(trErr(error.message));
   if(authMode==='up' && !data.session) return authMsg(T('confirmSent'), true);
+  sessionStorage.setItem('daynua.sess', '1'); localStorage.removeItem('daynua.guest');
   $('#auth').close();
 };
 $('#authReset').onclick = async ()=>{
@@ -4450,6 +4522,100 @@ matchMedia('(prefers-color-scheme: dark)').addEventListener('change', ()=>{ appl
 applyUI();
 runRollover();
 render();
+
+/* ─── 첫 화면 ───
+   로고가 써지는 동안(≈1.5초) 로그인 상태를 확인한다.
+   · 로그인돼 있고(자동 로그인 켬 또는 이번 실행에서 로그인) → 로고가 다 써지면 앱으로
+   · 자동 로그인을 끈 채 새로 켰다 → 로그아웃시키고 로그인 화면
+   · 로그인 안 함 → 로그인 화면 ('로그인 없이 시작'을 한 번 골랐으면 그대로 앱으로) */
+const gate = $('#gate'), gE = $('#gEmail'), gP = $('#gPw'), gA = $('#gAuto'), gGo = $('#gGo');
+const GATE_DRAW = 1500, gateT0 = performance.now();
+const wait = ms => new Promise(r => setTimeout(r, ms));
+const autoOn = () => localStorage.getItem('daynua.auto') !== '0';   // 예전부터 로그인돼 있던 기기는 그대로 자동
+let gateMode = 'in';
+if(reduceMo()) gate.classList.add('reduce');
+function gateMsg(s, ok){ const e = $('#gErr'); e.textContent = s || ''; e.hidden = !s; e.classList.toggle('ok', !!ok); }
+function gateRender(){
+  const up = gateMode === 'up';
+  gE.placeholder = T('emailPh'); gP.placeholder = T('pwPh');
+  gGo.textContent = up ? T('signup') : T('login');
+  $('#gSwap').textContent = up ? T('toLogin') : T('toSignup');
+  $('#gReset').textContent = T('forgot'); $('#gReset').hidden = up;
+  $('#gAutoTx').textContent = T('autoLogin'); $('#gAutoRow').hidden = up;
+  $('#gGuest').textContent = T('guestGo'); $('#gGuest').hidden = up;
+  gP.autocomplete = 'new-password';                    // 브라우저가 저장된 비밀번호를 끼워 넣지 않게
+}
+function gateEnter(){
+  if(gate.hidden && !document.documentElement.classList.contains('gating')) return;
+  const root = document.documentElement, calm = reduceMo();
+  root.classList.remove('gating');
+  if(!calm){ root.classList.add('entering'); setTimeout(()=>root.classList.remove('entering'), 900); }
+  gate.classList.add('out');
+  setTimeout(()=>{ gate.hidden = true; gate.classList.remove('out', 'show-card', 'static'); }, calm ? 0 : 650);
+}
+function gateLogin(instant){
+  gateMode = 'in'; gateRender();
+  gE.value = localStorage.getItem('daynua.email') || ''; gP.value = '';
+  gA.checked = localStorage.getItem('daynua.auto') === '1';
+  gate.hidden = false; gate.classList.remove('out');
+  const show = () => { gate.classList.add('show-card'); if(canDrag && !gE.value) gE.focus({preventScroll:true}); };
+  if(instant) show(); else wait(Math.max(0, GATE_DRAW - (performance.now() - gateT0) + 150)).then(show);
+}
+function gateReopen(){                                   // 로그아웃·탈퇴 뒤
+  sessionStorage.removeItem('daynua.sess'); localStorage.removeItem('daynua.guest');
+  document.documentElement.classList.add('gating');
+  gate.classList.add('static'); gateMsg('');
+  gateLogin(true);
+}
+async function gateStart(){
+  window.__gate = 1;
+  if(user && ARRIVED_BY_LINK) sessionStorage.setItem('daynua.sess', '1');
+  const sessOK = sessionStorage.getItem('daynua.sess') === '1';
+  const left = () => Math.max(0, GATE_DRAW - (performance.now() - gateT0));
+  if(user && sb){
+    if(autoOn() || sessOK){ sessionStorage.setItem('daynua.sess', '1'); await wait(left()); return gateEnter(); }
+    await sb.auth.signOut().catch(()=>{});               // 자동 로그인을 끈 채 다시 켰다
+  } else if(!sb || localStorage.getItem('daynua.guest') === '1'){
+    await wait(left()); return gateEnter();
+  }
+  gateLogin(false);
+}
+$('#gSwap').onclick = ()=>{ gateMode = gateMode === 'up' ? 'in' : 'up'; gateMsg(''); gateRender(); };
+$('#gGuest').onclick = ()=>{ localStorage.setItem('daynua.guest', '1'); gateEnter(); };
+$('#gReset').onclick = async ()=>{
+  const email = gE.value.trim();
+  if(!email) return gateMsg(T('needEmail'));
+  const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: location.origin + location.pathname });
+  gateMsg(error ? trErr(error.message) : T('sent'), !error);
+};
+gGo.onclick = async ()=>{
+  const email = gE.value.trim(), pw = gP.value;
+  if(!email || !pw) return gateMsg(T('needBoth'));
+  gGo.disabled = true; gateMsg('');
+  try{
+    if(gateMode === 'up'){
+      const { data, error } = await sb.auth.signUp({ email, password:pw,
+        options:{ emailRedirectTo: location.origin + location.pathname } });
+      if(error) return gateMsg(trErr(error.message));
+      if(data.session) await sb.auth.signOut();          // 가입 뒤에는 로그인 화면으로 — 한 번 더 로그인한다
+      localStorage.setItem('daynua.email', email);
+      gateMode = 'in'; gateRender(); gP.value = '';
+      return gateMsg(data.session ? T('signedUp') : T('confirmSent'), true);
+    }
+    const { error } = await sb.auth.signInWithPassword({ email, password:pw });
+    if(error) return gateMsg(trErr(error.message));
+    localStorage.setItem('daynua.auto', gA.checked ? '1' : '0');
+    localStorage.setItem('daynua.email', email);
+    localStorage.removeItem('daynua.guest');
+    sessionStorage.setItem('daynua.sess', '1');
+    gP.value = '';
+    gateEnter();
+  }catch(e){ gateMsg(T('needBoth')); }
+  finally{ gGo.disabled = false; }
+};
+$('#gCard').addEventListener('keydown', e=>{ if(e.key === 'Enter' && e.target.tagName !== 'BUTTON'){ e.preventDefault(); gGo.click(); } });
+gateRender();
+gateStart();
 
 if(location.hash === '#test'){                     // 색 대비는 DOM 이 있어야 재므로 여기서
   const was = doc.ui.theme;
