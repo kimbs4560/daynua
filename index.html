@@ -1040,7 +1040,7 @@ html.entering #app,html.entering #fab{animation:appIn .65s cubic-bezier(.2,.8,.2
 const SUPABASE_URL = 'https://cjhwxjznuleyfcbwwvtb.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_acxKbtekhqwFZwI0EUtArg_3FSj5AHh';
 const VAPID_PUBLIC = 'BItluVUoPAOjdIacpE7-6Ko45leNKobu8SbCNP1L6zdozMUrtFBNjh7ncFVZGSvwdHf4vNkYQKj5BarWq01G0hE';
-const BUILD = '2026-10-01.33';
+const BUILD = '2026-10-01.34';
 /* Daynua 앱(Android 껍데기) 안이면 위젯·알림·내보내기를 앱에 맡긴다. 아니면 null */
 const APP = typeof DaynuaApp !== 'undefined' ? DaynuaApp : null;
 const ARRIVED_BY_LINK = /access_token|type=(signup|recovery|magiclink|invite)|[?&]code=/.test(location.hash + location.search);
@@ -1131,7 +1131,8 @@ const I18N = {
   rediscover:'다시 볼까요?', keepLater:'계속 나중에',
   tomorrow:'내일', dayAfter:'모레', pickDate:'날짜 변경',
   toIdeas:'떠오른 일로', del:'삭제', moveTo:'옮기기', edit:'수정',
-  moveUp:'앞으로', moveDown:'뒤로', catHint:'분류를 우클릭(폰은 꾹 누르기)하면 수정·순서·삭제할 수 있어요.',
+  moveUp:'앞으로', moveDown:'뒤로', catHint:'분류를 우클릭하면 수정·순서·삭제할 수 있어요.',
+  catHintTouch:'분류를 꾹 누르면 수정·순서·삭제할 수 있어요.',
   thisOneOnly:'이번 항목만 수정됩니다. 반복 자체는 설정 → 반복 할 일에서 바꿉니다.',
   skip:'이번 회차 건너뛰기', waitOn:'기다리는 중으로', waitOff:'기다리기 해제',
   waiting:'기다리는 중',
@@ -1197,7 +1198,7 @@ const I18N = {
   ideasHint:'떠오른 일 = 아직 정리하지 않은 것 · 나중에 = 언젠가 할 것',
   calHint:'날짜 아래 점은 그날 일정의 분류 색입니다. 계획한 일을 다 끝낸 날은 칸이 분류 색으로 물들고 ✓ 가 뜹니다.',
   tipPC:'날짜를 우클릭하면 그날 남은 일정을 한꺼번에 정리할 수 있어요. 할 일을 달력으로 끌어 놓아도 이동됩니다.',
-  tipMobile:'할 일을 꾹 눌렀다가 끌면 다른 날로 옮길 수 있어요. ⋯ 를 누르면 더 많은 메뉴가 열려요.',
+  tipMobile:'할 일을 꾹 눌렀다가 끌면 다른 날로 옮길 수 있어요. 날짜를 꾹 누르면 그날 남은 일정을 정리할 수 있고, ⋯ 를 누르면 더 많은 메뉴가 열려요.',
   secApp:'앱', installBtn:'홈 화면에 설치',
   installHint:'설치하면 주소창 없이 앱처럼 열리고, 앱 서랍에도 나타납니다.',
   installAndroid:'브라우저 메뉴(⋮ 또는 ≡) → ‘앱 설치’ 또는 ‘홈 화면에 추가’',
@@ -1218,6 +1219,7 @@ const I18N = {
   aTasks:n=>`할 일 ${n}개`, aAllDone:'모두 완료', aCleared:'남은 일 없음 (일부는 미룸)',
   aSomeDone:(n,d)=>`할 일 ${n}개 중 ${d}개 완료`,
   firstHint:'할 일을 적고 Enter 만 누르면 됩니다. 날짜와 분류는 나중에 정해도 돼요.',
+  firstHintTouch:'할 일을 적고 키보드의 완료(↵)를 누르면 됩니다. 날짜와 분류는 나중에 정해도 돼요.',
   allTime:'전체', thisYear:'올해', recent:'최근 했던 일', activity:'활동',
   actLegend:'그날 끝낸 일의 수',
   saveFail:'저장 공간이 부족합니다. 설정 → 데이터 → 내보내기로 백업해주세요.',
@@ -1274,7 +1276,8 @@ const I18N = {
   rediscover:'Worth another look?', keepLater:'Keep for later',
   tomorrow:'Tomorrow', dayAfter:'In 2 days', pickDate:'Change date',
   toIdeas:'Move to Ideas', del:'Delete', moveTo:'Move', edit:'Edit',
-  moveUp:'Move up', moveDown:'Move down', catHint:'Right-click (long-press on phones) a category to edit, reorder or delete it.',
+  moveUp:'Move up', moveDown:'Move down', catHint:'Right-click a category to edit, reorder or delete it.',
+  catHintTouch:'Press and hold a category to edit, reorder or delete it.',
   thisOneOnly:'Only this one changes. Edit the routine itself in Settings → Routines.',
   skip:'Skip this one', waitOn:'Mark as waiting', waitOff:'Not waiting',
   waiting:'Waiting',
@@ -1340,7 +1343,7 @@ const I18N = {
   ideasHint:'Ideas = not sorted yet · Someday = one day, no date',
   calHint:'Dots under a date are the categories of that day. A fully finished day is tinted with them and gets a ✓.',
   tipPC:'Right-click a date to clear out what is left that day. You can also drag a task onto the calendar.',
-  tipMobile:'Press and hold a task, then drag it to move it to another day. Tap ⋯ for more.',
+  tipMobile:'Press and hold a task, then drag it to move it to another day. Press and hold a date to clear out what is left that day. Tap ⋯ for more.',
   secApp:'App', installBtn:'Install to Home screen',
   installHint:'Opens like an app without the address bar, and shows up in your app drawer.',
   installAndroid:'Browser menu (⋮ or ≡) → Install app / Add to Home screen',
@@ -1361,6 +1364,7 @@ const I18N = {
   aTasks:n=>`${n} tasks`, aAllDone:'all completed', aCleared:'nothing left (some moved)',
   aSomeDone:(n,d)=>`${d} of ${n} completed`,
   firstHint:'Type and press Enter. Dates and categories can wait.',
+  firstHintTouch:'Type, then tap Done on the keyboard. Dates and categories can wait.',
   allTime:'All time', thisYear:'This year', recent:'Recently done', activity:'Activity',
   actLegend:'tasks finished that day',
   saveFail:'Storage is full. Back up via Settings → Data → Export.',
@@ -1846,11 +1850,11 @@ let catHintSeen = localStorage.getItem('daynua.hint5') === '1';
 const tipNow = () => {
   /* 하나 닫으면 그 자리에 다음 안내가 바로 뜬다 — 안내가 아니라 벽이 된다 */
   if(localStorage.getItem('daynua.tipDay') === todayKey()) return null;
-  if(firstRun) return {id:1, text:T('firstHint')};
+  if(firstRun) return {id:1, text:T(canDrag ? 'firstHint' : 'firstHintTouch')};
   if(!calHintSeen && monthHasComplete) return {id:3, text:T('calHint')};
   const n = Object.values(doc.todos).reduce((s,l)=>s+l.length, 0);
   if(!moveHintSeen && n >= 3) return {id:4, text: canDrag ? T('tipPC') : T('tipMobile')};
-  if(!catHintSeen && doc.cats.length >= 2) return {id:5, text:T('catHint')};
+  if(!catHintSeen && doc.cats.length >= 2) return {id:5, text:T(canDrag ? 'catHint' : 'catHintTouch')};
   return null;
 };
 let doneOpen = (localStorage.getItem('daynua.doneOpen') ?? '0') === '1';
