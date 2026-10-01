@@ -1040,7 +1040,9 @@ html.entering #app,html.entering #fab{animation:appIn .65s cubic-bezier(.2,.8,.2
 const SUPABASE_URL = 'https://cjhwxjznuleyfcbwwvtb.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_acxKbtekhqwFZwI0EUtArg_3FSj5AHh';
 const VAPID_PUBLIC = 'BItluVUoPAOjdIacpE7-6Ko45leNKobu8SbCNP1L6zdozMUrtFBNjh7ncFVZGSvwdHf4vNkYQKj5BarWq01G0hE';
-const BUILD = '2026-10-01.32';
+const BUILD = '2026-10-01.33';
+/* Daynua 앱(Android 껍데기) 안이면 위젯·알림·내보내기를 앱에 맡긴다. 아니면 null */
+const APP = typeof DaynuaApp !== 'undefined' ? DaynuaApp : null;
 const ARRIVED_BY_LINK = /access_token|type=(signup|recovery|magiclink|invite)|[?&]code=/.test(location.hash + location.search);
 /* 크롬·삼성 인터넷이 '설치할 수 있다'고 알려주는 이벤트. 동기화 라이브러리를 기다리는 동안
    지나가 버리지 않게 모듈 맨 위에서 받는다. */
@@ -1148,6 +1150,7 @@ const I18N = {
   notifyDenied:'브라우저에서 알림이 차단되어 있습니다. 주소창 자물쇠 → 알림 허용으로 바꿔주세요.',
   pushAsk:'알림 설정은 켜져 있지만 이 기기에서는 아직 허용하지 않았습니다. 허용해야 앱을 꺼 둬도 알림이 옵니다.',
   pushAllow:'이 기기에서 알림 허용',
+  appRemind:'이 폰의 알림으로 예약했습니다. 앱을 꺼 둬도 그 시각에 울립니다.',
   pushOk:'서버 알림이 연결되어 있습니다. 앱을 꺼 둬도 그 시각에 울립니다.',
   pushNoSub:'이 기기에서 알림 등록에 실패했습니다. 폰 설정 → 앱 → Chrome 의 알림을 켜고 배터리 사용 제한을 ‘제한 없음’으로 바꾼 뒤 앱을 다시 열어주세요.',
   pushDbErr:'서버에 알림을 등록하지 못했습니다. 인터넷을 확인하고 잠시 뒤 다시 시도해주세요.',
@@ -1290,6 +1293,7 @@ const I18N = {
   notifyDenied:'Notifications are blocked in this browser. Allow them in site settings.',
   pushAsk:'Reminders are on, but this device has not allowed notifications yet. Allow them so reminders arrive with the app closed.',
   pushAllow:'Allow notifications on this device',
+  appRemind:'Scheduled on this phone. It fires at that time even with the app closed.',
   pushOk:'Server reminders are connected. They fire at that time even with the app closed.',
   pushNoSub:'Could not register this device. Turn on Chrome notifications in phone settings, set battery usage to unrestricted, then reopen the app.',
   pushDbErr:'Could not register with the server. Check your connection and try again.',
@@ -2058,8 +2062,9 @@ function applyUI(){
   root.style.setProperty('--accent-ink', ink(acc));
   root.style.setProperty('--on-accent',
     ratio('#ffffff', acc) >= ratio('#111111', acc) ? '#ffffff' : '#111111');
-  document.querySelector('meta[name=theme-color]')
-    ?.setAttribute('content', getComputedStyle(root).getPropertyValue('--bg').trim() || '#fff8f1');
+  const barBg = getComputedStyle(root).getPropertyValue('--bg').trim() || '#fff8f1';
+  document.querySelector('meta[name=theme-color]')?.setAttribute('content', barBg);
+  if(APP) try{ APP.setBars(barBg, lum(barBg) > .5); }catch{}
   const [a,b] = T('brand');
   $('#brand').innerHTML = `${a}<b>${b}</b>`;
   $('#today').textContent = T('today');
@@ -3843,13 +3848,13 @@ async function renderCfg(){
   const cs = await countries();
   const cname = new Intl.DisplayNames([loc()], {type:'region'});
   const opt = (v,l,on)=>`<option value="${v}" ${on?'selected':''}>${esc(l)}</option>`;
-  const denied = typeof Notification !== 'undefined' && Notification.permission === 'denied';
+  const denied = !APP && typeof Notification !== 'undefined' && Notification.permission === 'denied';
 
   const snaps = (()=>{ try{ return JSON.parse(localStorage.getItem('daynua.snaps') || '[]'); }catch{ return []; } })();
   const when = at => new Intl.DateTimeFormat(loc(),
     {month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit'}).format(new Date(at));
 
-  const standalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone;
+  const standalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone || !!APP;
   /* 이미 설치해서 쓰는 중이면 보여줄 게 없다. 설치할 수 있으면 버튼, 터치 기기에서 이벤트가
      없으면(삼성 인터넷·아이폰 등) 브라우저 메뉴로 가는 길을 글로 알려준다. */
   const installBlock = standalone ? '' : installEvt
@@ -3913,12 +3918,12 @@ async function renderCfg(){
         ${doc.ui.notify ? `<input type="time" id="notifyAt" value="${doc.ui.notifyAt}"
             style="width:auto;margin:0;flex:none">
           <button class="chip" id="notifyTest">${T('notifyTest')}</button>` : ''}
-        ${doc.ui.notify && typeof Notification !== 'undefined' && Notification.permission === 'default'
+        ${doc.ui.notify && permDefault()
           ? `<button class="chip" id="notifyAllow" style="background:var(--accent);color:var(--on-accent)">${T('pushAllow')}</button>` : ''}
       </div>
       <div class="hint">${denied ? T('notifyDenied')
-        : doc.ui.notify && typeof Notification !== 'undefined' && Notification.permission === 'default' ? T('pushAsk')
-        : doc.ui.notify && pushOn ? T('pushOk')
+        : doc.ui.notify && permDefault() ? T('pushAsk')
+        : doc.ui.notify && pushOn ? T(APP ? 'appRemind' : 'pushOk')
         : doc.ui.notify && pushWhy === 'nosub' ? T('pushNoSub')
         : doc.ui.notify && pushWhy === 'dberr' ? T('pushDbErr')
         : doc.ui.notify && !pushOn ? T('notifyLocal') : T('notifyNote')}</div></div>
@@ -4004,6 +4009,11 @@ async function renderCfg(){
   };
   $('#openRout').onclick = ()=>{ $('#cfg').close(); renderRout(); $('#rout').showModal(); };
   $('#expBtn').onclick = ()=>{
+    if(APP){                                              // 앱 안에서는 Blob 다운로드가 안 되므로 앱이 저장한다
+      const name = `daynua-${todayKey()}.json`;
+      let ok = false; try{ ok = APP.saveFile(name, JSON.stringify(doc,null,1)); }catch{}
+      return flash((doc.ui.lang==='en' ? (ok ? 'Saved to Downloads: ' : 'Could not save: ') : (ok ? '다운로드 폴더에 저장했어요: ' : '저장하지 못했어요: ')) + name);
+    }
     const a = document.createElement('a');
     a.href = URL.createObjectURL(new Blob([JSON.stringify(doc,null,1)],{type:'application/json'}));
     a.download = `daynua-${todayKey()}.json`;
@@ -4124,7 +4134,17 @@ const urlB64 = s => {
   const raw = atob((s + pad).replace(/-/g,'+').replace(/_/g,'/'));
   return Uint8Array.from(raw, c => c.charCodeAt(0));
 };
+const permDefault = () => APP ? !APP.notifyAllowed()
+  : typeof Notification !== 'undefined' && Notification.permission === 'default';
 async function askNotify(){
+  if(APP){                                               // 안드로이드 13+ 는 앱이 직접 허용을 받는다
+    if(APP.notifyAllowed()) return true;
+    return new Promise(res => {
+      const done = () => { window.__nativePerm = null; res(APP.notifyAllowed()); };
+      window.__nativePerm = done; setTimeout(done, 20000);
+      APP.askNotify();
+    });
+  }
   if(typeof Notification === 'undefined') return false;
   if(Notification.permission === 'granted') return true;
   if(Notification.permission === 'denied') return false;
@@ -4136,16 +4156,24 @@ async function writeSummary(){
     const open = actionable(todayKey());
     const stars = open.filter(t=>t.s).map(t=>'★ '+t.t);
     const body = [...stars, ...open.filter(t=>!t.s).map(t=>t.t)].slice(0,5).join(' · ');
-    const c = await caches.open('daynua-state');
-    await c.put('/__summary', new Response(JSON.stringify({
+    const sum = {
       date: todayKey(), count: open.length,
       title: open.length ? T('notifyTitle')(open.length) : 'Daynua',
       body: body || T('notifyEmpty'), stale: T('notifyStale')
-    }), {headers:{'Content-Type':'application/json'}}));
+    };
+    if(APP) try{ APP.setSummary(JSON.stringify(sum)); }catch{}
+    const c = await caches.open('daynua-state');
+    await c.put('/__summary', new Response(JSON.stringify(sum), {headers:{'Content-Type':'application/json'}}));
   }catch{}
 }
 async function syncPush(){
   pushOn = false; pushWhy = '';
+  if(APP){                                               // 앱 안: 서버 푸시 없이 폰의 알람으로 울린다
+    const on = !!doc.ui.notify, ok = on && APP.notifyAllowed();
+    try{ APP.setReminder(ok, doc.ui.notifyAt || '09:00'); }catch{}
+    pushOn = ok; pushWhy = on && !ok ? 'noperm' : '';
+    return;
+  }
   if(!('serviceWorker' in navigator) || !('PushManager' in window)){ pushWhy = 'nosub'; return; }
   const reg = await navigator.serviceWorker.ready.catch(()=>null);
   if(!reg){ pushWhy = 'nosub'; return; }
@@ -4185,6 +4213,16 @@ function scheduleNotify(){
   notifyTimer = setTimeout(()=>{ fireNotify(); scheduleNotify(); }, at - now);
 }
 async function fireNotify(force){
+  if(APP){
+    if(!APP.notifyAllowed()) return;
+    runRollover();
+    const open = actionable(todayKey());
+    if(!open.length && !force) return;
+    const stars = open.filter(t=>t.s).map(t=>'★ '+t.t);
+    const body = [...stars, ...open.filter(t=>!t.s).map(t=>t.t)].slice(0,5).join(' · ') || T('notifyEmpty');
+    try{ APP.notifyNow(T('notifyTitle')(open.length), body); }catch{}
+    return;
+  }
   if(typeof Notification === 'undefined' || Notification.permission !== 'granted') return;
   runRollover();
   const open = actionable(todayKey());
@@ -4439,6 +4477,7 @@ function renderAcct(){
     doc.ui.notify = false; await syncPush();
     save();                                   // 계정 칸을 제대로 닫고 나간다
     await sb.auth.signOut(); $('#acctDlg').close();
+    if(APP) try{ APP.logoutWidget(); }catch{}
     gateReopen();
   });
   $('#pwBtn')?.addEventListener('click', ()=>{ $('#acctDlg').close(); openPw('change'); });
@@ -4459,6 +4498,7 @@ function renderAcct(){
     delArmed = false;
     $('#acctDlg').close(); applyUI(); save(); render();
     flash(T('delAcctDone'));
+    if(APP) try{ APP.logoutWidget(); }catch{}
     gateReopen();
   });
   $('#inBtn')?.addEventListener('click', ()=>{ $('#acctDlg').close(); openAuth('in'); });
@@ -4534,6 +4574,7 @@ $('#authGo').onclick = async ()=>{
   if(error) return authMsg(trErr(error.message));
   if(authMode==='up' && !data.session) return authMsg(T('confirmSent'), true);
   sessionStorage.setItem('daynua.sess', '1'); localStorage.removeItem('daynua.guest');
+  if(APP) try{ APP.loginWidget(email, pw); }catch{}
   $('#auth').close();
 };
 $('#authReset').onclick = async ()=>{
@@ -4603,6 +4644,7 @@ async function gateStart(){
   if(user && sb){
     if(autoOn() || sessOK){ sessionStorage.setItem('daynua.sess', '1'); await wait(left()); return gateEnter(); }
     await sb.auth.signOut().catch(()=>{});               // 자동 로그인을 끈 채 다시 켰다
+    if(APP) try{ APP.logoutWidget(); }catch{}
   } else if(!sb || localStorage.getItem('daynua.guest') === '1'){
     await wait(left()); return gateEnter();
   }
@@ -4632,6 +4674,7 @@ gGo.onclick = async ()=>{
     }
     const { error } = await sb.auth.signInWithPassword({ email, password:pw });
     if(error) return gateMsg(trErr(error.message));
+    if(APP) try{ APP.loginWidget(email, pw); }catch{}     // 위젯이 쓸 별도 세션 (비밀번호는 저장하지 않는다)
     localStorage.setItem('daynua.auto', gA.checked ? '1' : '0');
     localStorage.setItem('daynua.email', email);
     localStorage.removeItem('daynua.guest');
@@ -4644,6 +4687,7 @@ gGo.onclick = async ()=>{
 $('#gCard').addEventListener('keydown', e=>{ if(e.key === 'Enter' && e.target.tagName !== 'BUTTON'){ e.preventDefault(); gGo.click(); } });
 gateRender();
 gateStart();
+if(APP) syncPush();
 
 if(location.hash === '#test'){                     // 색 대비는 DOM 이 있어야 재므로 여기서
   const was = doc.ui.theme;
