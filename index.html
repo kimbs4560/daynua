@@ -202,7 +202,12 @@ input,select,textarea{font:inherit;color:inherit}
 .cell .n{font-size:13px;font-weight:600;line-height:22px;min-width:22px;height:22px;text-align:center;border-radius:50%}
 .mk{display:flex;gap:3px;justify-content:center;align-items:center;height:12px;margin-top:3px}
 .mk i{display:block;width:5px;height:5px;border-radius:50%;background:var(--c)}
-.cell .chk{position:static;width:13px;height:13px;padding:2.5px;flex:none}
+.cell .chk{position:static;width:14px;height:14px;padding:3px;flex:none}
+/* 끝낸 날 — 칸을 그날 분류 색으로 은은하게 채우고(JS 가 --fill 대신 background 를 준다) ✓ 는 잉크색으로 또렷하게 */
+.cell.fin .chk{background:var(--ink);color:var(--bg)}
+.cell.fin.soft .chk{background:none;border:1.5px solid var(--ink);color:var(--ink)}
+.cell.tint{border-color:transparent}
+.cell.tint.out{opacity:.5}
 /* ✓ 는 날짜를 밀어내지 않게 오른쪽 위에 얹는다 */
 /* 그날 계획을 다 끝냈다는 표시.
    10px 짜리 갈고리는 있어도 눈에 안 들어왔다 — 채운 동그라미로 바꾼다.
@@ -241,7 +246,7 @@ input,select,textarea{font:inherit;color:inherit}
   .cell .n{font-size:14px}
   .mk{margin-top:5px}
   .mk i{width:6px;height:6px}
-  .cell .chk{width:15px;height:15px;padding:3px}
+  .cell .chk{width:16px;height:16px;padding:3.5px}
   .cell .hn{display:block;font-size:9px;font-weight:700;color:var(--sun);max-width:100%;
     white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
   .ev{display:flex;flex-direction:column;gap:2px;margin-top:3px;align-items:stretch}
@@ -827,6 +832,14 @@ dialog input:focus,dialog select:focus{border-color:var(--accent)}
   li .tx{font-size:17.5px}
   .bar2 h1{font-size:42px}
 }
+/* 창이 세로로 넉넉하면 달력 칸이 그만큼 자란다 — 설치 앱 창(약 930×1000)에서 아래가 텅 비던 것을 메운다.
+   (머리글·여백·요일줄 ≈ 280px 를 뺀 높이를 줄 수로 나눈다. 너무 작거나 커지지 않게 한도를 둔다.) */
+@media (min-width:720px){
+  /* 칸이 세로로만 길어진 기둥처럼 되지 않게, 칸 너비의 1.2배를 넘기지 않는다 */
+  #cal{container-type:inline-size}
+  #cal .cell{min-height:clamp(62px, min(calc((100dvh - 280px) / var(--rows,6) - 6px), calc((100cqw - 36px) / 7 * 1.2)), 168px)}
+  #cal .cell .n{font-size:15px}
+}
 </style>
 </head>
 <body>
@@ -938,7 +951,7 @@ dialog input:focus,dialog select:focus{border-color:var(--accent)}
 const SUPABASE_URL = 'https://cjhwxjznuleyfcbwwvtb.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_acxKbtekhqwFZwI0EUtArg_3FSj5AHh';
 const VAPID_PUBLIC = 'BItluVUoPAOjdIacpE7-6Ko45leNKobu8SbCNP1L6zdozMUrtFBNjh7ncFVZGSvwdHf4vNkYQKj5BarWq01G0hE';
-const BUILD = '2026-10-01.22';
+const BUILD = '2026-10-01.24';
 /* 크롬·삼성 인터넷이 '설치할 수 있다'고 알려주는 이벤트. 동기화 라이브러리를 기다리는 동안
    지나가 버리지 않게 모듈 맨 위에서 받는다. */
 /* 설치한 PC 앱 창이 작게 열리는 경우 — 처음 한 번만 알맞은 크기로 키운다.
@@ -1083,7 +1096,7 @@ const I18N = {
   quickAdd:'할 일 추가', archive:'보관함', category:'분류', newCatShort:'+ 새 분류',
   note:'메모', undo:'실행 취소', undone:'되돌렸습니다', gotIt:'알겠어요',
   ideasHint:'떠오른 일 = 아직 정리하지 않은 것 · 나중에 = 언젠가 할 것',
-  calHint:'날짜 아래 점은 그날 일정의 분류 색이고, ✓ 는 그날 계획한 일을 다 끝냈다는 뜻입니다.',
+  calHint:'날짜 아래 점은 그날 일정의 분류 색입니다. 계획한 일을 다 끝낸 날은 칸이 분류 색으로 물들고 ✓ 가 뜹니다.',
   tipPC:'날짜를 우클릭하면 그날 남은 일정을 한꺼번에 정리할 수 있어요. 할 일을 달력으로 끌어 놓아도 이동됩니다.',
   tipMobile:'할 일을 꾹 눌렀다가 끌면 다른 날로 옮길 수 있어요. ⋯ 를 누르면 더 많은 메뉴가 열려요.',
   secApp:'앱', installBtn:'홈 화면에 설치',
@@ -1219,7 +1232,7 @@ const I18N = {
   quickAdd:'Add a task', archive:'Inbox', category:'Category', newCatShort:'+ New category',
   note:'Note', undo:'Undo', undone:'Reverted', gotIt:'Got it',
   ideasHint:'Ideas = not sorted yet · Someday = one day, no date',
-  calHint:'Dots under a date show the categories of that day; ✓ means you finished everything you planned.',
+  calHint:'Dots under a date are the categories of that day. A fully finished day is tinted with them and gets a ✓.',
   tipPC:'Right-click a date to clear out what is left that day. You can also drag a task onto the calendar.',
   tipMobile:'Press and hold a task, then drag it to move it to another day. Tap ⋯ for more.',
   secApp:'App', installBtn:'Install to Home screen',
@@ -2144,15 +2157,21 @@ function renderMonth(tk){
     const k = key(d), s = cellData(k);
     if(s.complete && d.getMonth() === cur.getMonth()) monthHasComplete = true;
     const hn = holName(k), w = d.getDay();
+    /* 분류 색이 1개면 한 색, 2개면 반반, 3개면 3등분 … 비율이 아니라 '균등' — 한눈에 몇 종류였는지가 읽히게 */
+    const tint = s.cleared && s.dist.length ? (() => {
+      const cs = s.dist.map(x => `color-mix(in srgb,${x.color ? stripColor(x.color) : 'var(--faint)'} 38%,transparent)`);
+      const n = cs.length;
+      return n === 1 ? cs[0] : `linear-gradient(90deg,${cs.map((c,i)=>`${c} ${i*100/n}% ${(i+1)*100/n}%`).join(',')})`;
+    })() : '';
     const cls = ['cell', d.getMonth()!==cur.getMonth()?'out':'',
       k===tk?'today':'', k===sel?'sel':'',
-      s.cleared ? (s.complete ? 'fin' : 'fin soft') : ''].join(' ');
+      s.cleared ? (s.complete ? 'fin' : 'fin soft') : '', tint ? 'tint' : ''].join(' ');
     const nc = hn || w===0 ? 'var(--sun)' : w===6 ? 'var(--sat)' : '';
     const label = !s.list.length ? fmtDay.format(d)
       : s.complete ? `${fmtDay.format(d)}, ${T('aTasks')(s.list.length)}, ${T('aAllDone')}`
       : s.cleared ? `${fmtDay.format(d)}, ${T('aTasks')(s.list.length)}, ${T('aCleared')}`
       : `${fmtDay.format(d)}, ${T('aSomeDone')(s.list.length, s.list.filter(t=>t.d).length)}`;
-    return `<div class="${cls}" data-k="${k}" role="button" tabindex="0"
+    return `<div class="${cls}" data-k="${k}" role="button" tabindex="0"${tint?` style="background:${tint}"`:''}
         aria-pressed="${k===sel}" aria-label="${esc(label)}">
       <span class="n mono" ${nc?`style="color:${nc}"`:''}>${d.getDate()}</span>
       ${hn?`<div class="hn" title="${esc(hn)}">${esc(hn)}</div>`:''}
@@ -2161,7 +2180,7 @@ function renderMonth(tk){
     </div>`;
   }).join('');
   $('#cal').innerHTML = `<div class="wk">${wdNames().map(w=>`<span>${w}</span>`).join('')}</div>
-    <div class="grid">${cells}</div>`;
+    <div class="grid" style="--rows:${days.length/7}">${cells}</div>`;
 }
 
 /* ── 주간: 이번 주 7일에 무엇을 하기로 했는지. 시간축은 만들지 않는다. ── */
