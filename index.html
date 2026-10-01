@@ -850,6 +850,23 @@ dialog input:focus,dialog select:focus{border-color:var(--accent)}
   #cal .cell .n{font-size:15px}
 }
 @media (min-width:1600px){ #cal .cell .chk{width:30px;height:30px} }
+/* 주간 카드의 ✓ 도 월 달력과 같은 모양(동그라미 없이 갈고리) */
+.wcard .chk{width:22px;height:22px;padding:0;border:0;border-radius:0;background:none;color:var(--ink)}
+.wcard .chk path{stroke-width:2.6}
+.wcard.fin.soft .chk{border:0;background:none;opacity:.5}
+/* 7칸 주간(1100px~): 좁은 칸에서 '오늘'·'2남음' 이 세로로 꺾이던 것을 막고, 칸은 창 높이만큼 자란다 */
+@media (min-width:1100px){
+  .wcard .chk{width:18px;height:18px}
+  .wtoday{display:none}
+  .wh{flex-wrap:nowrap;gap:4px}
+  .wh .wleft{white-space:nowrap}
+  .wh .wleft small{display:none}
+  .wcard{min-height:clamp(236px, calc(100dvh - 270px), 620px)}
+}
+@media (min-width:1500px){
+  .wtoday{display:inline-block;white-space:nowrap}
+  .wh .wleft small{display:inline}
+}
 
 /* ── 첫 화면: 로고가 써지고 → 로그인 → 앱이 켜지듯 열린다 ── */
 html.gating body > :not(#gate):not(script){visibility:hidden}
@@ -1023,7 +1040,7 @@ html.entering #app,html.entering #fab{animation:appIn .65s cubic-bezier(.2,.8,.2
 const SUPABASE_URL = 'https://cjhwxjznuleyfcbwwvtb.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_acxKbtekhqwFZwI0EUtArg_3FSj5AHh';
 const VAPID_PUBLIC = 'BItluVUoPAOjdIacpE7-6Ko45leNKobu8SbCNP1L6zdozMUrtFBNjh7ncFVZGSvwdHf4vNkYQKj5BarWq01G0hE';
-const BUILD = '2026-10-01.31';
+const BUILD = '2026-10-01.32';
 const ARRIVED_BY_LINK = /access_token|type=(signup|recovery|magiclink|invite)|[?&]code=/.test(location.hash + location.search);
 /* 크롬·삼성 인터넷이 '설치할 수 있다'고 알려주는 이벤트. 동기화 라이브러리를 기다리는 동안
    지나가 버리지 않게 모듈 맨 위에서 받는다. */
@@ -3673,9 +3690,9 @@ $('#next').onclick = ()=>{ navigatePeriod(1); calStep(1); };
 /* '오늘'은 보기가 아니라 이동이다 — 보던 보기를 그대로 두고 오늘이 든 기간으로 간다 */
 $('#today').onclick = ()=>{ view='day'; cur=new Date(); sel=key(cur); render(); revealDay(); };
 $('#viewSeg').onclick = e=>{ const v = e.target.closest('button')?.dataset.v; if(v) setCalView(v); };
-$('#btnIdeas').onclick = ()=>{ view = view==='ideas' ? 'day' : 'ideas'; ideasFocus = view==='ideas' && canDrag; render(); fade('#side'); };
-$('#btnSearch').onclick = ()=>{ view = view==='search' ? 'day' : 'search'; render(); fade('#side'); };
-$('#btnStats').onclick = ()=>{ view = view==='stats' ? 'day' : 'stats'; render(); fade('#side'); };
+$('#btnIdeas').onclick = ()=>{ view = view==='ideas' ? 'day' : 'ideas'; ideasFocus = view==='ideas' && canDrag; render(); fade('#side'); if(view !== 'day') revealDay(); };
+$('#btnSearch').onclick = ()=>{ view = view==='search' ? 'day' : 'search'; render(); fade('#side'); if(view !== 'day') revealDay(); };
+$('#btnStats').onclick = ()=>{ view = view==='stats' ? 'day' : 'stats'; render(); fade('#side'); if(view !== 'day') revealDay(); };
 
 /* ─── 카테고리 ─── */
 let catEdit = null, catColor = PALETTE[0], catArmed = false, catForTodo = null, catForQuick = false;
