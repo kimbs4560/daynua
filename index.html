@@ -879,7 +879,7 @@ dialog input:focus,dialog select:focus{border-color:var(--accent)}
 const SUPABASE_URL = 'https://cjhwxjznuleyfcbwwvtb.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_acxKbtekhqwFZwI0EUtArg_3FSj5AHh';
 const VAPID_PUBLIC = 'BItluVUoPAOjdIacpE7-6Ko45leNKobu8SbCNP1L6zdozMUrtFBNjh7ncFVZGSvwdHf4vNkYQKj5BarWq01G0hE';
-const BUILD = '2026-09-30.20';
+const BUILD = '2026-10-01.21';
 /* 크롬·삼성 인터넷이 '설치할 수 있다'고 알려주는 이벤트. 동기화 라이브러리를 기다리는 동안
    지나가 버리지 않게 모듈 맨 위에서 받는다. */
 let installEvt = null;
@@ -908,6 +908,8 @@ const I18N = {
   cfgSub:'테마·언어·공휴일·알림·가져오기.',
   theme:'테마', auto:'자동', light:'밝게', dark:'어둡게', accent:'강조색',
   lang:'언어', country:'공휴일 국가', none:'사용 안 함', weekStart:'주 시작',
+  rollLbl:'못 끝낸 일', rollKeep:'그날에 그대로', rollMove:'오늘로 가져오기',
+  rollHint:'지난 날의 못 끝낸 일을 다음 날로 자동으로 넘길지 정합니다. ‘그날에 그대로’면 했는데 체크를 안 한 일도 그 날짜에 남아 있어서, 그 날을 눌러 체크하거나 직접 옮길 수 있어요.',
   sunday:'일요일', monday:'월요일', routines:'반복 할 일', manage:'관리하기',
   account:'계정', login:'로그인', logout:'로그아웃', signup:'회원가입',
   loggedOut:'로그인하면 PC·휴대폰이 같은 데이터를 봅니다.',
@@ -1041,6 +1043,8 @@ const I18N = {
   cfgSub:'Theme, language, holidays, reminders, import.',
   theme:'Theme', auto:'Auto', light:'Light', dark:'Dark', accent:'Accent',
   lang:'Language', country:'Holiday country', none:'Off', weekStart:'Week starts',
+  rollLbl:'Unfinished tasks', rollKeep:'Stay on their day', rollMove:'Carry over to today',
+  rollHint:'Choose whether unfinished tasks from past days move to today automatically. With “Stay on their day”, tasks you did but forgot to tick stay on their date, where you can tick or move them yourself.',
   sunday:'Sunday', monday:'Monday', routines:'Routines', manage:'Manage',
   account:'Account', login:'Log in', logout:'Log out', signup:'Sign up',
   loggedOut:'Log in to share data across your devices.',
@@ -1559,7 +1563,8 @@ const UI_DEFAULT = {theme:'auto', accent:'', tint:0,
                     lang: /^ko/i.test(NAV) ? 'ko' : 'en',
                     country: (NAV.split('-')[1] || (/^ko/i.test(NAV) ? 'KR' : '')).toUpperCase(),
                     weekStart: /^ko|^ja|^zh|^en-US|^pt-BR/i.test(NAV) ? 0 : 1,
-                    notify:false, notifyAt:'09:00'};
+                    notify:false, notifyAt:'09:00',
+                    rollover:false};     // 못 끝낸 일을 다음 날로 자동으로 넘기지 않는다 (했는데 체크를 안 한 날도 있어서)
 /* 카테고리는 선택 사항이므로 처음엔 하나도 만들지 않는다 (필요해지면 사용자가 만든다) */
 const FRESH = () => ({ts:0, rev:0, ui:{...UI_DEFAULT},
   cats:[], todos:{}, rout:[], miss:{}, notes:{}, imports:[], del:{}});
@@ -1723,6 +1728,7 @@ const holName = k => hol[k] && (doc.ui.lang==='en' ? hol[k][1] : hol[k][0]);
 const offSet = () => new Set(Object.keys(hol));
 
 function runRollover(){
+  if(!doc.ui.rollover) return;               // 기본: 그날에 그대로. 안 한 일도, 체크 안 한 일도 제 날짜에 남는다
   if(rollover(doc.todos, doc.miss, todayKey())){ doc.ts = Date.now(); save(); push(); }
 }
 const esc = s => String(s ?? '').replace(/[&<>"]/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
@@ -2764,7 +2770,9 @@ $('#side').addEventListener('click', e=>{
     if(e.target.matches('.ck')){
       if(t.sk){ delete t.sk; return touch(); }
       t.d = !t.d;
-      if(t.d){ t.dd = tk; t.s = false; delete t.w; } else delete t.dd;
+      /* 지난 날짜에 있는 일을 나중에 체크하는 건 대개 '그날 했는데 체크를 안 한' 경우다.
+         완료일을 오늘로 적으면 그날이 안 끝난 날로 남고 1년 잔디도 오늘로 잡힌다 — 그 날짜에 적는다. */
+      if(t.d){ t.dd = isDateKey(from) && from < tk ? from : tk; t.s = false; delete t.w; } else delete t.dd;
       animate(`li[data-id="${id}"]`, 'ckd');
       /* ✓ 는 그날 마지막 하나를 끝냈을 때만. 체크 효과와 겹쳐 요란해지지 않게 */
       if(t.d && daySummary(bucket(from), doc.miss[from] || 0).complete)
@@ -3599,6 +3607,12 @@ async function renderCfg(){
       <select id="selCountry">${opt('', T('none'), !doc.ui.country)}
         ${cs.map(c=>opt(c.countryCode, (()=>{try{return cname.of(c.countryCode)||c.name}catch{return c.name}})(),
           doc.ui.country===c.countryCode)).join('')}</select></div>
+    <div class="grp wide"><span class="lbl">${T('rollLbl')}</span>
+      <div class="seg" data-k="rollover">
+        <button data-v="0" class="${doc.ui.rollover?'':'on'}">${T('rollKeep')}</button>
+        <button data-v="1" class="${doc.ui.rollover?'on':''}">${T('rollMove')}</button>
+      </div>
+      <div class="hint">${T('rollHint')}</div></div>
     <div class="grp"><span class="lbl">${T('routines')}</span>
       <button class="chip" id="openRout">${T('manage')} (${doc.rout.length})</button></div>
     </div>
@@ -3655,8 +3669,9 @@ async function renderCfg(){
       doc.ui.notify = v === '1';
       await syncPush(); scheduleNotify();
     } else {
-      doc.ui[k] = k==='weekStart' ? +v : v;
+      doc.ui[k] = k==='weekStart' ? +v : k==='rollover' ? v === '1' : v;
       if(k==='lang'){ resetHolidays(); loadHolidays(cur.getFullYear()); }
+      if(k==='rollover') runRollover();                  // 켜는 순간 지난 일을 가져온다
     }
     applyUI(); touch(); renderCfg();
   });
