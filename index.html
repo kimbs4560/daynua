@@ -76,15 +76,19 @@ input,select,textarea{font:inherit;color:inherit}
 
 #app{max-width:560px;margin:0 auto;padding:18px 16px 84px}
 /* 오른쪽 아래 설정 단추가 목록의 마지막 줄을 덮고 있었다 */
-@media (max-width:899px){ #app{padding-bottom:116px} }
-@media (min-width:900px){
+@media (min-width:600px){ #app{max-width:640px} }      /* 큰 폰·좁은 창: 560 에 갇혀 양옆이 비지 않게 */
+@media (max-width:719px){ #app{padding-bottom:72px} }
+/* 2단(달력 + 옆 패널)은 720px 부터. 설치한 앱 창이 800px 쯤으로 열려도 세로 한 줄로 좁아지지 않는다.
+   옆 패널은 좁은 창에서는 340px, 넓어지면 400px. */
+@media (min-width:720px){
   #app{max-width:1180px;padding:26px 24px 40px;display:grid;gap:0 20px;
-    grid-template-columns:1fr 400px;grid-template-areas:"top top" "bar bar" "cal side";align-items:start}
+    grid-template-columns:minmax(0,1fr) 340px;grid-template-areas:"top top" "bar bar" "cal side";align-items:start}
   .top{grid-area:top} .bar2{grid-area:bar;margin-bottom:14px}
   #cal{grid-area:cal;margin:0;padding:16px;min-width:0}
   #side{grid-area:side;position:sticky;top:26px;max-height:calc(100vh - 52px);overflow-y:auto;padding:16px}
   /* 주간은 7칸이 나란히 서야 하므로 달력 쪽에 조금 더 준다 */
-  @media (min-width:1100px){ #app.v-week{grid-template-columns:1fr 366px} }
+  @media (min-width:1000px){ #app{grid-template-columns:minmax(0,1fr) 400px} }
+  @media (min-width:1100px){ #app.v-week{grid-template-columns:minmax(0,1fr) 366px} }
   /* 1년 화면은 옆칸 없이 전체 폭 — 그래야 날짜 칸이 누를 만한 크기가 된다 */
   #app.overview{grid-template-columns:1fr;grid-template-areas:"top" "bar" "cal"}
   #app.overview #side{display:none}
@@ -132,7 +136,7 @@ input,select,textarea{font:inherit;color:inherit}
 /* 폰에서는 설정 단추를 위로 올린다. 오른쪽 아래에 떠 있던 톱니가 목록 줄의 ☆·⋯ 바로 위에 올라앉아
    그 줄의 ⋯ 를 누르면 메뉴 대신 설정이 열렸다. 자주 쓰는 동작도 아니라 목록 위에 떠 있을 이유가 없다. */
 #btnCfg{display:none}
-@media (max-width:899px){ #btnCfg{display:flex} #fab{display:none} }
+@media (max-width:999px), (hover:none){ #btnCfg{display:flex} #fab{display:none} }
 /* 아주 좁은 화면(폴드 바깥 화면 등)에서는 윗줄이 넘치지 않게 여백부터 줄인다 */
 @media (max-width:359px){ .top{gap:3px} .brand{letter-spacing:1.5px} }
 @media (max-width:340px){ .acct.out .nm{display:none} .acct.out{padding:4px} }
@@ -185,17 +189,20 @@ input,select,textarea{font:inherit;color:inherit}
 .wk{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:6px}
 .wk span{text-align:center;font-size:11px;color:var(--sub);font-weight:700}
 .grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
-.cell{position:relative;min-height:62px;user-select:none;-webkit-touch-callout:none;border-radius:8px;background:var(--fill);overflow:hidden;
-  cursor:pointer;border:1.5px solid transparent;display:flex;flex-direction:column;
-  padding:4px 4px 5px;
+.cell{position:relative;min-height:60px;user-select:none;-webkit-touch-callout:none;border-radius:10px;background:none;overflow:hidden;
+  cursor:pointer;border:1.5px solid transparent;display:flex;flex-direction:column;align-items:center;
+  padding:6px 2px 4px;
   transition:border-color var(--mo) var(--ease),background var(--mo-fast) var(--ease)}
 @media (hover:hover){.cell:hover{background:var(--line)}}
 /* 폰에서는 달력이 첫 화면의 절반을 먹어 할 일이 한 줄도 안 보였다 */
-@media (max-width:899px){ .cell{min-height:52px} }
+@media (max-width:999px){ .cell{min-height:50px} }
 /* 길게 누르기 — 500ms 동안 아무 반응이 없으면 이상하다. 살짝 눌린 티만 낸다 */
 @media (hover:none){ .cell:active,.wcard:active{background:var(--line);transition-delay:90ms} }
-.cellTop{position:relative;display:flex;align-items:center;justify-content:center;min-height:17px}
-.cell .n{font-size:12px;font-weight:700;line-height:17px;text-align:center}
+/* 칸에는 날짜와 표시 하나만 둔다 — 무엇이 있는지는 고른 날의 목록이 말한다 */
+.cell .n{font-size:13px;font-weight:600;line-height:22px;min-width:22px;height:22px;text-align:center;border-radius:50%}
+.mk{display:flex;gap:3px;justify-content:center;align-items:center;height:12px;margin-top:3px}
+.mk i{display:block;width:5px;height:5px;border-radius:50%;background:var(--c)}
+.cell .chk{position:static;width:13px;height:13px;padding:2.5px;flex:none}
 /* ✓ 는 날짜를 밀어내지 않게 오른쪽 위에 얹는다 */
 /* 그날 계획을 다 끝냈다는 표시.
    10px 짜리 갈고리는 있어도 눈에 안 들어왔다 — 채운 동그라미로 바꾼다.
@@ -207,42 +214,36 @@ input,select,textarea{font:inherit;color:inherit}
 .fin.soft .chk{background:none;border:2px solid var(--accent);color:var(--accent-ink)}
 /* 폰에서는 '남은 개수'가 서던 줄이 완료한 날엔 비어 있다 — 그 자리를 쓴다.
    달력 배경을 완료율로 칠하던 방식은 예전에 없앴다(색은 '분류'의 몫). 자리만 빌린다. */
-@media (max-width:899px){
-  .cell .chk{left:50%;right:auto;top:20px;transform:translateX(-50%);width:16px;height:16px;padding:3px}
-  /* 배지가 들어선 만큼 분류 띠를 내린다 — 개수가 서던 자리를 빌렸으니 자리값도 치른다 */
-  .cell.fin .strip{margin-top:21px}
-}
 /* 숫자 색은 건드리지 않는다. 지금도 일요일·공휴일·오늘이 강조색을 쓰고 있어서
    완료까지 같은 색을 쓰면 무엇을 뜻하는 색인지 알 수 없게 된다 — 뜻은 배지 하나로 족하다. */
 .cell.out{background:none}                     @media (hover:hover){/* 다른 달은 '옅게'가 아니라 '비워서' 구분 */
 .cell.out:hover{background:var(--fill)}}
 .cell.out .n{color:var(--sub)}                 /* 흐려 보여도 며칠인지는 읽혀야 한다 */
-.cell.out .left,.cell.out .strip{display:none} /* 다른 달 잔여 개수·구성 막대는 군더더기 */
+.cell.out .mk{opacity:.4}                     /* 다른 달 표시는 옅게 */
 .cell.out .e,.cell.out .more{opacity:.7}
 /* 오늘과 '고른 날'은 다른 것을 말한다 — 둘이 겹쳐도 둘 다 보이게 테두리와 숫자로 나눈다 */
 .cell.sel,.wcard.sel{border-color:var(--ink)}
-.cell.today .n,.wcard.today .wn{color:var(--accent-ink)!important;font-weight:800}
-.cell.today .n::after,.wcard.today .wn::after{content:"";position:absolute;left:50%;bottom:-3px;
+.cell.today .n{background:var(--accent);color:var(--on-accent)!important;font-weight:800}
+.wcard.today .wn{color:var(--accent-ink)!important;font-weight:800}
+.wcard.today .wn::after{content:"";position:absolute;left:50%;bottom:-3px;
   transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:var(--accent)}
 .cell .n,.wcard .wn{position:relative}
 /* 끄는 중인 칸은 테두리로만 말한다 — 달력이 커졌다 작아지면 어디에 놓는지 알 수 없다 */
 .cell.over{border-color:var(--accent);border-style:dashed;background:var(--line)}
-.cell .left{font-size:9.5px;font-weight:800;color:var(--sub);text-align:center;margin-top:1px}
 .cell .hn,.cell .dn,.ev,.more{display:none}
 /* 그날의 구성 — 완료 여부와 무관하게 '무엇을 계획했는지'만 말한다 */
 .strip{margin:5px 3px 0;display:flex;gap:1px;height:3px;border-radius:2px;overflow:hidden}
 .strip i{display:block;background:var(--c)}
 .strip i.none{background:var(--faint)}
-@media (min-width:900px){
-  .cell{min-height:96px;padding:5px 7px 7px;border-radius:10px}
-  .cellTop{justify-content:flex-start}
-  .cell .n{font-size:13px}
-  .chk{top:1px;right:0;width:18px;height:18px;padding:4px}
-  .cell .left{display:none}
-  .cell .hn{display:block;font-size:9px;font-weight:700;color:var(--sun);
-    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:-1px}
-  .cell .dn{display:block;font-size:9px;color:var(--sub);font-style:italic;
-    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* 칸 안에 제목이 들어가려면 칸이 70px 은 되어야 한다 — 그 폭이 되는 1000px 부터 */
+@media (min-width:1000px){
+  .cell{min-height:72px;padding:8px 4px 6px}
+  .cell .n{font-size:14px}
+  .mk{margin-top:5px}
+  .mk i{width:6px;height:6px}
+  .cell .chk{width:15px;height:15px;padding:3px}
+  .cell .hn{display:block;font-size:9px;font-weight:700;color:var(--sun);max-width:100%;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
   .ev{display:flex;flex-direction:column;gap:2px;margin-top:3px;align-items:stretch}
   .e{font-size:10.5px;line-height:1.45;font-weight:600;padding-left:5px;color:var(--ink);
     border-left:2px solid var(--c);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -272,15 +273,40 @@ input,select,textarea{font:inherit;color:inherit}
 .wl .e{font-size:12px;font-weight:600;color:var(--ink);padding-left:6px;border-left:2px solid var(--c);
   overflow:hidden;text-overflow:ellipsis;min-width:0;line-height:1.4}
 .wl .e.done{opacity:.72;text-decoration:line-through}
-.wl .e[data-i="2"],.wl .e[data-i="3"],.wl .e[data-i="4"]{display:none}
+.wl .e[data-i="3"],.wl .e[data-i="4"]{display:none}
 .wl .more{display:inline;font-size:10.5px;font-weight:700;color:var(--sub);flex:none}
 .wl .more.d{display:none}
 .whn{grid-column:2;font-size:10.5px;font-weight:700;color:var(--sun)}
 /* 넉넉한 폭에서는 한 줄에 더 보여준다 (가로 카드 그대로) */
 @media (min-width:600px){
-  .wl .e[data-i="2"],.wl .e[data-i="3"]{display:block}
+  .wl .e[data-i="3"]{display:block}
   .wl .more.m{display:none}
   .wl .more.d{display:inline}
+}
+/* 폰·좁은 창의 주 보기는 '일정 목록' — 모바일은 격자보다 목록을 좋아한다.
+   날짜 머리(요일·날짜·오늘, 오른쪽에 ✓ 또는 남은 개수) 아래에 제목을 세로로 쌓는다.
+   예전엔 제목 두 개가 옆으로 나란히 잘리고, 개수·✓ 가 카드마다 다른 자리에 떠 있었다. */
+@media (max-width:1099px){
+  .wcard{display:flex;flex-direction:column;align-items:stretch;gap:8px;padding:11px 14px;min-height:52px}
+  .wh{min-width:0;gap:7px;align-items:baseline}
+  .wh .wd{font-size:12.5px}
+  .wh .wn{font-size:19px;line-height:1}
+  .wtoday{font-size:10.5px;font-weight:800;color:var(--accent-ink);background:var(--card);
+    border-radius:6px;padding:1px 6px;line-height:1.5;align-self:center}
+  .wh .whn{font-size:11px;font-weight:700;color:var(--sun);min-width:0;white-space:nowrap;
+    overflow:hidden;text-overflow:ellipsis}
+  .wh .wsp{flex:1}
+  .wh .wleft{display:flex;align-items:baseline;gap:3px;font-size:13px;color:var(--ink);
+    background:var(--card);border-radius:8px;padding:2px 8px;align-self:center}
+  .wh .wleft small{font-size:10.5px;font-weight:700;color:var(--sub)}
+  .wh .chk{align-self:center}
+  .wcard .strip{display:none}
+  .wcard.today .wn::after{display:none}
+  .wcard.today{box-shadow:inset 3px 0 0 var(--accent)}
+  .wl{flex-direction:column;align-items:stretch;gap:5px;white-space:normal;overflow:visible}
+  .wl .e{display:block;font-size:13.5px;line-height:1.4;padding-left:9px;border-left-width:3px;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .wl .more{font-size:11.5px;padding-left:12px}
 }
 /* 7칸이 나란히 서도 글자가 읽히는 폭부터 세로 칸으로 — 1024 에서 억지로 7칸을 만들지 않는다 */
 @media (min-width:1100px){
@@ -293,7 +319,7 @@ input,select,textarea{font:inherit;color:inherit}
   .wcard .strip{margin:7px 0 0}
   .wl{flex-direction:column;align-items:stretch;gap:3px;margin-top:7px;white-space:normal;overflow:hidden}
   .wl .e{font-size:11px;white-space:nowrap}
-  .whn{font-size:10px;margin-top:3px}
+  .whn{font-size:10px;margin-top:0;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 }
 
 /* ── 1년 ──
@@ -574,28 +600,61 @@ li .took{font-size:10.5px;font-weight:700;color:var(--sub);background:var(--fill
 
 #sheetWrap{position:fixed;inset:0;z-index:25}
 .sbd{position:absolute;inset:0;background:rgba(0,0,0,.45);animation:moFade 150ms var(--ease)}
-#sheet{position:absolute;left:0;right:0;bottom:0;background:var(--card);
-  border-top:1px solid var(--line);border-radius:20px 20px 0 0;
-  padding:8px 12px calc(14px + env(safe-area-inset-bottom));
-  box-shadow:0 -10px 34px rgba(0,0,0,.28);animation:moSheet 200ms var(--ease)}
+/* 바닥 시트 — Material 3 의 기준을 따른다: 위쪽 모서리 28px · 손잡이 32×4 · 최대 폭 640px · 줄 높이 48px 이상.
+   (이전엔 모서리 20px·손잡이 없음·줄마다 같은 글자 크기로 이어져 딱딱했다) */
+#sheet{position:absolute;left:0;right:0;bottom:0;max-width:640px;margin:0 auto;background:var(--card);
+  border-radius:28px 28px 0 0;padding:0 12px calc(12px + env(safe-area-inset-bottom));
+  box-shadow:0 -10px 34px rgba(0,0,0,.3);animation:moSheet 200ms var(--ease);
+  max-height:82vh;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+@supports (height:1dvh){ #sheet{max-height:88dvh} }
 /* 시트는 이미 화면 아래에 붙어 있다 — 200px 씩 올라올 이유가 없다 */
 #sheetWrap.closing{pointer-events:none}
 #sheetWrap.closing .sbd{opacity:0;animation:none;transition:opacity 150ms var(--ease)}
 #sheetWrap.closing #sheet{opacity:0;transform:translateY(10px);animation:none;
   transition:opacity 150ms var(--ease),transform 150ms var(--ease)}
-/* 분류가 많으면 시트가 화면보다 길어진다 — 시트 안에서 굴러가게 (버튼이 화면 밖에 숨지 않게) */
-#sheet{max-height:82vh;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
-@supports (height:1dvh){ #sheet{max-height:86dvh} }
-#sheet .mh{position:sticky;top:0;background:var(--card);z-index:1}
-/* 목록이 길어도 닫기는 늘 손에 닿는 자리에 */
-#sheet .sclose{position:sticky;bottom:0;background:var(--card);box-shadow:0 -8px 12px var(--card)}
-#sheet button{display:flex;width:100%;align-items:center;gap:9px;padding:15px 12px;
-  border-radius:11px;font-size:15px;font-weight:600;text-align:left}
+/* 손잡이 — 아래로 끌면 닫힌다. 이 영역과 머리만 끌 수 있게 해서 목록 스크롤과 겹치지 않는다 */
+.grab{position:sticky;top:0;z-index:2;display:flex;justify-content:center;padding:10px 0 4px;
+  margin:0 -12px;background:var(--card);border-radius:28px 28px 0 0;touch-action:none}
+.grab i{width:36px;height:4px;border-radius:2px;background:var(--faint);opacity:.5}
+/* 머리: 어떤 할 일의 메뉴인지 — 분류 색 점 + 제목(두 줄까지) + 날짜·분류 */
+.sh-head{display:flex;align-items:center;gap:12px;padding:6px 4px 14px;touch-action:none}
+.sh-head .dot{width:11px;height:11px;border-radius:4px;flex:none}
+.sh-head .ttl{flex:1;min-width:0}
+.sh-head .ttl b{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;
+  font-size:17px;font-weight:800;line-height:1.35;letter-spacing:-.2px}
+.sh-head .ttl span{display:block;font-size:12.5px;font-weight:600;color:var(--sub);margin-top:3px}
+#sheet .sh-head .x{width:40px;height:40px;min-height:0;padding:0;justify-content:center;border-radius:50%;
+  flex:none;color:var(--sub)}
+.qlbl{font-size:11.5px;font-weight:800;letter-spacing:.5px;color:var(--faint);padding:0 6px 8px}
+/* 빠른 날짜 — Todoist·TickTick 처럼 메뉴 맨 위에 '내일 · 모레 …' 를 타일로 */
+.qgrid{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:8px;margin:0 0 8px}
+#sheet .qt{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:3px;width:auto;min-height:62px;padding:8px 2px;border-radius:16px;background:var(--fill);
+  font-size:14px;font-weight:700;text-align:center;color:var(--ink);cursor:pointer;user-select:none}
+#sheet .qt small{font-size:11px;font-weight:600;color:var(--faint)}
+#sheet .qt svg{color:var(--sub)}
+#sheet .qt:active{background:var(--line)}
+/* '날짜 선택' 타일 위에 날짜 입력을 투명하게 깔아 둔다 — 누르면 곧바로 달력이 열린다 */
+#sheet label.qt input{position:absolute;inset:0;width:100%;height:100%;margin:0;padding:0;opacity:0;cursor:pointer}
+/* 항목 줄 — 아이콘 + 글자, 높이 52px */
+#sheet button{display:flex;width:100%;align-items:center;gap:14px;min-height:52px;padding:0 12px;
+  border-radius:14px;font-size:15.5px;font-weight:600;text-align:left}
 #sheet button:active{background:var(--fill)}
-#sheet button .k{margin-left:auto;font-size:12.5px;color:var(--sub);font-weight:700}
-#sheet .sep{height:1px;background:var(--line);margin:5px 6px}
-#sheet .mh{padding:12px 12px 10px;font-size:16px}
-#sheet input[type=date]{padding:13px 12px;font-size:15px;margin:4px 0}
+#sheet button svg{flex:none;color:var(--sub)}
+#sheet button .k{margin-left:auto;display:flex;align-items:center;gap:4px;font-size:13px;
+  color:var(--faint);font-weight:600}
+#sheet button .k svg{color:var(--faint)}
+#sheet .rm,#sheet .rm svg{color:var(--danger)}
+#sheet .sep{height:1px;background:var(--line);margin:6px 8px;opacity:.8}
+#sheet .ogrid{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:8px;margin:8px 0 2px}
+#sheet .ob{justify-content:center;gap:8px;min-height:48px;background:var(--fill);border-radius:14px;font-size:14.5px}
+#sheet .cdot{width:12px;height:12px;border-radius:4px;flex:none;margin:0 4px}
+#sheet .cdot.none{border:1.5px dashed var(--faint)}
+/* 날짜 시트(달력 칸을 꾹 눌렀을 때)의 머리도 같은 결로 */
+#sheet .mh{padding:4px 6px 12px;font-size:17px;font-weight:800;flex-direction:column;align-items:flex-start;gap:3px}
+#sheet .mh span{font-size:12.5px}
+#sheet input[type=date]{width:100%;min-height:52px;padding:0 14px;margin:6px 0;border:1px solid var(--line);
+  border-radius:14px;background:var(--bg);font-size:15px;outline:none}
 
 /* ── 다이얼로그: 화면이 넓으면 넓게 ── */
 dialog{border:1px solid var(--line);border-radius:18px;padding:20px;width:min(88vw,340px);
@@ -704,8 +763,8 @@ dialog input:focus,dialog select:focus{border-color:var(--accent)}
 /* 화면이 넓어지면 여백만 늘리지 말고 글자·칸도 같이 키운다 */
 @media (min-width:1280px){
   #app{max-width:1320px;grid-template-columns:1fr 430px;gap:0 24px}
-  .cell{min-height:112px}
-  .cell .n{font-size:14px}
+  .cell{min-height:84px}
+  .cell .n{font-size:15px}
   .e{font-size:11px}
   .bar2 h1{font-size:34px}
   li .tx{font-size:15.5px}
@@ -714,9 +773,9 @@ dialog input:focus,dialog select:focus{border-color:var(--accent)}
 @media (min-width:1600px){
   #app{max-width:1560px;grid-template-columns:1fr 480px;padding:32px 28px 48px}
   .panel{border-radius:18px;padding:20px}
-  .cell{min-height:132px;border-radius:12px}
-  .cell .n{font-size:15px}
-  .cell .hn,.cell .dn{font-size:10px}
+  .cell{min-height:96px;border-radius:12px}
+  .cell .n{font-size:16px}
+  .cell .hn{font-size:10px}
   .e{font-size:12px;padding:2px 5px}
   .wk span{font-size:12.5px}
   .grid{gap:7px}
@@ -763,7 +822,7 @@ dialog input:focus,dialog select:focus{border-color:var(--accent)}
 }
 @media (min-width:1900px){
   #app{max-width:1760px;grid-template-columns:1fr 540px}
-  .cell{min-height:150px}
+  .cell{min-height:108px}
   .e{font-size:12.5px}
   li .tx{font-size:17.5px}
   .bar2 h1{font-size:42px}
@@ -879,9 +938,24 @@ dialog input:focus,dialog select:focus{border-color:var(--accent)}
 const SUPABASE_URL = 'https://cjhwxjznuleyfcbwwvtb.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_acxKbtekhqwFZwI0EUtArg_3FSj5AHh';
 const VAPID_PUBLIC = 'BItluVUoPAOjdIacpE7-6Ko45leNKobu8SbCNP1L6zdozMUrtFBNjh7ncFVZGSvwdHf4vNkYQKj5BarWq01G0hE';
-const BUILD = '2026-10-01.21';
+const BUILD = '2026-10-01.22';
 /* 크롬·삼성 인터넷이 '설치할 수 있다'고 알려주는 이벤트. 동기화 라이브러리를 기다리는 동안
    지나가 버리지 않게 모듈 맨 위에서 받는다. */
+/* 설치한 PC 앱 창이 작게 열리는 경우 — 처음 한 번만 알맞은 크기로 키운다.
+   그 뒤의 창 크기는 브라우저가 기억하므로, 사용자가 줄여 놓은 것은 건드리지 않는다. */
+(function(){
+  try{
+    if(!matchMedia('(display-mode: standalone)').matches || matchMedia('(hover:none)').matches) return;
+    if(localStorage.getItem('daynua.sized')) return;
+    localStorage.setItem('daynua.sized', '1');
+    if(outerWidth >= 1080 && outerHeight >= 720) return;                  // 이미 충분히 크다
+    const aw = screen.availWidth, ah = screen.availHeight;
+    const W = Math.min(1280, aw - 80), H = Math.min(860, ah - 60);
+    if(W < 720 || H < 560) return;                                        // 화면이 작으면 그대로
+    resizeTo(W, H);
+    moveTo((screen.availLeft || 0) + Math.round((aw - W) / 2), (screen.availTop || 0) + Math.round((ah - H) / 2));
+  }catch{}
+})();
 let installEvt = null;
 addEventListener('beforeinstallprompt', e => {
   e.preventDefault(); installEvt = e;
@@ -1009,7 +1083,7 @@ const I18N = {
   quickAdd:'할 일 추가', archive:'보관함', category:'분류', newCatShort:'+ 새 분류',
   note:'메모', undo:'실행 취소', undone:'되돌렸습니다', gotIt:'알겠어요',
   ideasHint:'떠오른 일 = 아직 정리하지 않은 것 · 나중에 = 언젠가 할 것',
-  calHint:'달력의 ✓ 는 그날 계획한 일을 다 끝냈다는 뜻이고, 아래 얇은 띠는 그날의 분류 구성입니다.',
+  calHint:'날짜 아래 점은 그날 일정의 분류 색이고, ✓ 는 그날 계획한 일을 다 끝냈다는 뜻입니다.',
   tipPC:'날짜를 우클릭하면 그날 남은 일정을 한꺼번에 정리할 수 있어요. 할 일을 달력으로 끌어 놓아도 이동됩니다.',
   tipMobile:'할 일을 꾹 눌렀다가 끌면 다른 날로 옮길 수 있어요. ⋯ 를 누르면 더 많은 메뉴가 열려요.',
   secApp:'앱', installBtn:'홈 화면에 설치',
@@ -1019,6 +1093,7 @@ const I18N = {
   remainN:n=>`남은 할 일 ${n}개`, moveAllTo:s=>`${s}로 모두 이동`, pickDate2:'다른 날짜로 이동',
   allLater:'모두 나중에', delAll:'남은 일정 모두 삭제',
   moveUp:'위로 올리기', moveDown:'아래로 내리기',
+  qtNoDate:'날짜 없이', pickDate:'날짜 선택', sheetMove:'날짜 옮기기', leftTag:'남음',
   showAllN:n=>`나머지 ${n}개 더 보기`,
   delDay:'이 날 기록 지우기',
   delDayAsk:n=>`완료한 일까지 포함해 이 날의 ${n}개를 지웁니다. 계속할까요?`,
@@ -1144,7 +1219,7 @@ const I18N = {
   quickAdd:'Add a task', archive:'Inbox', category:'Category', newCatShort:'+ New category',
   note:'Note', undo:'Undo', undone:'Reverted', gotIt:'Got it',
   ideasHint:'Ideas = not sorted yet · Someday = one day, no date',
-  calHint:'✓ on a day means you finished everything you planned. The thin bar below shows what kinds of tasks it held.',
+  calHint:'Dots under a date show the categories of that day; ✓ means you finished everything you planned.',
   tipPC:'Right-click a date to clear out what is left that day. You can also drag a task onto the calendar.',
   tipMobile:'Press and hold a task, then drag it to move it to another day. Tap ⋯ for more.',
   secApp:'App', installBtn:'Install to Home screen',
@@ -1154,6 +1229,7 @@ const I18N = {
   remainN:n=>`${n} left`, moveAllTo:s=>`Move all to ${s}`, pickDate2:'Move all to another date',
   allLater:'All to Someday', delAll:'Delete what is left',
   moveUp:'Move up', moveDown:'Move down',
+  qtNoDate:'No date', pickDate:'Pick date', sheetMove:'Move to', leftTag:'left',
   showAllN:n=>`Show ${n} more`,
   delDay:'Clear this day',
   delDayAsk:n=>`This erases all ${n} items on this day, completed ones included. Continue?`,
@@ -1902,6 +1978,25 @@ const ICON = {
   chev:   svg('<path d="M4 6.2 8 10.2l4-4"/>', 15),
 };
 
+/* 시트 항목 앞의 아이콘 — 글자만 이어지면 딱딱하다. 줄마다 무엇인지 한눈에 보이게 */
+const SI = {
+  edit:  svg('<path d="M11.1 2.5 13.5 4.9 5.7 12.7 2.6 13.4 3.3 10.3z"/>', 20),
+  tag:   svg('<path d="M2.5 8.2V3.2a.7.7 0 0 1 .7-.7h5l5.3 5.3a.7.7 0 0 1 0 1l-4.7 4.7a.7.7 0 0 1-1 0z"/><circle cx="5.6" cy="5.6" r=".9"/>', 20),
+  list:  svg('<path d="M6.5 4h7M6.5 8h7M6.5 12h7"/><circle cx="3" cy="4" r=".7"/><circle cx="3" cy="8" r=".7"/><circle cx="3" cy="12" r=".7"/>', 20),
+  note:  svg('<path d="M3.5 2.5h9v11h-9z"/><path d="M5.6 6h4.8M5.6 8.5h4.8M5.6 11h2.6"/>', 20),
+  wait:  svg('<path d="M4.6 2h6.8M4.6 14h6.8M5.6 2v2.5L8 6.9l2.4-2.4V2M5.6 14v-2.5L8 9.1l2.4 2.4V14"/>', 20),
+  bulb:  svg('<path d="M5.6 12.2a4.6 4.6 0 1 1 4.8 0v1.1a1 1 0 0 1-1 1H6.6a1 1 0 0 1-1-1z"/><path d="M6.4 11.9h3.2"/>', 20),
+  skip:  svg('<path d="M3 8h8M8.5 4.5 12 8l-3.5 3.5"/><path d="M13.4 4v8"/>', 20),
+  trash: svg('<path d="M3 4.5h10M6.2 4.5V3h3.6v1.5M4.5 4.5l.6 8.5h5.8l.6-8.5M6.8 7v3.8M9.2 7v3.8"/>', 20),
+  up:    svg('<path d="M8 12.5v-9M4.5 7 8 3.5 11.5 7"/>', 18),
+  down:  svg('<path d="M8 3.5v9M4.5 9 8 12.5 11.5 9"/>', 18),
+  cal:   svg('<rect x="2.5" y="3.5" width="11" height="10" rx="1.6"/><path d="M2.5 6.6h11M5.6 2v3M10.4 2v3"/>', 18),
+  chev:  svg('<path d="M6 3.5 10.5 8 6 12.5"/>', 16),
+  check: svg('<path d="M3.5 8.4 6.6 11.5 12.5 5"/>', 18),
+  x:     svg('<path d="M4 4l8 8M12 4l-8 8"/>', 20),
+  back:  svg('<path d="M10 3.5 5.5 8l4.5 4.5"/>', 20),
+};
+
 /* 요약은 한 번 그리는 동안 한 번만 센다 — 칸마다 전체 기록을 다시 훑지 않게 */
 let sumCache = new Map();
 const sumOf = k => { let v = sumCache.get(k);
@@ -2036,7 +2131,7 @@ function stripColor(h, target = 3){
 function cellData(k){
   const list = bucket(k), s = sumOf(k);
   return {list, complete:s.complete, cleared:s.cleared, left:s.actionable,
-          dist:catDist(list, doc.cats), visible:cellOrder(list).slice(0,3)};
+          dist:catDist(list, doc.cats)};
 }
 let monthHasComplete = false;
 
@@ -2048,26 +2143,21 @@ function renderMonth(tk){
   const cells = days.map(d=>{
     const k = key(d), s = cellData(k);
     if(s.complete && d.getMonth() === cur.getMonth()) monthHasComplete = true;
-    const hn = holName(k), dn = doc.notes[k], w = d.getDay();
+    const hn = holName(k), w = d.getDay();
     const cls = ['cell', d.getMonth()!==cur.getMonth()?'out':'',
       k===tk?'today':'', k===sel?'sel':'',
       s.cleared ? (s.complete ? 'fin' : 'fin soft') : ''].join(' ');
     const nc = hn || w===0 ? 'var(--sun)' : w===6 ? 'var(--sat)' : '';
-    const ev = s.visible.map(evHTML).join('')
-      + (s.list.length>3 ? `<span class="more">${T('more')(s.list.length-3)}</span>` : '');
     const label = !s.list.length ? fmtDay.format(d)
       : s.complete ? `${fmtDay.format(d)}, ${T('aTasks')(s.list.length)}, ${T('aAllDone')}`
       : s.cleared ? `${fmtDay.format(d)}, ${T('aTasks')(s.list.length)}, ${T('aCleared')}`
       : `${fmtDay.format(d)}, ${T('aSomeDone')(s.list.length, s.list.filter(t=>t.d).length)}`;
     return `<div class="${cls}" data-k="${k}" role="button" tabindex="0"
         aria-pressed="${k===sel}" aria-label="${esc(label)}">
-      <div class="cellTop"><span class="n mono" ${nc?`style="color:${nc}"`:''}>${d.getDate()}</span>${s.cleared?CHK:''}</div>
+      <span class="n mono" ${nc?`style="color:${nc}"`:''}>${d.getDate()}</span>
       ${hn?`<div class="hn" title="${esc(hn)}">${esc(hn)}</div>`:''}
-      ${!hn && dn?`<div class="dn" title="${esc(dn)}">${esc(dn)}</div>`:''}
-      ${!s.cleared && s.left?`<span class="left">${s.left}</span>`:''}
-      <div class="ev">${ev}</div>
-      ${s.dist.length?`<div class="strip">${s.dist.map(x=>
-        `<i class="${x.color?'':'none'}" style="--c:${x.color?stripColor(x.color):'var(--faint)'};flex:${x.ratio}"></i>`).join('')}</div>`:''}
+      <div class="mk">${s.cleared ? CHK : s.dist.slice(0,4).map(x=>
+        `<i style="--c:${x.color?stripColor(x.color):'var(--faint)'}"></i>`).join('')}</div>
     </div>`;
   }).join('');
   $('#cal').innerHTML = `<div class="wk">${wdNames().map(w=>`<span>${w}</span>`).join('')}</div>
@@ -2080,7 +2170,7 @@ function renderWeek(tk){
   materialize(days.map(dOf));
   const wdS = new Intl.DateTimeFormat(loc(), {weekday:'short'});
   const fmtDay = new Intl.DateTimeFormat(loc(), {month:'long', day:'numeric'});
-  const MAX = 4, MOBILE = 2;
+  const MAX = 4, MOBILE = 3;
   const cards = days.map(k=>{
     const d = dOf(k), s = sumOf(k), list = bucket(k);
     const hn = holName(k), w = d.getDay();
@@ -2097,14 +2187,15 @@ function renderWeek(tk){
         tabindex="0" aria-pressed="${k===sel}" aria-label="${esc(label)}">
       <div class="wh"><span class="wd">${esc(wdS.format(d))}</span>
         <span class="wn mono" ${nc?`style="color:${nc}"`:''}>${d.getDate()}</span>
+        ${k===tk ? `<span class="wtoday">${T('today')}</span>` : ''}
+        ${hn ? `<span class="whn">${esc(hn)}</span>` : ''}
         <span class="wsp"></span>
-        ${s.cleared ? CHK : s.actionable ? `<span class="wleft">${s.actionable}</span>` : ''}</div>
+        ${s.cleared ? CHK : s.actionable ? `<span class="wleft">${s.actionable}<small>${T('leftTag')}</small></span>` : ''}</div>
       ${dist.length?`<div class="strip">${dist.map(x=>
         `<i class="${x.color?'':'none'}" style="--c:${x.color?stripColor(x.color):'var(--faint)'};flex:${x.ratio}"></i>`).join('')}</div>`:''}
       <div class="wl">${ord.slice(0, MAX).map(evHTML).join('')}
         ${restM?`<span class="more m">${T('more')(restM)}</span>`:''}
         ${restD?`<span class="more d">${T('more')(restD)}</span>`:''}</div>
-      ${hn?`<div class="whn">${esc(hn)}</div>`:''}
     </div>`;
   }).join('');
   $('#cal').innerHTML = `<div class="week">${cards}</div>`;
@@ -2973,6 +3064,83 @@ function flash(msg, canUndo){
 
 /* ─── 빠른 이동 메뉴 ─── */
 let menuCtx = null, menuCats = false, menuAt = [0,0];
+const md2 = k => { const d = dOf(k); return (d.getMonth()+1) + '/' + d.getDate(); };
+
+/* 폰의 ⋯ 시트. 위에서 아래로: 머리(무슨 할 일인가) → 날짜 옮기기 타일 → 항목 → 위/아래 → 삭제.
+   Material 3 바닥 시트 규격 + Todoist·TickTick 처럼 '내일'이 맨 위에 오게. */
+function todoSheetHTML(t, from, spot){
+  const tk = todayKey(), c = catOf(t.c);
+  const where = isDateKey(from) ? md2(from) : from === 'later' ? T('later') : T('archive');
+  const head = (title, sub, back) => `<div class="grab"><i></i></div>
+    <div class="sh-head">
+      ${back ? `<button class="x" data-a="back" aria-label="${T('category')}">${SI.back}</button>`
+             : c ? `<span class="dot" style="background:${stripColor(c.c)}"></span>` : ''}
+      <div class="ttl"><b>${esc(title)}</b><span>${sub}</span></div>
+      <button class="x" data-a="close" aria-label="${T('close')}">${SI.x}</button></div>`;
+
+  if(menuCats){                                       // 분류 고르기
+    const row = (id, name, col) => `<button data-cat="${id}">
+      <span class="cdot${col ? '' : ' none'}" ${col ? `style="background:${stripColor(col)}"` : ''}></span>
+      <span>${esc(name)}</span>${(t.c || '') === id ? `<span class="k">${SI.check}</span>` : ''}</button>`;
+    return head(T('category'), esc(t.t || ''), true)
+      + row('', T('noCat'), null) + doc.cats.map(x => row(x.id, x.n, x.c)).join('')
+      + `<div class="sep"></div><button data-a="newcat">${T('newCatShort')}</button>`;
+  }
+
+  const tiles = [];
+  if(tk !== from)          tiles.push(['today',    T('today'),    md2(tk)]);
+  if(shift(tk,1) !== from) tiles.push(['tomorrow', T('tomorrow'), md2(shift(tk,1))]);
+  if(shift(tk,2) !== from) tiles.push(['d2',       T('dayAfter'), md2(shift(tk,2))]);
+  if(from !== 'later')     tiles.push(['later',    T('later'),    T('qtNoDate')]);
+  const row = (a, icon, label, k, cls = '') =>
+    `<button data-a="${a}" ${cls ? `class="${cls}"` : ''}>${icon}<span>${label}</span>${k ? `<span class="k">${k}</span>` : ''}</button>`;
+
+  return head(t.t || '', where + (c ? ' · ' + esc(c.n) : ''), false)
+    + `<div class="qlbl">${T('sheetMove')}</div>
+       <div class="qgrid">
+         ${tiles.map(([a, l, sub]) => `<button class="qt" data-a="${a}">${l}<small>${sub}</small></button>`).join('')}
+         <label class="qt">${SI.cal}<span>${T('pickDate')}</span>
+           <input type="date" id="menuDate" value="${isDateKey(from) ? from : tk}"></label>
+       </div>`
+    + row('edit', SI.edit, T('edit'))
+    + row('cats', SI.tag, T('category'), `${esc(c?.n || T('noCat'))}${SI.chev}`)
+    + row('sub', SI.list, T('subs'))
+    + row('note', SI.note, T('note'))
+    + (t.d ? '' : row('wait', SI.wait, t.w ? T('waitOff') : T('waitOn')))
+    + (t.r && !t.d ? row('skip', SI.skip, T('skip')) : '')
+    + (from !== 'ideas' ? row('ideas', SI.bulb, T('toIdeas')) : '')
+    + (spot && spot.i >= 0 && spot.n > 1 ? `<div class="ogrid">
+        ${spot.i > 0 ? `<button class="ob" data-a="up">${SI.up}<span>${T('moveUp')}</span></button>` : ''}
+        ${spot.i < spot.n - 1 ? `<button class="ob" data-a="down">${SI.down}<span>${T('moveDown')}</span></button>` : ''}
+      </div>` : '')
+    + `<div class="sep"></div>` + row('del', SI.trash, T('del'), '', 'rm');
+}
+
+/* 시트를 아래로 끌어 닫기 — 손잡이와 머리에서만 시작한다 (목록 스크롤과 겹치지 않게).
+   손가락을 놓을 때 90px 넘게 내려왔으면 닫고, 아니면 제자리로 돌아간다. */
+function sheetDrag(){
+  $('#sheet').addEventListener('pointerdown', e=>{
+    if(e.pointerType === 'mouse' || !e.target.closest('.grab, .sh-head, .mh') || e.target.closest('button')) return;
+    const sh = $('#sheet'), bd = $('#sheetWrap .sbd'), y0 = e.clientY;
+    let dy = 0;
+    sh.style.animation = 'none'; sh.style.transition = 'none';
+    const mv = ev => {
+      dy = Math.max(0, ev.clientY - y0);
+      sh.style.transform = `translateY(${dy}px)`;
+      bd.style.opacity = String(Math.max(.15, 1 - dy / 320));
+    };
+    const up = ()=>{
+      removeEventListener('pointermove', mv); removeEventListener('pointerup', up); removeEventListener('pointercancel', up);
+      const go = dy > 90;
+      sh.style.transition = 'transform 180ms var(--ease)';
+      if(go) closeMenu(), closeSheet();
+      else{ sh.style.transform = ''; bd.style.opacity = ''; }
+      setTimeout(()=>{ sh.style.animation = sh.style.transition = sh.style.transform = ''; bd.style.opacity = ''; }, 260);
+    };
+    addEventListener('pointermove', mv); addEventListener('pointerup', up); addEventListener('pointercancel', up);
+  });
+}
+sheetDrag();
 function openMenu(x, y, from, id){
   menuCtx = {from, id};
   menuAt = [x, y];
@@ -3012,9 +3180,7 @@ function openMenu(x, y, from, id){
      메뉴인지 알 수 없었다. 시트에는 어떤 할 일인지 제목을 얹는다. */
   if(!canDrag){
     todoSheet = true;
-    $('#sheet').innerHTML =
-      `<div class="mh">${esc(t.t || '')}</div>` + body +
-      `<div class="sep"></div><button data-a="close" class="sclose">${T('close')}</button>`;
+    $('#sheet').innerHTML = todoSheetHTML(t, from, spot);
     clearTimeout(sheetHideT);
     $('#sheetWrap').classList.remove('closing');
     $('#sheetWrap').hidden = false; ovOpen();
@@ -3149,8 +3315,7 @@ function openDateMenu(x, y, k, sheet){
   dateCtx = k; dateSheet = !!sheet;
   if(!sheet) menuAtXY = [x, y];
   if(sheet){
-    $('#sheet').innerHTML = dateMenuHTML(k) +
-      `<div class="sep"></div><button data-da="close" class="sclose">${T('close')}</button>`;
+    $('#sheet').innerHTML = `<div class="grab"><i></i></div>` + dateMenuHTML(k);
     clearTimeout(sheetHideT);
     $('#sheetWrap').classList.remove('closing');
     $('#sheetWrap').hidden = false; ovOpen();
@@ -3391,7 +3556,7 @@ function setCalView(v){
 }
 /* 모바일에서 날짜를 눌렀는데 그날 목록이 화면 밖이면 그때만 살짝 올려준다 — 스크롤을 빼앗지 않는다 */
 function revealDay(){
-  if(matchMedia('(min-width:900px)').matches) return;
+  if(matchMedia('(min-width:720px)').matches) return;
   const el = $('#side'); if(!el?.firstElementChild) return;
   const r = el.getBoundingClientRect();
   if(r.top > innerHeight - 120)
