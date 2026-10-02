@@ -973,6 +973,33 @@ html.entering #app,html.entering #fab{animation:appIn .65s cubic-bezier(.2,.8,.2
   .wcard .wl .more.d{display:block}
   .wcard .wleft{font-size:13.5px;padding:4px 12px}
 }
+
+/* ── 다듬기 ── */
+@media (max-width:420px){ .bar2 h1 small.ky{display:inline} }
+/* 이전·다음 달 날짜도 읽혀야 한다 — 흐리게 하되 숫자는 진하게 */
+#cal .cell.tint.out{opacity:.78}
+#cal .cell.out.tint .n{color:var(--ink)}
+/* 1년: 할 일 없는 날은 칸 없이 숫자만. 있는 날만 색·점으로 말한다 */
+.yd{background:none}
+.yd.has::after{width:6px;height:6px;margin-left:-3px;bottom:2px;background:var(--ink);opacity:.7}
+.yd.a3.has::after{background:var(--on-accent);opacity:.9}
+/* PC 에서는 12개월이 스크롤 없이 한 화면에 들어온다 */
+@media (min-width:900px){
+  .year{gap:16px 20px}
+  .yd{aspect-ratio:auto;height:clamp(20px, calc((100dvh - 470px) / 18), 34px);min-height:0}
+}
+@media (min-width:1000px){
+  .year{grid-template-columns:repeat(6,1fr);gap:20px 22px}
+  .yd{height:clamp(20px, calc((100dvh - 420px) / 12), 36px);font-size:12px}
+  .ylegend .n{margin-left:14px}
+}
+/* 주간: 비어 있는 날은 한 줄로 낮게 (폰) */
+@media (max-width:719px){
+  .wcard.empty{min-height:0;padding:8px 14px 8px 10px;align-items:center}
+  .wcard.empty .wh{flex-direction:row;gap:3px}
+  .wcard.empty .wn{width:28px;height:28px;font-size:14px}
+  .wcard.empty .none{padding:0}
+}
 </style>
 </head>
 <body>
@@ -1102,7 +1129,7 @@ html.entering #app,html.entering #fab{animation:appIn .65s cubic-bezier(.2,.8,.2
 const SUPABASE_URL = 'https://cjhwxjznuleyfcbwwvtb.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_acxKbtekhqwFZwI0EUtArg_3FSj5AHh';
 const VAPID_PUBLIC = 'BItluVUoPAOjdIacpE7-6Ko45leNKobu8SbCNP1L6zdozMUrtFBNjh7ncFVZGSvwdHf4vNkYQKj5BarWq01G0hE';
-const BUILD = '2026-10-01.38';
+const BUILD = '2026-10-01.39';
 /* Daynua 앱(Android 껍데기) 안이면 위젯·알림·내보내기를 앱에 맡긴다. 아니면 null */
 const APP = typeof DaynuaApp !== 'undefined' ? DaynuaApp : null;
 const ARRIVED_BY_LINK = /access_token|type=(signup|recovery|magiclink|invite)|[?&]code=/.test(location.hash + location.search);
@@ -1258,9 +1285,9 @@ const I18N = {
   quickAdd:'할 일 추가', archive:'보관함', category:'분류', newCatShort:'+ 새 분류',
   note:'메모', undo:'실행 취소', undone:'되돌렸습니다', gotIt:'알겠어요',
   ideasHint:'떠오른 일 = 아직 정리하지 않은 것 · 나중에 = 언젠가 할 것',
-  calHint:'날짜 아래 점은 그날 일정의 분류 색입니다. 계획한 일을 다 끝낸 날은 칸이 분류 색으로 물들고 ✓ 가 뜹니다.',
-  tipPC:'날짜를 우클릭하면 그날 남은 일정을 한꺼번에 정리할 수 있어요. 할 일을 달력으로 끌어 놓아도 이동됩니다.',
-  tipMobile:'할 일을 꾹 눌렀다가 끌면 다른 날로 옮길 수 있어요. 날짜를 꾹 누르면 그날 남은 일정을 정리할 수 있고, ⋯ 를 누르면 더 많은 메뉴가 열려요.',
+  calHint:'다 끝낸 날은 분류 색으로 칠해져요.',
+  tipPC:'날짜를 우클릭하면 남은 일정을 한꺼번에 정리할 수 있어요.',
+  tipMobile:'할 일이나 날짜를 꾹 누르면 옮기거나 정리할 수 있어요.',
   secApp:'앱', installBtn:'홈 화면에 설치',
   installHint:'설치하면 주소창 없이 앱처럼 열리고, 앱 서랍에도 나타납니다.',
   installAndroid:'브라우저 메뉴(⋮ 또는 ≡) → ‘앱 설치’ 또는 ‘홈 화면에 추가’',
@@ -1403,9 +1430,9 @@ const I18N = {
   quickAdd:'Add a task', archive:'Inbox', category:'Category', newCatShort:'+ New category',
   note:'Note', undo:'Undo', undone:'Reverted', gotIt:'Got it',
   ideasHint:'Ideas = not sorted yet · Someday = one day, no date',
-  calHint:'Dots under a date are the categories of that day. A fully finished day is tinted with them and gets a ✓.',
-  tipPC:'Right-click a date to clear out what is left that day. You can also drag a task onto the calendar.',
-  tipMobile:'Press and hold a task, then drag it to move it to another day. Press and hold a date to clear out what is left that day. Tap ⋯ for more.',
+  calHint:'A fully finished day is tinted with its category colors and gets a ✓.',
+  tipPC:'Right-click a date to clear out what is left that day.',
+  tipMobile:'Press and hold a task or a date to move or tidy things up.',
   secApp:'App', installBtn:'Install to Home screen',
   installHint:'Opens like an app without the address bar, and shows up in your app drawer.',
   installAndroid:'Browser menu (⋮ or ≡) → Install app / Add to Home screen',
@@ -2198,9 +2225,10 @@ const evHTML = (t, i) => { const c = catOf(t.c);
 /* 제목은 보기마다 다르다 — 주는 기간, 월은 달, 년은 해 */
 function viewTitle(){
   const y = cur.getFullYear();
+  const ky = y === new Date().getFullYear() ? '' : ' class="ky"';     // 올해가 아니면 좁은 화면에서도 연도를 보인다
   if(calView === 'year') return `${y}`;
   if(calView === 'month')
-    return `${new Intl.DateTimeFormat(loc(),{month:'long'}).format(cur)}<small>${y}</small>`;
+    return `${new Intl.DateTimeFormat(loc(),{month:'long'}).format(cur)}<small${ky}>${y}</small>`;
   const w = weekGrid(key(cur), ws()), a = dOf(w[0]), b = dOf(w[6]);
   const ko = doc.ui.lang !== 'en';
   const mo = d => ko ? `${d.getMonth()+1}월` : new Intl.DateTimeFormat('en-US',{month:'short'}).format(d);
@@ -2211,7 +2239,7 @@ function viewTitle(){
                           : `${mo(a)} ${a.getDate()} – ${mo(b)} ${b.getDate()}`);
   const yr = a.getFullYear() === b.getFullYear() ? `${a.getFullYear()}`
                                                  : `${a.getFullYear()}–${b.getFullYear()}`;
-  return `${head}<small>${yr}</small>`;
+  return `${head}<small${a.getFullYear() === new Date().getFullYear() && b.getFullYear() === a.getFullYear() ? '' : ' class="ky"'}>${yr}</small>`;
 }
 
 /* ─── 움직임 ───
@@ -2404,7 +2432,7 @@ function renderWeek(tk){
         <span class="wn mono">${d.getDate()}${s.cleared ? CHK : ''}</span></div>
       <div class="wl">
         ${hn ? `<span class="whn">${esc(hn)}</span>` : ''}
-        ${ord.length ? ord.slice(0, MAX).map(evHTML).join('') : `<span class="none">${T('weekNone')}</span>`}
+        ${ord.length ? ord.slice(0, MAX).map(evHTML).join('') : hn ? '' : `<span class="none">${T('weekNone')}</span>`}
         ${restM?`<span class="more m">${T('more')(restM)}</span>`:''}
         ${restD?`<span class="more d">${T('more')(restD)}</span>`:''}</div>
       ${!s.cleared && s.actionable ? `<span class="wleft">${s.actionable}<small>${T('leftTag')}</small></span>` : ''}
@@ -3766,7 +3794,7 @@ function revealDay(){
   if(matchMedia('(min-width:720px)').matches) return;
   const el = $('#side'); if(!el?.firstElementChild) return;
   const r = el.getBoundingClientRect();
-  if(r.top > innerHeight - 120)
+  if(r.top > (calView === 'week' ? innerHeight * .4 : innerHeight - 120))   // 주간은 7줄이 길어 패널이 접힌 아래에 있다
     el.scrollIntoView({behavior: reduceMo() ? 'auto' : 'smooth', block:'start'});
 }
 /* 화살표로 넘길 때만 아주 작게 이어준다 (7px). 휙 넘기기는 손가락을 따라온 만큼 제 폭이 따로 있다 */
