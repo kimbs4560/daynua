@@ -1044,7 +1044,9 @@ li .tm{flex:none;font-size:11.5px;font-weight:700;color:var(--sub);background:va
 .timerow{display:flex;align-items:center;gap:10px;justify-content:space-between}
 .timerow>span:first-child{font-weight:600}
 #menu .timerow{padding:4px 10px;font-size:13px}
-#sheet .timerow{min-height:52px;padding:0 14px;font-size:15px}
+#sheet .timerow{min-height:52px;padding:0 14px;font-size:15px;gap:16px}
+#sheet .timerow svg{flex:none;color:var(--sub)}
+#sheet .timerow>span:not(.tsel){flex:1}
 #sheet #tpop button{font-size:16px;min-height:42px}
 
 /* ── 글자 한 단계 키움 (너무 작던 것들) ── */
@@ -1224,7 +1226,7 @@ li .tm{font-size:12px}
 const SUPABASE_URL = 'https://cjhwxjznuleyfcbwwvtb.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_acxKbtekhqwFZwI0EUtArg_3FSj5AHh';
 const VAPID_PUBLIC = 'BItluVUoPAOjdIacpE7-6Ko45leNKobu8SbCNP1L6zdozMUrtFBNjh7ncFVZGSvwdHf4vNkYQKj5BarWq01G0hE';
-const BUILD = '2026-10-01.53';
+const BUILD = '2026-10-01.54';
 /* Daynua 앱(Android 껍데기) 안이면 위젯·알림·내보내기를 앱에 맡긴다. 아니면 null */
 const APP = typeof DaynuaApp !== 'undefined' ? DaynuaApp : null;
 const ARRIVED_BY_LINK = /access_token|type=(signup|recovery|magiclink|invite)|[?&]code=/.test(location.hash + location.search);
@@ -1373,7 +1375,7 @@ const I18N = {
   more:n=>`+${n}`, activeDays:'활동한 날', daysUnit:n=>`${n}일`,
   yearEmpty:'이 해에는 아직 완료 기록이 없습니다.',
   secLook:'모양', secCal:'달력', secNoti:'알림', secData:'데이터', secAdv:'고급',
-  restore:'복구 지점', restoreSub:'덮어쓰기·가져오기·동기화 직전의 상태를 몇 벌 보관합니다.',
+  restore:'복구 지점', restoreSub:'덮어쓰기, 가져오기, 동기화 직전의 상태를 몇 벌 보관합니다.',
   restoreWhy:{import:'가져오기 전', restore:'백업 복원 전', merge:'계정 합치기 전', sync:'동기화 전'},
   restoreDo:'되돌리기', restoreAsk:'지금 데이터를 이 시점으로 되돌릴까요?',
   restoreDone:'되돌렸습니다.', restoreNone:'아직 복구 지점이 없습니다.',
@@ -2310,6 +2312,7 @@ const SI = {
   check: svg('<path d="M3.5 8.4 6.6 11.5 12.5 5"/>', 18),
   x:     svg('<path d="M4 4l8 8M12 4l-8 8"/>', 20),
   back:  svg('<path d="M10 3.5 5.5 8l4.5 4.5"/>', 20),
+  clock: svg('<circle cx="8" cy="8" r="5.6"/><path d="M8 4.8V8l2.2 1.4"/>', 20),
 };
 
 /* 요약은 한 번 그리는 동안 한 번만 센다 — 칸마다 전체 기록을 다시 훑지 않게 */
@@ -3643,7 +3646,7 @@ function todoSheetHTML(t, from, spot){
            <input type="date" id="menuDate" value="${isDateKey(from) ? from : tk}"></label>
        </div>`
     + row('edit', SI.edit, T('edit'))
-    + `<div class="timerow"><span>${T('timeSet')}</span>${timeSelHTML('menuT', t.tm)}</div>`
+    + `<div class="timerow">${SI.clock}<span>${T('timeSet')}</span>${timeSelHTML('menuT', t.tm)}</div>`
     + row('cats', SI.tag, T('category'), `${esc(c?.n || T('noCat'))}${SI.chev}`)
     + row('more', menuMore ? SI.up : SI.down, T(menuMore ? 'menuLess' : 'menuMore'))
     + (menuMore ? more : '')
