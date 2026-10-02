@@ -1042,15 +1042,43 @@ html[data-vt=next]::view-transition-new(side),html[data-vt=prev]::view-transitio
 li .tm{flex:none;font-size:11.5px;font-weight:700;color:var(--sub);background:var(--fill);border-radius:6px;padding:1px 6px;line-height:1.5}
 .wcard .wl .e .tm{flex:none;font-size:12px;font-weight:700;color:var(--sub);background:none;padding:0}
 .tsel{display:inline-flex;align-items:center;gap:3px;flex:none}
-.tsel select{width:auto;margin:0;padding:6px 4px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--ink);
-  font:inherit;font-size:13px;font-weight:700;outline:none}
-.tsel select:disabled{opacity:.45}
 .tsel i{font-style:normal;color:var(--faint);font-weight:700}
+.tsel .tbtn{display:inline-flex;align-items:center;gap:5px;padding:6px 8px;border:1px solid var(--line);border-radius:9px;
+  background:var(--bg);color:var(--ink);font-size:13px;font-weight:700;white-space:nowrap;font-variant-numeric:tabular-nums}
+.tsel .tbtn::after{content:"";width:5px;height:5px;border-right:1.6px solid currentColor;border-bottom:1.6px solid currentColor;
+  transform:rotate(45deg) translateY(-1px);opacity:.5}
+.tsel .tbtn:disabled{opacity:.45}
+@media (hover:hover){ .tsel .tbtn:not(:disabled):hover{border-color:var(--faint)} }
+/* 열리는 목록: 6칸 높이에서 끊고 안에서 내린다 */
+#tpop{position:fixed;z-index:3500;max-height:216px;overflow-y:auto;overscroll-behavior:contain;touch-action:pan-y;
+  background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:4px;
+  box-shadow:0 10px 30px rgba(0,0,0,.22);animation:moMenu 120ms var(--ease);scrollbar-width:thin;user-select:none}
+#tpop[hidden]{display:none}
+#tpop button{display:block;width:100%;min-height:34px;padding:7px 14px;border-radius:8px;text-align:left;
+  font-size:14px;font-weight:700;color:inherit;font-variant-numeric:tabular-nums}
+@media (hover:hover){ #tpop button:hover{background:var(--fill)} }
+#tpop button.on{background:var(--ink);color:var(--bg)}
 .timerow{display:flex;align-items:center;gap:10px;justify-content:space-between}
 .timerow>span:first-child{font-weight:600}
 #menu .timerow{padding:4px 10px;font-size:13px}
 #sheet .timerow{min-height:52px;padding:0 14px;font-size:15px}
-#sheet .tsel select{font-size:15px;padding:9px 8px;border-radius:12px}
+#sheet .tsel .tbtn{font-size:15px;padding:9px 10px;border-radius:12px}
+#sheet #tpop button{font-size:16px;min-height:42px}
+
+/* ── 글자 한 단계 키움 (너무 작던 것들) ── */
+.wk span{font-size:12.5px}
+.qcat button{font-size:12.5px}
+.sec{font-size:11.5px}
+.mk b{font-size:10.5px}
+.ywd span{font-size:10.5px}
+.yd{font-size:11.5px}
+.ylegend,.ylegend .n{font-size:12.5px}
+.wcard .wd{font-size:12.5px}
+.wcard .wleft small{font-size:12px}
+li .tm{font-size:12px}
+@media (min-width:900px){ .ywd span{font-size:11.5px} .yd{font-size:12.5px} }
+/* 시간 칸은 손가락으로 누르기 쉽게 */
+@media (hover:none){ .tsel .tbtn{padding:8px 10px;font-size:14px} .qadd.main .tsel{gap:2px} }
 </style>
 </head>
 <body>
@@ -1180,7 +1208,7 @@ li .tm{flex:none;font-size:11.5px;font-weight:700;color:var(--sub);background:va
 const SUPABASE_URL = 'https://cjhwxjznuleyfcbwwvtb.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_acxKbtekhqwFZwI0EUtArg_3FSj5AHh';
 const VAPID_PUBLIC = 'BItluVUoPAOjdIacpE7-6Ko45leNKobu8SbCNP1L6zdozMUrtFBNjh7ncFVZGSvwdHf4vNkYQKj5BarWq01G0hE';
-const BUILD = '2026-10-01.49';
+const BUILD = '2026-10-01.51';
 /* Daynua 앱(Android 껍데기) 안이면 위젯·알림·내보내기를 앱에 맡긴다. 아니면 null */
 const APP = typeof DaynuaApp !== 'undefined' ? DaynuaApp : null;
 const ARRIVED_BY_LINK = /access_token|type=(signup|recovery|magiclink|invite)|[?&]code=/.test(location.hash + location.search);
@@ -1362,7 +1390,7 @@ const I18N = {
   allTime:'전체', thisYear:'올해', recent:'최근 했던 일', activity:'활동',
   timeAlertLbl:'시간 일정 알림', timeAlertHint:'시각을 정한 할 일을, 고른 시점에 알려 줘요.',
   timeHintWeb:' 앱을 닫아 두면 알림이 오지 않을 수 있어요. 안드로이드 앱에서는 닫아 두어도 와요.',
-  timeLead:['알림 없음','정시','10분 전','30분 전','1시간 전'], timeSet:'시간', timeH:'시', timeM:'분',
+  timeLead:['알림 없음','정시','10분 전','30분 전','1시간 전'], timeSet:'시간', timeNone:'시간 없음', timeH:'시', timeM:'분',
   timeBody:(tm,l)=> l ? `${tm} · ${l}분 전` : tm,
   actLegend:'끝낸 일이 많을수록 진해져요', yearSum:(n,d)=>`${d}일에 걸쳐 ${n}개를 끝냈어요`, yHas:'남은 할 일', weekNone:'비어 있음',
   saveFail:'저장 공간이 부족합니다. 설정 → 데이터 → 내보내기로 백업해주세요.',
@@ -1510,7 +1538,7 @@ const I18N = {
   allTime:'All time', thisYear:'This year', recent:'Recently done', activity:'Activity',
   timeAlertLbl:'Timed task alerts', timeAlertHint:'Notifies you about tasks that have a time, at the moment you choose.',
   timeHintWeb:' Notifications may not arrive while the app is closed. The Android app delivers them even when closed.',
-  timeLead:['No alert','On time','10 min before','30 min before','1 hour before'], timeSet:'Time', timeH:'Hour', timeM:'Minute',
+  timeLead:['No alert','On time','10 min before','30 min before','1 hour before'], timeSet:'Time', timeNone:'No time', timeH:'Hour', timeM:'Minute',
   timeBody:(tm,l)=> l ? `${tm} · in ${l} min` : tm,
   actLegend:'Darker = more tasks finished', yearSum:(n,d)=>`${n} done over ${d} day${d===1?'':'s'}`, yHas:'still to do', weekNone:'Nothing planned',
   saveFail:'Storage is full. Back up via Settings → Data → Export.',
@@ -2645,7 +2673,7 @@ function renderDay(tk){
           ${canDrag ? 'draggable="true"' : ''}><i style="background:${stripColor(c.c)}"></i>${esc(c.n)}</button>`).join('')}
       <button data-q="+" class="newc">${doc.cats.length ? '+' : T('addCat')}</button>
     </div>
-    <div class="qadd main"><span>+</span><input id="qd" maxlength="200" placeholder="${T('quickAdd')}">${timeSelHTML('qth', 'qtm', qtVal)}</div>
+    <div class="qadd main"><span>+</span><input id="qd" maxlength="200" placeholder="${T('quickAdd')}">${timeSelHTML('qt', qtVal)}</div>
     ${tipNow() ? `<div class="tip" id="tip${tipNow().id}"><span>${tipNow().text}</span>
         <button data-tip="${tipNow().id}">${T('gotIt')}</button></div>` : ''}
     ${!sm.all ? `<div class="dayempty"><b>${T('dayEmpty')}</b><span>${T('dayEmptyHint')}</span></div>`
@@ -3290,12 +3318,11 @@ function addQuick(el, keep){
   else touchSoon();
 }
 
-$('#side').addEventListener('change', e=>{
-  const id = e.target.id;
-  if(id !== 'qth' && id !== 'qtm') return;
-  qtVal = timeFrom($('#qth'), $('#qtm')); syncQt();
+$('#side').addEventListener('tchange', e=>{
+  if(e.target.id !== 'qt') return;
+  qtVal = timeFrom(e.target);
   if(qtVal) askTimeNotify();
-  if(id === 'qtm') $('#qd')?.focus();                 // 분까지 골랐으면 다시 제목 칸으로
+  if(e.detail.k === 'm') $('#qd')?.focus();           // 분까지 골랐으면 다시 제목 칸으로
 });
 
 let searchTimer = null;
@@ -3308,11 +3335,11 @@ $('#side').addEventListener('input', e=>{
 
 $('#side').addEventListener('focusout', e=>{
   if(e.target.id === 'qd' || e.target.id === 'qi'){
-    if(e.relatedTarget?.closest('#qcat') || ['qth', 'qtm'].includes(e.relatedTarget?.id)) return;     // 분류·시각을 고르는 중이면 아직 만들지 않는다
+    if(e.relatedTarget?.closest('#qcat, #qt')) return;     // 분류·시각을 고르는 중이면 아직 만들지 않는다
     return addQuick(e.target, false);
   }
-  if(e.target.id === 'qth' || e.target.id === 'qtm'){          // 시각만 고르고 다른 곳으로 나가면 지금까지 적은 것으로 만든다
-    if(['qd', 'qth', 'qtm'].includes(e.relatedTarget?.id) || e.relatedTarget?.closest('#qcat')) return;
+  if(e.target.closest('#qt')){                                 // 시각만 고르고 다른 곳으로 나가면 지금까지 적은 것으로 만든다
+    if(e.relatedTarget?.id === 'qd' || e.relatedTarget?.closest('#qcat, #qt, #tpop')) return;
     const q = $('#qd'); if(q?.value.trim()) addQuick(q, false);
     return;
   }
@@ -3401,25 +3428,84 @@ function flash(msg, canUndo){
 /* ─── 빠른 이동 메뉴 ─── */
 let menuCtx = null, menuCats = false, menuMore = false, menuAt = [0,0];
 let qtVal = '';                                     // 빠른 입력에 골라 둔 시각 (다시 그려도 남는다)
-/* 시와 분을 따로 고르는 칸 — 국가 고르기처럼 목록이 뜨고, 끝(00·23 / 00·50)에서 멈춘다.
-   분은 10분 단위만. (이미 있던 10분 단위가 아닌 값은 그 값만 하나 더 끼운다) req: 비워 둘 수 없는 칸 */
+/* 시와 분을 따로 고르는 칸 — 누르면 짧은 목록(6칸 높이)이 뜨고, 끌거나 휠로 내려서 고른다. 끝(00·23)에서 멈춘다.
+   분은 10분 단위만. (이미 있던 10분 단위가 아닌 값은 그 값만 하나 더 끼운다) req: 비워 둘 수 없는 칸.
+   값은 칸 바깥 span 의 data-h / data-m 에 있고, 바뀌면 그 span 에서 'tchange' 가 올라온다. */
 const p2t = n => String(n).padStart(2, '0');
-function timeSelHTML(idH, idM, v, req){
+function timeSelHTML(id, v, req){
   const ok = /^\d\d:\d\d$/.test(v || '');
-  const h = ok ? +v.slice(0, 2) : (req ? 9 : null), m = ok ? +v.slice(3) : 0;
-  const mins = [0, 10, 20, 30, 40, 50]; if(!mins.includes(m)) mins.push(m), mins.sort((a, b) => a - b);
-  return `<span class="tsel"><select id="${idH}" aria-label="${T('timeH')}">${req ? '' : `<option value="">${T('timeSet')}</option>`}${
-      Array.from({length:24}, (_, i) => `<option value="${i}" ${h === i ? 'selected' : ''}>${p2t(i)}</option>`).join('')}</select><i>:</i>
-    <select id="${idM}" aria-label="${T('timeM')}" ${h === null ? 'disabled' : ''}>${
-      mins.map(x => `<option value="${x}" ${m === x ? 'selected' : ''}>${p2t(x)}</option>`).join('')}</select></span>`;
+  const h = ok ? +v.slice(0, 2) : (req ? 9 : ''), m = ok ? +v.slice(3) : 0;
+  return `<span class="tsel" id="${id}" data-h="${h}" data-m="${m}" data-req="${req ? 1 : 0}">
+    <button type="button" class="tbtn" data-p="h" aria-label="${T('timeH')}" aria-haspopup="listbox">${h === '' ? T('timeSet') : p2t(h)}</button><i>:</i>
+    <button type="button" class="tbtn" data-p="m" aria-label="${T('timeM')}" aria-haspopup="listbox" ${h === '' ? 'disabled' : ''}>${p2t(m)}</button></span>`;
 }
-const timeFrom = (hs, ms) => !hs || hs.value === '' ? '' : `${p2t(+hs.value)}:${p2t(+(ms?.value || 0))}`;
+const timeFrom = w => !w || w.dataset.h === '' ? '' : `${p2t(+w.dataset.h)}:${p2t(+w.dataset.m)}`;
+function tselShow(w, v){                              // 밖에서 값을 넣을 때
+  const ok = /^\d\d:\d\d$/.test(v || '');
+  w.dataset.h = ok ? String(+v.slice(0, 2)) : ''; w.dataset.m = ok ? String(+v.slice(3)) : '0';
+  const [hb, mb] = w.querySelectorAll('.tbtn');
+  hb.textContent = ok ? p2t(+w.dataset.h) : T('timeSet'); mb.textContent = p2t(+w.dataset.m); mb.disabled = !ok;
+}
+/* 목록은 한 개를 돌려 쓴다. 설정 같은 모달 안에서도 눌리도록 열릴 때 그 안으로 옮긴다. */
+const tpop = document.createElement('div');
+tpop.id = 'tpop'; tpop.hidden = true; tpop.setAttribute('role', 'listbox');
+document.body.appendChild(tpop);
+let tpFor = null, tpMoved = false;
+function tpClose(refocus){ tpop.hidden = true; if(refocus) tpFor?.focus(); tpFor = null; }
+function tpShow(btn){
+  if(btn.disabled) return;
+  const w = btn.closest('.tsel'), k = btn.dataset.p, req = w.dataset.req === '1', m = +w.dataset.m;
+  let items;
+  if(k === 'h') items = [...(req ? [] : [['', T('timeNone')]]), ...Array.from({length:24}, (_, i) => [String(i), p2t(i)])];
+  else { const mins = [0, 10, 20, 30, 40, 50]; if(!mins.includes(m)) mins.push(m), mins.sort((a, b) => a - b); items = mins.map(x => [String(x), p2t(x)]); }
+  const cur = k === 'h' ? w.dataset.h : String(m);
+  tpop.innerHTML = items.map(([v, l]) => `<button type="button" role="option" data-v="${v}" class="${v === cur ? 'on' : ''}">${l}</button>`).join('');
+  (btn.closest('dialog') || document.body).appendChild(tpop);
+  tpFor = btn; tpop.dataset.p = k; tpop.hidden = false;
+  tpop.style.minWidth = Math.max(btn.offsetWidth, 72) + 'px';
+  const on = tpop.querySelector('.on'); if(on) tpop.scrollTop = on.offsetTop - tpop.clientHeight / 2 + on.offsetHeight / 2;
+  const r = btn.getBoundingClientRect(), pr = tpop.getBoundingClientRect();
+  let left = Math.min(r.left, innerWidth - pr.width - 8), top = r.bottom + 4;
+  if(top + pr.height > innerHeight - 8) top = Math.max(8, r.top - pr.height - 4);       // 아래가 모자라면 위로
+  tpop.style.left = left + 'px'; tpop.style.top = top + 'px';
+  const a = tpop.getBoundingClientRect();                                               // 변형된 조상 안이어도 어긋나지 않게 맞춘다
+  tpop.style.left = (left + (left - a.left)) + 'px'; tpop.style.top = (top + (top - a.top)) + 'px';
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('.tsel .tbtn');
+  if(b){ if(!tpop.hidden && tpFor === b) return tpClose(); return tpShow(b); }
+});
+document.addEventListener('mousedown', e => {          // 눌러도 제목 칸의 포커스(= 키보드)를 빼앗지 않는다
+  if(e.target.closest('.tsel .tbtn, #tpop')) e.preventDefault();
+});
+tpop.addEventListener('click', e => {
+  const b = e.target.closest('button'); if(!b || tpMoved || !tpFor) return;
+  const w = tpFor.closest('.tsel'), k = tpop.dataset.p;
+  if(k === 'h') w.dataset.h = b.dataset.v; else w.dataset.m = b.dataset.v;
+  tselShow(w, w.dataset.h === '' ? '' : `${p2t(+w.dataset.h)}:${p2t(+w.dataset.m)}`);
+  tpClose(false);
+  w.dispatchEvent(new CustomEvent('tchange', {bubbles:true, detail:{k}}));
+});
+tpop.addEventListener('keydown', e => {
+  const bs = [...tpop.querySelectorAll('button')], i = bs.indexOf(document.activeElement);
+  if(e.key === 'ArrowDown'){ e.preventDefault(); bs[Math.min(bs.length - 1, i + 1)]?.focus(); }
+  if(e.key === 'ArrowUp'){ e.preventDefault(); bs[Math.max(0, i - 1)]?.focus(); }
+});
+document.addEventListener('keydown', e => { if(e.key === 'Escape' && !tpop.hidden){ e.stopPropagation(); tpClose(true); } }, true);
+document.addEventListener('pointerdown', e => { if(!tpop.hidden && !e.target.closest('#tpop, .tsel .tbtn')) tpClose(); });
+addEventListener('resize', () => tpClose());
+addEventListener('scroll', e => { if(!tpop.hidden && e.target !== tpop) tpClose(); }, true);
+/* 마우스로도 끌어서 내린다 (터치는 기본 스크롤이 한다) */
+tpop.addEventListener('pointerdown', e => {
+  if(e.pointerType !== 'mouse' || e.button !== 0) return;
+  const y0 = e.clientY, s0 = tpop.scrollTop; tpMoved = false;
+  const mv = ev => { const dy = ev.clientY - y0; if(Math.abs(dy) > 4) tpMoved = true; tpop.scrollTop = s0 - dy; };
+  const up = () => { removeEventListener('pointermove', mv); removeEventListener('pointerup', up); setTimeout(() => { tpMoved = false; }, 0); };
+  addEventListener('pointermove', mv); addEventListener('pointerup', up);
+});
 /* 시각을 처음 붙일 때, 알림 허용이 아직이면 그때 한 번 묻는다 */
 const askTimeNotify = () => { if((doc.ui.timeLead ?? 0) >= 0 && permDefault()) askNotify(); };
-const syncQt = () => {
-  const h = $('#qth'), m = $('#qtm'); if(!h || !m) return;
-  h.value = qtVal ? String(+qtVal.slice(0, 2)) : ''; m.value = qtVal ? String(+qtVal.slice(3)) : '0'; m.disabled = !qtVal;
-};
+const syncQt = () => { const w = $('#qt'); if(w) tselShow(w, qtVal); };
 const md2 = k => { const d = dOf(k); return (d.getMonth()+1) + '/' + d.getDate(); };
 
 /* 폰의 ⋯ 시트. 위에서 아래로: 머리(무슨 할 일인가) → 날짜 옮기기 타일 → 항목 → 위/아래 → 삭제.
@@ -3464,7 +3550,7 @@ function todoSheetHTML(t, from, spot){
            <input type="date" id="menuDate" value="${isDateKey(from) ? from : tk}"></label>
        </div>`
     + row('edit', SI.edit, T('edit'))
-    + `<div class="timerow"><span>${T('timeSet')}</span>${timeSelHTML('menuTH', 'menuTM', t.tm)}</div>`
+    + `<div class="timerow"><span>${T('timeSet')}</span>${timeSelHTML('menuT', t.tm)}</div>`
     + row('cats', SI.tag, T('category'), `${esc(c?.n || T('noCat'))}${SI.chev}`)
     + row('more', menuMore ? SI.up : SI.down, T(menuMore ? 'menuLess' : 'menuMore'))
     + (menuMore ? more : '')
@@ -3517,7 +3603,7 @@ function openMenu(x, y, from, id){
     opts.map(([a,label,k])=>`<button data-a="${a}">${label}<span class="k">${k.slice(5)}</span></button>`).join('') +
     `<input type="date" id="menuDate" value="${isDateKey(from)?from:tk}">
      ${from!=='later' ? `<button data-a="later">${T('later')}</button>` : ''}
-     <div class="timerow"><span>${T('timeSet')}</span>${timeSelHTML('menuTH', 'menuTM', t.tm)}</div>
+     <div class="timerow"><span>${T('timeSet')}</span>${timeSelHTML('menuT', t.tm)}</div>
      <div class="sep"></div>
      <button data-a="cats">${T('category')}<span class="k">${esc(catOf(t.c)?.n || T('noCat'))}</span></button>
      <button data-a="more">${T(menuMore ? 'menuLess' : 'menuMore')}<span class="k">${menuMore ? '▴' : '▾'}</span></button>
@@ -3561,7 +3647,7 @@ function closeMenu(){
   menuHideT = setTimeout(()=>{ mm.hidden = true; mm.classList.remove('closing'); }, 110);
 }
 const onTodoAction = e=>{
-  const btn = e.target.closest('button'); if(!btn || !menuCtx) return;
+  const btn = e.target.closest('button'); if(!btn || !menuCtx || btn.closest('.tsel')) return;   // 시간 칸은 자기 일이 따로 있다 (여기로 새면 삭제로 읽힌다)
   const a = btn.dataset.a, tk = todayKey(), {from, id} = menuCtx;
   if(a === 'close') return closeMenu();
   const t = bucket(from).find(v=>v.id===id);
@@ -3598,16 +3684,14 @@ const onTodoAction = e=>{
 };
 $('#menu').addEventListener('click', onTodoAction);
 $('#sheet').addEventListener('click', onTodoAction);
+const onTodoTime = e=>{
+  if(e.target.id !== 'menuT' || !menuCtx) return;
+  const {from, id} = menuCtx, t = bucket(from).find(v=>v.id===id), v = timeFrom(e.target);
+  if(t){ if(v) t.tm = v; else delete t.tm; touch(); if(v) askTimeNotify(); }   // 메뉴는 열어 둔 채로 분까지 고를 수 있게
+};
+$('#menu').addEventListener('tchange', onTodoTime);
+$('#sheet').addEventListener('tchange', onTodoTime);
 const onTodoDate = e=>{
-  if((e.target.id === 'menuTH' || e.target.id === 'menuTM') && menuCtx){
-    const {from, id} = menuCtx, t = bucket(from).find(v=>v.id===id);
-    const root = e.target.closest('#menu, #sheet');
-    const hs = root.querySelector('#menuTH'), ms = root.querySelector('#menuTM');
-    ms.disabled = hs.value === '';
-    const v = timeFrom(hs, ms);
-    if(t){ if(v) t.tm = v; else delete t.tm; touch(); if(v) askTimeNotify(); }   // 메뉴는 열어 둔 채로 분까지 고를 수 있게
-    return;
-  }
   if(e.target.id !== 'menuDate' || !menuCtx) return;
   const {from, id} = menuCtx, to = e.target.value;
   closeMenu();
@@ -3616,7 +3700,7 @@ const onTodoDate = e=>{
 $('#menu').addEventListener('change', onTodoDate);
 $('#sheet').addEventListener('change', onTodoDate);
 document.addEventListener('pointerdown', e=>{
-  if(!$('#menu').hidden && !e.target.closest('#menu') && !e.target.closest('.mv')) closeMenu();
+  if(!$('#menu').hidden && !e.target.closest('#menu, #tpop') && !e.target.closest('.mv')) closeMenu();
 });
 
 /* ─── 날짜 단위 정리 (PC 우클릭 · 모바일 길게 누르기) ───
@@ -4157,7 +4241,7 @@ async function renderCfg(){
           <button data-v="0" class="${doc.ui.notify?'':'on'}">${T('off')}</button>
           <button data-v="1" class="${doc.ui.notify?'on':''}">${T('on')}</button>
         </div>
-        ${doc.ui.notify ? `${timeSelHTML('notifyH', 'notifyM', doc.ui.notifyAt || '09:00', true)}
+        ${doc.ui.notify ? `${timeSelHTML('notifyT', doc.ui.notifyAt || '09:00', true)}
           <button class="chip" id="notifyTest">${T('notifyTest')}</button>` : ''}
         ${doc.ui.notify && permDefault()
           ? `<button class="chip" id="notifyAllow" style="background:var(--accent);color:var(--on-accent)">${T('pushAllow')}</button>` : ''}
@@ -4238,8 +4322,8 @@ async function renderCfg(){
     e.target.nextElementSibling.textContent = doc.ui.tint + '%';
   });
   $('#tintRange').addEventListener('change', ()=>{ touch(); renderCfg(); });
-  for(const id of ['notifyH', 'notifyM']) $('#' + id)?.addEventListener('change', async ()=>{
-    doc.ui.notifyAt = timeFrom($('#notifyH'), $('#notifyM')) || '09:00';
+  $('#notifyT')?.addEventListener('tchange', async ()=>{
+    doc.ui.notifyAt = timeFrom($('#notifyT')) || '09:00';
     await syncPush(); scheduleNotify(); touch(); renderCfg();
   });
   $('#notifyTest')?.addEventListener('click', ()=>fireNotify(true));
