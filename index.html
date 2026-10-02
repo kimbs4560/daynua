@@ -1039,20 +1039,18 @@ html[data-vt=next]::view-transition-new(side),html[data-vt=prev]::view-transitio
 
 /* ── 시간 지정 (설정에서 켠 때만 보인다) ── */
 .qadd.main #qd{min-width:0}
-.qadd.main .qtime{flex:none;display:flex;align-items:center;gap:5px;padding:6px 10px;border-radius:9px;border:1px solid var(--line);
-  background:var(--bg);font-size:12.5px;font-weight:700;color:var(--sub);white-space:nowrap}
-.qadd.main .qtime svg{opacity:.7}
-.qadd.main .qtime.set{color:var(--ink);border-color:var(--accent)}
 li .tm{flex:none;font-size:11.5px;font-weight:700;color:var(--sub);background:var(--fill);border-radius:6px;padding:1px 6px;line-height:1.5}
 .wcard .wl .e .tm{flex:none;font-size:12px;font-weight:700;color:var(--sub);background:none;padding:0}
-dialog#tp{width:min(92vw,340px)}
-#tp .tpl{font-size:10.5px;font-weight:800;letter-spacing:.8px;color:var(--sub);margin:14px 0 6px}
-#tp .tpg{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
-#tp .tpg button{padding:10px 0;border-radius:10px;background:var(--fill);font-size:14px;font-weight:700;color:var(--ink);
-  font-variant-numeric:tabular-nums}
-#tp .tpg button.on{background:var(--ink);color:var(--bg)}
-#tp .row{margin-top:18px}
-#tp .row button:disabled{opacity:.4}
+.tsel{display:inline-flex;align-items:center;gap:3px;flex:none}
+.tsel select{width:auto;margin:0;padding:6px 4px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--ink);
+  font:inherit;font-size:13px;font-weight:700;outline:none}
+.tsel select:disabled{opacity:.45}
+.tsel i{font-style:normal;color:var(--faint);font-weight:700}
+.timerow{display:flex;align-items:center;gap:10px;justify-content:space-between}
+.timerow>span:first-child{font-weight:600}
+#menu .timerow{padding:4px 10px;font-size:13px}
+#sheet .timerow{min-height:52px;padding:0 14px;font-size:15px}
+#sheet .tsel select{font-size:15px;padding:9px 8px;border-radius:12px}
 </style>
 </head>
 <body>
@@ -1101,7 +1099,6 @@ dialog#tp{width:min(92vw,340px)}
 <div id="menu" hidden></div>
 <div id="sheetWrap" hidden><div class="sbd"></div><div id="sheet"></div></div>
 
-<dialog id="tp"><h3 id="tpT"></h3><div id="tpBody"></div></dialog>
 <dialog id="acctDlg">
   <h3 id="acctTitle"></h3>
   <p id="acctSub"></p>
@@ -1183,7 +1180,7 @@ dialog#tp{width:min(92vw,340px)}
 const SUPABASE_URL = 'https://cjhwxjznuleyfcbwwvtb.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_acxKbtekhqwFZwI0EUtArg_3FSj5AHh';
 const VAPID_PUBLIC = 'BItluVUoPAOjdIacpE7-6Ko45leNKobu8SbCNP1L6zdozMUrtFBNjh7ncFVZGSvwdHf4vNkYQKj5BarWq01G0hE';
-const BUILD = '2026-10-01.48';
+const BUILD = '2026-10-01.49';
 /* Daynua 앱(Android 껍데기) 안이면 위젯·알림·내보내기를 앱에 맡긴다. 아니면 null */
 const APP = typeof DaynuaApp !== 'undefined' ? DaynuaApp : null;
 const ARRIVED_BY_LINK = /access_token|type=(signup|recovery|magiclink|invite)|[?&]code=/.test(location.hash + location.search);
@@ -1288,7 +1285,7 @@ const I18N = {
   searchHint:'과거에 완료한 일과 그때 남긴 메모까지 함께 찾습니다.',
   lastDone:'마지막 완료', daysAgo:n=>n===0?'오늘':`${n}일 전`, neverDone:'완료 기록 없음',
   openNow:n=>`아직 남은 것 ${n}개`, again:'다시 할 일로',
-  notify:'알림', on:'켜기', off:'끄기',
+  notify:'당일 일정 알림', on:'켜기', off:'끄기',
   notifyNote:'앱을 꺼 둬도 그 시각에 울립니다. 남은 할 일이 없으면 울리지 않습니다.',
   notifyLocal:'이 기기에만 예약했습니다. 로그인하면 앱을 꺼 둬도 알림이 옵니다.',
   notifyDenied:'브라우저에서 알림이 차단되어 있습니다. 주소창 자물쇠 → 알림 허용으로 바꿔주세요.',
@@ -1363,9 +1360,9 @@ const I18N = {
   firstHint:'할 일을 적고 Enter 만 누르면 됩니다. 날짜와 분류는 나중에 정해도 돼요.',
   firstHintTouch:'할 일을 적고 키보드의 완료(↵)를 누르면 됩니다. 날짜와 분류는 나중에 정해도 돼요.',
   allTime:'전체', thisYear:'올해', recent:'최근 했던 일', activity:'활동',
-  timeLbl:'시간 지정', timeHint:'켜면 할 일에 시각을 붙일 수 있어요. 시각은 정하지 않아도 되고, 정한 것만 그 시각에 알려 줘요.',
+  timeAlertLbl:'시간 일정 알림', timeAlertHint:'시각을 정한 할 일을, 고른 시점에 알려 줘요.',
   timeHintWeb:' 앱을 닫아 두면 알림이 오지 않을 수 있어요. 안드로이드 앱에서는 닫아 두어도 와요.',
-  timeLead:['정시','10분 전','30분 전','1시간 전'], timeSet:'시간', timeNone:'없음', timeStepL:['5분 간격','10분 간격'], tpHour:'시', tpMin:'분', tpOk:'확인', tpClear:'시간 없음',
+  timeLead:['알림 없음','정시','10분 전','30분 전','1시간 전'], timeSet:'시간', timeH:'시', timeM:'분',
   timeBody:(tm,l)=> l ? `${tm} · ${l}분 전` : tm,
   actLegend:'끝낸 일이 많을수록 진해져요', yearSum:(n,d)=>`${d}일에 걸쳐 ${n}개를 끝냈어요`, yHas:'남은 할 일', weekNone:'비어 있음',
   saveFail:'저장 공간이 부족합니다. 설정 → 데이터 → 내보내기로 백업해주세요.',
@@ -1436,7 +1433,7 @@ const I18N = {
   searchHint:'Past completions and the notes you left are searched too.',
   lastDone:'Last done', daysAgo:n=>n===0?'today':`${n}d ago`, neverDone:'never completed',
   openNow:n=>`${n} still open`, again:'Add again',
-  notify:'Reminders', on:'On', off:'Off',
+  notify:'Daily summary', on:'On', off:'Off',
   notifyNote:'Fires at that time even with the app closed. Silent when nothing is left.',
   notifyLocal:'Scheduled on this device only. Log in for reminders with the app closed.',
   notifyDenied:'Notifications are blocked in this browser. Allow them in site settings.',
@@ -1511,9 +1508,9 @@ const I18N = {
   firstHint:'Type and press Enter. Dates and categories can wait.',
   firstHintTouch:'Type, then tap Done on the keyboard. Dates and categories can wait.',
   allTime:'All time', thisYear:'This year', recent:'Recently done', activity:'Activity',
-  timeLbl:'Time of day', timeHint:'Turn on to give tasks a time. Optional per task; only the ones you set will notify you.',
+  timeAlertLbl:'Timed task alerts', timeAlertHint:'Notifies you about tasks that have a time, at the moment you choose.',
   timeHintWeb:' Notifications may not arrive while the app is closed. The Android app delivers them even when closed.',
-  timeLead:['On time','10 min before','30 min before','1 hour before'], timeSet:'Time', timeNone:'None', timeStepL:['5-min steps','10-min steps'], tpHour:'HOUR', tpMin:'MINUTE', tpOk:'Done', tpClear:'No time',
+  timeLead:['No alert','On time','10 min before','30 min before','1 hour before'], timeSet:'Time', timeH:'Hour', timeM:'Minute',
   timeBody:(tm,l)=> l ? `${tm} · in ${l} min` : tm,
   actLegend:'Darker = more tasks finished', yearSum:(n,d)=>`${n} done over ${d} day${d===1?'':'s'}`, yHas:'still to do', weekNone:'Nothing planned',
   saveFail:'Storage is full. Back up via Settings → Data → Export.',
@@ -1912,7 +1909,7 @@ const UI_DEFAULT = {theme:'auto', accent:'', tint:0,
                     lang: /^ko/i.test(NAV) ? 'ko' : 'en',
                     country: (NAV.split('-')[1] || (/^ko/i.test(NAV) ? 'KR' : '')).toUpperCase(),
                     weekStart: /^ko|^ja|^zh|^en-US|^pt-BR/i.test(NAV) ? 0 : 1,
-                    notify:false, notifyAt:'09:00', timeOn:false, timeLead:0, timeStep:10,
+                    notify:false, notifyAt:'09:00', timeLead:0,
                     rollover:false};     // 못 끝낸 일을 다음 날로 자동으로 넘기지 않는다 (했는데 체크를 안 한 날도 있어서)
 /* 카테고리는 선택 사항이므로 처음엔 하나도 만들지 않는다 (필요해지면 사용자가 만든다) */
 const FRESH = () => ({ts:0, rev:0, ui:{...UI_DEFAULT},
@@ -2244,13 +2241,12 @@ const svg = (d, n = 17) => `<svg viewBox="0 0 16 16" width="${n}" height="${n}" 
 const ICON = {
   search: svg('<circle cx="7" cy="7" r="4.6"/><path d="M10.4 10.4 14 14"/>'),
   inbox:  svg('<path d="M5.6 12.2a4.6 4.6 0 1 1 4.8 0v1.1a1 1 0 0 1-1 1H6.6a1 1 0 0 1-1-1z"/><path d="M6.4 11.9h3.2"/>'),
-  gear:   svg('<circle cx="8" cy="8" r="3.1"/><path d="M8 1.7v1.3M8 13v1.3M14.3 8H13M3 8H1.7M12.45 3.55l-.92.92M4.47 11.53l-.92.92M12.45 12.45l-.92-.92M4.47 4.47l-.92-.92"/>'),
+  gear:   `<svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>`,
   pencil: svg('<path d="M11.1 2.5 13.5 4.9 5.7 12.7 2.6 13.4 3.3 10.3z"/>', 14),
   wait:   svg('<path d="M4.6 2h6.8M4.6 14h6.8M5.6 2v2.5L8 6.9l2.4-2.4V2M5.6 14v-2.5L8 9.1l2.4 2.4V14"/>', 13),
   repeat: svg('<path d="M2.8 6.6A4 4 0 0 1 6.8 3H12"/><path d="M10.2 1.2 12.4 3l-2.2 1.8"/><path d="M13.2 9.4A4 4 0 0 1 9.2 13H4"/><path d="M5.8 15 3.6 13l2.2-1.8"/>', 13),
   /* 접힌 것을 여는 표시. 홑화살괄호(›) 는 글자라서 크기도 굵기도 옆 글씨와 따로 논다 */
   chev:   svg('<path d="M4 6.2 8 10.2l4-4"/>', 15),
-  clock:  svg('<circle cx="8" cy="8" r="5.6"/><path d="M8 4.8V8l2.2 1.4"/>', 15),
 };
 
 /* 시트 항목 앞의 아이콘 — 글자만 이어지면 딱딱하다. 줄마다 무엇인지 한눈에 보이게 */
@@ -2270,7 +2266,6 @@ const SI = {
   check: svg('<path d="M3.5 8.4 6.6 11.5 12.5 5"/>', 18),
   x:     svg('<path d="M4 4l8 8M12 4l-8 8"/>', 20),
   back:  svg('<path d="M10 3.5 5.5 8l4.5 4.5"/>', 20),
-  clock: svg('<circle cx="8" cy="8" r="5.6"/><path d="M8 4.8V8l2.2 1.4"/>', 20),
 };
 
 /* 요약은 한 번 그리는 동안 한 번만 센다 — 칸마다 전체 기록을 다시 훑지 않게 */
@@ -2283,7 +2278,7 @@ const cellRank = t => (t.s && !t.d) ? 0 : (!t.d && !t.sk && !t.w) ? 1 : t.d ? 2 
 const cellOrder = list => [...list].sort((a,b) => cellRank(a) - cellRank(b));
 const monthName = m => new Intl.DateTimeFormat(loc(), {month:'long'}).format(new Date(2024, m, 1));
 const evHTML = (t, i) => { const c = catOf(t.c);
-  return `<span class="e ${t.d||t.sk?'done':''}" data-i="${i}" style="--c:${c?stripColor(c.c):'var(--faint)'}"><i></i>${doc.ui.timeOn && t.tm ? `<b class="tm mono">${t.tm}</b>` : ''}<span class="et">${esc(t.t)}</span>${t.s && !t.d ? '<b class="star">★</b>' : ''}</span>`; };
+  return `<span class="e ${t.d||t.sk?'done':''}" data-i="${i}" style="--c:${c?stripColor(c.c):'var(--faint)'}"><i></i>${t.tm ? `<b class="tm mono">${t.tm}</b>` : ''}<span class="et">${esc(t.t)}</span>${t.s && !t.d ? '<b class="star">★</b>' : ''}</span>`; };
 
 /* 제목은 보기마다 다르다 — 주는 기간, 월은 달, 년은 해 */
 function viewTitle(){
@@ -2576,7 +2571,7 @@ function rowHTML(t, from, opt = {}){
   return `<li class="${cls}" data-id="${t.id}" data-from="${from}" style="color:${col}"
       ${canMove ? 'draggable="true"' : ''}>
     <button class="ck"></button>
-    ${doc.ui.timeOn && t.tm ? `<span class="tm mono">${t.tm}</span>` : ''}
+    ${t.tm ? `<span class="tm mono">${t.tm}</span>` : ''}
     <span class="tx" spellcheck="false">${esc(t.t)}</span>
     ${t.r?`<span class="rp" title="${T('routines')}">${ICON.repeat}</span>`:''}
     ${t.w?`<span class="wi" title="${T('waiting')}">${ICON.wait}</span>`:''}
@@ -2650,8 +2645,7 @@ function renderDay(tk){
           ${canDrag ? 'draggable="true"' : ''}><i style="background:${stripColor(c.c)}"></i>${esc(c.n)}</button>`).join('')}
       <button data-q="+" class="newc">${doc.cats.length ? '+' : T('addCat')}</button>
     </div>
-    <div class="qadd main"><span>+</span><input id="qd" maxlength="200" placeholder="${T('quickAdd')}">${
-      doc.ui.timeOn ? `<button type="button" id="qt" class="qtime${qtVal ? ' set' : ''}" aria-label="${T('timeSet')}">${qtVal || ICON.clock + T('timeSet')}</button>` : ''}</div>
+    <div class="qadd main"><span>+</span><input id="qd" maxlength="200" placeholder="${T('quickAdd')}">${timeSelHTML('qth', 'qtm', qtVal)}</div>
     ${tipNow() ? `<div class="tip" id="tip${tipNow().id}"><span>${tipNow().text}</span>
         <button data-tip="${tipNow().id}">${T('gotIt')}</button></div>` : ''}
     ${!sm.all ? `<div class="dayempty"><b>${T('dayEmpty')}</b><span>${T('dayEmptyHint')}</span></div>`
@@ -3285,7 +3279,7 @@ function addQuick(el, keep){
   const ideas = el.id === 'qi';
   const c = !ideas && catOf(quickCat) ? quickCat : undefined;
   const nid = uid();
-  const tm = !ideas && doc.ui.timeOn ? qtVal : '';      // 시각은 고른 때만 붙는다
+  const tm = !ideas ? qtVal : '';      // 시각은 고른 때만 붙는다
   qtVal = ''; syncQt();
   (doc.todos[ideas ? 'ideas' : sel] ||= []).push(
     ideas ? {id:nid, t, d:false, cr:todayKey(), mv:0}
@@ -3296,11 +3290,12 @@ function addQuick(el, keep){
   else touchSoon();
 }
 
-/* 시각 버튼을 눌러도 제목 칸의 포커스(= 키보드)를 빼앗지 않는다 */
-$('#side').addEventListener('mousedown', e=>{ if(e.target.closest('#qt')) e.preventDefault(); });
-$('#side').addEventListener('click', e=>{
-  if(!e.target.closest('#qt')) return;
-  pickTime(qtVal, v => { qtVal = v; syncQt(); $('#qd')?.focus(); });
+$('#side').addEventListener('change', e=>{
+  const id = e.target.id;
+  if(id !== 'qth' && id !== 'qtm') return;
+  qtVal = timeFrom($('#qth'), $('#qtm')); syncQt();
+  if(qtVal) askTimeNotify();
+  if(id === 'qtm') $('#qd')?.focus();                 // 분까지 골랐으면 다시 제목 칸으로
 });
 
 let searchTimer = null;
@@ -3313,8 +3308,13 @@ $('#side').addEventListener('input', e=>{
 
 $('#side').addEventListener('focusout', e=>{
   if(e.target.id === 'qd' || e.target.id === 'qi'){
-    if(tpOpen || e.relatedTarget?.closest('#qcat') || e.relatedTarget?.id === 'qt') return;     // 분류·시각을 고르는 중이면 아직 만들지 않는다
+    if(e.relatedTarget?.closest('#qcat') || ['qth', 'qtm'].includes(e.relatedTarget?.id)) return;     // 분류·시각을 고르는 중이면 아직 만들지 않는다
     return addQuick(e.target, false);
+  }
+  if(e.target.id === 'qth' || e.target.id === 'qtm'){          // 시각만 고르고 다른 곳으로 나가면 지금까지 적은 것으로 만든다
+    if(['qd', 'qth', 'qtm'].includes(e.relatedTarget?.id) || e.relatedTarget?.closest('#qcat')) return;
+    const q = $('#qd'); if(q?.value.trim()) addQuick(q, false);
+    return;
   }
   if(e.target.id === 'dayNote'){
     const v = e.target.value.trim();
@@ -3401,7 +3401,25 @@ function flash(msg, canUndo){
 /* ─── 빠른 이동 메뉴 ─── */
 let menuCtx = null, menuCats = false, menuMore = false, menuAt = [0,0];
 let qtVal = '';                                     // 빠른 입력에 골라 둔 시각 (다시 그려도 남는다)
-const syncQt = () => { const b = $('#qt'); if(b){ b.classList.toggle('set', !!qtVal); b.innerHTML = qtVal || ICON.clock + T('timeSet'); } };
+/* 시와 분을 따로 고르는 칸 — 국가 고르기처럼 목록이 뜨고, 끝(00·23 / 00·50)에서 멈춘다.
+   분은 10분 단위만. (이미 있던 10분 단위가 아닌 값은 그 값만 하나 더 끼운다) req: 비워 둘 수 없는 칸 */
+const p2t = n => String(n).padStart(2, '0');
+function timeSelHTML(idH, idM, v, req){
+  const ok = /^\d\d:\d\d$/.test(v || '');
+  const h = ok ? +v.slice(0, 2) : (req ? 9 : null), m = ok ? +v.slice(3) : 0;
+  const mins = [0, 10, 20, 30, 40, 50]; if(!mins.includes(m)) mins.push(m), mins.sort((a, b) => a - b);
+  return `<span class="tsel"><select id="${idH}" aria-label="${T('timeH')}">${req ? '' : `<option value="">${T('timeSet')}</option>`}${
+      Array.from({length:24}, (_, i) => `<option value="${i}" ${h === i ? 'selected' : ''}>${p2t(i)}</option>`).join('')}</select><i>:</i>
+    <select id="${idM}" aria-label="${T('timeM')}" ${h === null ? 'disabled' : ''}>${
+      mins.map(x => `<option value="${x}" ${m === x ? 'selected' : ''}>${p2t(x)}</option>`).join('')}</select></span>`;
+}
+const timeFrom = (hs, ms) => !hs || hs.value === '' ? '' : `${p2t(+hs.value)}:${p2t(+(ms?.value || 0))}`;
+/* 시각을 처음 붙일 때, 알림 허용이 아직이면 그때 한 번 묻는다 */
+const askTimeNotify = () => { if((doc.ui.timeLead ?? 0) >= 0 && permDefault()) askNotify(); };
+const syncQt = () => {
+  const h = $('#qth'), m = $('#qtm'); if(!h || !m) return;
+  h.value = qtVal ? String(+qtVal.slice(0, 2)) : ''; m.value = qtVal ? String(+qtVal.slice(3)) : '0'; m.disabled = !qtVal;
+};
 const md2 = k => { const d = dOf(k); return (d.getMonth()+1) + '/' + d.getDate(); };
 
 /* 폰의 ⋯ 시트. 위에서 아래로: 머리(무슨 할 일인가) → 날짜 옮기기 타일 → 항목 → 위/아래 → 삭제.
@@ -3446,7 +3464,7 @@ function todoSheetHTML(t, from, spot){
            <input type="date" id="menuDate" value="${isDateKey(from) ? from : tk}"></label>
        </div>`
     + row('edit', SI.edit, T('edit'))
-    + (doc.ui.timeOn ? row('timepick', SI.clock, T('timeSet'), t.tm || T('timeNone')) : '')
+    + `<div class="timerow"><span>${T('timeSet')}</span>${timeSelHTML('menuTH', 'menuTM', t.tm)}</div>`
     + row('cats', SI.tag, T('category'), `${esc(c?.n || T('noCat'))}${SI.chev}`)
     + row('more', menuMore ? SI.up : SI.down, T(menuMore ? 'menuLess' : 'menuMore'))
     + (menuMore ? more : '')
@@ -3499,7 +3517,7 @@ function openMenu(x, y, from, id){
     opts.map(([a,label,k])=>`<button data-a="${a}">${label}<span class="k">${k.slice(5)}</span></button>`).join('') +
     `<input type="date" id="menuDate" value="${isDateKey(from)?from:tk}">
      ${from!=='later' ? `<button data-a="later">${T('later')}</button>` : ''}
-     ${doc.ui.timeOn ? `<button data-a="timepick">${T('timeSet')}<span class="k">${t.tm || T('timeNone')}</span></button>` : ''}
+     <div class="timerow"><span>${T('timeSet')}</span>${timeSelHTML('menuTH', 'menuTM', t.tm)}</div>
      <div class="sep"></div>
      <button data-a="cats">${T('category')}<span class="k">${esc(catOf(t.c)?.n || T('noCat'))}</span></button>
      <button data-a="more">${T(menuMore ? 'menuLess' : 'menuMore')}<span class="k">${menuMore ? '▴' : '▾'}</span></button>
@@ -3557,17 +3575,8 @@ const onTodoAction = e=>{
   if(a === 'more'){ menuMore = !menuMore; return openMenu(menuAt[0], menuAt[1], from, id); }
   if(a === 'cats'){ menuCats = true; return openMenu(menuAt[0], menuAt[1], from, id); }
   if(a === 'back'){ menuCats = false; return openMenu(menuAt[0], menuAt[1], from, id); }
-  if(btn.dataset.cat === undefined && todoSheet && ['edit','newcat','sub','note','timepick'].includes(a)){
+  if(btn.dataset.cat === undefined && todoSheet && ['edit','newcat','sub','note'].includes(a)){
     todoSheet = false; closeSheet();               // 다른 화면으로 넘어가는 동작은 시트를 걷는다
-  }
-  if(a === 'timepick'){
-    closeMenu();
-    if(!t) return;
-    return pickTime(t.tm, v => {
-      const tt = bucket(from).find(x => x.id === id); if(!tt) return;
-      if(v) tt.tm = v; else delete tt.tm;
-      touch();
-    });
   }
   if(a === 'newcat'){ closeMenu(); catForTodo = {from, id}; return openCat(null); }
   if(a === 'edit'){ closeMenu(); return startEdit(from, id); }
@@ -3590,6 +3599,15 @@ const onTodoAction = e=>{
 $('#menu').addEventListener('click', onTodoAction);
 $('#sheet').addEventListener('click', onTodoAction);
 const onTodoDate = e=>{
+  if((e.target.id === 'menuTH' || e.target.id === 'menuTM') && menuCtx){
+    const {from, id} = menuCtx, t = bucket(from).find(v=>v.id===id);
+    const root = e.target.closest('#menu, #sheet');
+    const hs = root.querySelector('#menuTH'), ms = root.querySelector('#menuTM');
+    ms.disabled = hs.value === '';
+    const v = timeFrom(hs, ms);
+    if(t){ if(v) t.tm = v; else delete t.tm; touch(); if(v) askTimeNotify(); }   // 메뉴는 열어 둔 채로 분까지 고를 수 있게
+    return;
+  }
   if(e.target.id !== 'menuDate' || !menuCtx) return;
   const {from, id} = menuCtx, to = e.target.value;
   closeMenu();
@@ -4139,8 +4157,7 @@ async function renderCfg(){
           <button data-v="0" class="${doc.ui.notify?'':'on'}">${T('off')}</button>
           <button data-v="1" class="${doc.ui.notify?'on':''}">${T('on')}</button>
         </div>
-        ${doc.ui.notify ? `<input type="time" id="notifyAt" value="${doc.ui.notifyAt}"
-            style="width:auto;margin:0;flex:none">
+        ${doc.ui.notify ? `${timeSelHTML('notifyH', 'notifyM', doc.ui.notifyAt || '09:00', true)}
           <button class="chip" id="notifyTest">${T('notifyTest')}</button>` : ''}
         ${doc.ui.notify && permDefault()
           ? `<button class="chip" id="notifyAllow" style="background:var(--accent);color:var(--on-accent)">${T('pushAllow')}</button>` : ''}
@@ -4151,19 +4168,10 @@ async function renderCfg(){
         : doc.ui.notify && pushWhy === 'nosub' ? T('pushNoSub')
         : doc.ui.notify && pushWhy === 'dberr' ? T('pushDbErr')
         : doc.ui.notify && !pushOn ? T('notifyLocal') : T('notifyNote')}</div></div>
-    </div>
-    <div class="grp wide"><span class="lbl">${T('timeLbl')}</span>
-      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-        <div class="seg" data-k="timeOn" style="flex:1;min-width:160px">
-          <button data-v="0" class="${doc.ui.timeOn?'':'on'}">${T('off')}</button>
-          <button data-v="1" class="${doc.ui.timeOn?'on':''}">${T('on')}</button>
-        </div>
-        ${doc.ui.timeOn ? `<select id="selStep" style="width:auto;flex:none">${T('timeStepL').map((l,i)=>
-          { const v = [5,10][i]; return `<option value="${v}" ${tpStep()===v?'selected':''}>${l}</option>`; }).join('')}</select>
-        <select id="selLead" style="width:auto;flex:none">${T('timeLead').map((l,i)=>
-          { const v = [0,10,30,60][i]; return `<option value="${v}" ${(doc.ui.timeLead|0)===v?'selected':''}>${l}</option>`; }).join('')}</select>` : ''}
-      </div>
-      <div class="hint">${T('timeHint')}${APP ? '' : T('timeHintWeb')}</div></div>
+    <div class="grp wide"><span class="lbl">${T('timeAlertLbl')}</span>
+      <select id="selLead" style="width:auto;max-width:100%">${T('timeLead').map((l, i) =>
+        { const v = [-1, 0, 10, 30, 60][i]; return `<option value="${v}" ${(doc.ui.timeLead ?? 0) === v ? 'selected' : ''}>${l}</option>`; }).join('')}</select>
+      <div class="hint">${T('timeAlertHint')}${APP ? '' : T('timeHintWeb')}</div></div>
     </div>
     <div class="cfgsec">${T('secData')}</div><div class="grid2">
     <div class="grp wide">
@@ -4203,9 +4211,6 @@ async function renderCfg(){
       if(v === '1' && !(await askNotify())) return renderCfg();
       doc.ui.notify = v === '1';
       await syncPush(); scheduleNotify();
-    } else if(k === 'timeOn'){
-      if(v === '1') await askNotify();                    // 시각 알림도 알림 허용이 있어야 울린다
-      doc.ui.timeOn = v === '1';
     } else {
       doc.ui[k] = k==='weekStart' ? +v : k==='rollover' ? v === '1' : v;
       if(k==='lang'){ resetHolidays(); loadHolidays(cur.getFullYear()); }
@@ -4233,13 +4238,16 @@ async function renderCfg(){
     e.target.nextElementSibling.textContent = doc.ui.tint + '%';
   });
   $('#tintRange').addEventListener('change', ()=>{ touch(); renderCfg(); });
-  $('#notifyAt')?.addEventListener('change', async e=>{
-    doc.ui.notifyAt = e.target.value || '09:00';
+  for(const id of ['notifyH', 'notifyM']) $('#' + id)?.addEventListener('change', async ()=>{
+    doc.ui.notifyAt = timeFrom($('#notifyH'), $('#notifyM')) || '09:00';
     await syncPush(); scheduleNotify(); touch(); renderCfg();
   });
   $('#notifyTest')?.addEventListener('click', ()=>fireNotify(true));
-  $('#selLead')?.addEventListener('change', e=>{ doc.ui.timeLead = +e.target.value; touch(); renderCfg(); });
-  $('#selStep')?.addEventListener('change', e=>{ doc.ui.timeStep = +e.target.value; touch(); renderCfg(); });
+  $('#selLead')?.addEventListener('change', async e=>{
+    doc.ui.timeLead = +e.target.value;
+    if(doc.ui.timeLead >= 0 && permDefault()) await askNotify();    // 시각 알림도 알림 허용이 있어야 울린다
+    touch(); renderCfg();
+  });
   $('#notifyAllow')?.addEventListener('click', async ()=>{        // 설정은 기기 사이에 따라오지만 '허용'은 기기마다 따로다
     if(await askNotify()){ await syncPush(); scheduleNotify(); }
     renderCfg();
@@ -4392,47 +4400,13 @@ async function askNotify(){
   if(Notification.permission === 'denied') return false;
   return (await Notification.requestPermission()) === 'granted';
 }
-/* ── 시간 고르기 ──
-   스크롤 휠은 59분 다음이 0분으로 끝없이 돌아서 어디쯤인지 알 수 없다.
-   그래서 시(24칸)와 분(5·10분 간격)을 한 화면에 다 펼쳐 놓고 누르기만 한다. */
-let tpDone = null, tpH = null, tpM = 0, tpOpen = false;
-const tpStep = () => doc.ui.timeStep === 5 ? 5 : 10;
-function tpRender(){
-  const st = tpStep(), p2 = n => String(n).padStart(2, '0');
-  $('#tpT').textContent = T('timeSet');
-  $('#tpBody').innerHTML = `
-    <div class="tpl">${T('tpHour')}</div>
-    <div class="tpg">${Array.from({length:24}, (_, h) => `<button data-h="${h}" class="${tpH === h ? 'on' : ''}">${p2(h)}</button>`).join('')}</div>
-    <div class="tpl">${T('tpMin')}</div>
-    <div class="tpg">${Array.from({length:60 / st}, (_, i) => `<button data-m="${i * st}" class="${tpM === i * st ? 'on' : ''}">${p2(i * st)}</button>`).join('')}</div>
-    <div class="row"><button class="plain" data-tp="clear">${T('tpClear')}</button>
-      <button class="primary" data-tp="ok" ${tpH === null ? 'disabled' : ''}>${T('tpOk')}</button></div>`;
-}
-function pickTime(cur, done){
-  const st = tpStep();
-  if(/^\d\d:\d\d$/.test(cur || '')){ tpH = +cur.slice(0, 2); tpM = Math.min(60 - st, Math.round(+cur.slice(3) / st) * st); }
-  else { tpH = null; tpM = 0; }
-  tpDone = done; tpOpen = true; tpRender();
-  $('#tp').showModal();
-}
-$('#tp').addEventListener('click', e => {
-  if(e.target === $('#tp')) return $('#tp').close();                 // 바깥을 누르면 그냥 닫는다
-  const b = e.target.closest('button'); if(!b) return;
-  if(b.dataset.h !== undefined){ tpH = +b.dataset.h; return tpRender(); }
-  if(b.dataset.m !== undefined){ tpM = +b.dataset.m; return tpRender(); }
-  const p2 = n => String(n).padStart(2, '0');
-  const f = tpDone;
-  if(b.dataset.tp === 'ok' && tpH !== null){ tpDone = null; $('#tp').close(); f?.(`${p2(tpH)}:${p2(tpM)}`); }
-  if(b.dataset.tp === 'clear'){ tpDone = null; $('#tp').close(); f?.(''); }
-});
-$('#tp').addEventListener('close', () => { setTimeout(() => { tpOpen = false; }, 0); });
-
 /* 시각을 정한 할 일의 알림. 앱이면 폰 알람으로 맡기고, 웹은 열려 있는 동안만 울린다.
    앞으로 2주, 아직 안 끝낸 것만. 보낸 목록이 같으면 다시 보내지 않는다. */
 let timedSent = null, timedTimer = null;
 function timedList(){
-  if(!doc.ui.timeOn) return [];
-  const now = Date.now(), lead = doc.ui.timeLead|0, out = [];
+  const lead = doc.ui.timeLead ?? 0;
+  if(lead < 0) return [];                              // '알림 없음'
+  const now = Date.now(), out = [];
   for(const [k, list] of Object.entries(doc.todos)){
     if(!isDateKey(k)) continue;
     const day = dOf(k).getTime();
