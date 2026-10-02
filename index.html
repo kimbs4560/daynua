@@ -1149,7 +1149,7 @@ html[data-vt=next]::view-transition-new(side),html[data-vt=prev]::view-transitio
 const SUPABASE_URL = 'https://cjhwxjznuleyfcbwwvtb.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_acxKbtekhqwFZwI0EUtArg_3FSj5AHh';
 const VAPID_PUBLIC = 'BItluVUoPAOjdIacpE7-6Ko45leNKobu8SbCNP1L6zdozMUrtFBNjh7ncFVZGSvwdHf4vNkYQKj5BarWq01G0hE';
-const BUILD = '2026-10-01.40';
+const BUILD = '2026-10-01.41';
 /* Daynua 앱(Android 껍데기) 안이면 위젯·알림·내보내기를 앱에 맡긴다. 아니면 null */
 const APP = typeof DaynuaApp !== 'undefined' ? DaynuaApp : null;
 const ARRIVED_BY_LINK = /access_token|type=(signup|recovery|magiclink|invite)|[?&]code=/.test(location.hash + location.search);
@@ -1193,11 +1193,11 @@ const ACCENTS = ['#c9502f','#3f6fb5','#2f8f6b','#b58a2e','#7a5fb5','#c04a7a','#4
 /* ─── 문구 ─── */
 const I18N = {
  ko:{brand:['Day','nua'], today:'오늘', year:'1년', settings:'설정',
-  cfgSub:'테마·언어·공휴일·알림·가져오기.',
+  cfgSub:'',
   theme:'테마', auto:'자동', light:'밝게', dark:'어둡게', accent:'강조색',
   lang:'언어', country:'공휴일 국가', none:'사용 안 함', weekStart:'주 시작',
   rollLbl:'못 끝낸 일', rollKeep:'그날에 그대로', rollMove:'오늘로 가져오기',
-  rollHint:'지난 날의 못 끝낸 일을 다음 날로 자동으로 넘길지 정합니다. ‘그날에 그대로’면 했는데 체크를 안 한 일도 그 날짜에 남아 있어서, 그 날을 눌러 체크하거나 직접 옮길 수 있어요.',
+  rollHint:'못 끝낸 일을 다음 날로 자동으로 넘길지 정합니다. ‘그날에 그대로’면 안 한 일도 그 날짜에 남아요.',
   sunday:'일요일', monday:'월요일', routines:'반복 할 일', manage:'관리하기',
   account:'계정', login:'로그인', logout:'로그아웃', signup:'회원가입',
   loggedOut:'로그인하면 PC·휴대폰이 같은 데이터를 봅니다.',
@@ -1262,7 +1262,7 @@ const I18N = {
   pushAllow:'이 기기에서 알림 허용',
   appRemind:'이 폰의 알림으로 예약했습니다. 앱을 꺼 둬도 그 시각에 울립니다.',
   pushOk:'서버 알림이 연결되어 있습니다. 앱을 꺼 둬도 그 시각에 울립니다.',
-  pushNoSub:'이 기기에서 알림 등록에 실패했습니다. 폰 설정 → 앱 → Chrome 의 알림을 켜고 배터리 사용 제한을 ‘제한 없음’으로 바꾼 뒤 앱을 다시 열어주세요.',
+  pushNoSub:'이 기기에서 알림 등록에 실패했습니다. 알림 허용을 확인하고 앱을 다시 열어주세요.',
   pushDbErr:'서버에 알림을 등록하지 못했습니다. 인터넷을 확인하고 잠시 뒤 다시 시도해주세요.',
   notifyTitle:n=>`오늘 남은 할 일 ${n}개`, notifyTest:'지금 테스트',
   notifyStale:'오늘 할 일을 확인해보세요.', notifyEmpty:'남은 할 일이 없습니다.',
@@ -1270,7 +1270,7 @@ const I18N = {
   rate:'달성률', byCat:'분류별', oldest:'가장 오래 끌고 있는 일',
   statsEmpty:'아직 기록이 없습니다. 오늘 하나만 체크해보세요.',
   impTitle:'다른 앱에서 가져오기',
-  impSub:'Todoist · TickTick · 일반 CSV · Daynua 백업 파일을 읽습니다. 먼저 내용을 보여주고, 가져온 뒤에도 되돌릴 수 있습니다.',
+  impSub:'Todoist, TickTick, CSV, Daynua 백업 파일을 가져올 수 있어요. 먼저 내용을 보여 주고, 가져온 뒤에도 되돌릴 수 있어요.',
   impPick:'파일 고르기\n(.csv / .json)',
   impHow:'Todoist: 프로젝트 → ⋯ → Export as CSV\nTickTick: 설정 → 백업 → CSV 내려받기\nApple 미리 알림·Google Tasks는 CSV로 먼저 내보내야 합니다.',
   impFound:'읽었습니다',
@@ -1304,7 +1304,6 @@ const I18N = {
   restoreDone:'되돌렸습니다.', restoreNone:'아직 복구 지점이 없습니다.',
   quickAdd:'할 일 추가', archive:'보관함', category:'분류', newCatShort:'+ 새 분류',
   note:'메모', undo:'실행 취소', undone:'되돌렸습니다', gotIt:'알겠어요',
-  ideasHint:'떠오른 일 = 아직 정리하지 않은 것 · 나중에 = 언젠가 할 것',
   calHint:'다 끝낸 날은 분류 색으로 칠해져요.',
   tipPC:'날짜를 우클릭하면 남은 일정을 한꺼번에 정리할 수 있어요.',
   tipMobile:'할 일이나 날짜를 꾹 누르면 옮기거나 정리할 수 있어요.',
@@ -1330,7 +1329,7 @@ const I18N = {
   firstHint:'할 일을 적고 Enter 만 누르면 됩니다. 날짜와 분류는 나중에 정해도 돼요.',
   firstHintTouch:'할 일을 적고 키보드의 완료(↵)를 누르면 됩니다. 날짜와 분류는 나중에 정해도 돼요.',
   allTime:'전체', thisYear:'올해', recent:'최근 했던 일', activity:'활동',
-  actLegend:'그날 끝낸 일의 수', yHas:'남은 할 일', weekNone:'비어 있음',
+  actLegend:'끝낸 일이 많을수록 진해져요', yearSum:(n,d)=>`${d}일에 걸쳐 ${n}개를 끝냈어요`, yHas:'남은 할 일', weekNone:'비어 있음',
   saveFail:'저장 공간이 부족합니다. 설정 → 데이터 → 내보내기로 백업해주세요.',
   tint:'배경 물들이기', tintHint:'강조색을 배경에 섞습니다. 0%면 기본 종이색입니다.',
   subs:'하위 항목', subPh:'하위 항목 추가',
@@ -1338,7 +1337,7 @@ const I18N = {
   delAcctArmed:'한 번 더 누르면 계정과 모든 데이터가 지워집니다',
   delAcctDone:'계정이 삭제되었습니다.', delAcctFail:'삭제하지 못했습니다. 다시 로그인한 뒤 시도해주세요.'},
  en:{brand:['Day','nua'], today:'Today', year:'Year', settings:'Settings',
-  cfgSub:'Theme, language, holidays, reminders, import.',
+  cfgSub:'',
   theme:'Theme', auto:'Auto', light:'Light', dark:'Dark', accent:'Accent',
   lang:'Language', country:'Holiday country', none:'Off', weekStart:'Week starts',
   rollLbl:'Unfinished tasks', rollKeep:'Stay on their day', rollMove:'Carry over to today',
@@ -1449,7 +1448,6 @@ const I18N = {
   restoreDone:'Restored.', restoreNone:'No restore points yet.',
   quickAdd:'Add a task', archive:'Inbox', category:'Category', newCatShort:'+ New category',
   note:'Note', undo:'Undo', undone:'Reverted', gotIt:'Got it',
-  ideasHint:'Ideas = not sorted yet · Someday = one day, no date',
   calHint:'A fully finished day is tinted with its category colors and gets a ✓.',
   tipPC:'Right-click a date to clear out what is left that day.',
   tipMobile:'Press and hold a task or a date to move or tidy things up.',
@@ -1475,7 +1473,7 @@ const I18N = {
   firstHint:'Type and press Enter. Dates and categories can wait.',
   firstHintTouch:'Type, then tap Done on the keyboard. Dates and categories can wait.',
   allTime:'All time', thisYear:'This year', recent:'Recently done', activity:'Activity',
-  actLegend:'tasks finished that day', yHas:'still to do', weekNone:'Nothing planned',
+  actLegend:'Darker = more tasks finished', yearSum:(n,d)=>`${n} done over ${d} day${d===1?'':'s'}`, yHas:'still to do', weekNone:'Nothing planned',
   saveFail:'Storage is full. Back up via Settings → Data → Export.',
   tint:'Background tint', tintHint:'Blends your accent into the background. 0% is plain paper.',
   subs:'Checklist', subPh:'add an item',
@@ -2656,8 +2654,6 @@ function renderIdeas(tk){
   $('#side').innerHTML = `
     <div class="dh"><b>${T('archive')}</b></div>
     <div class="qadd"><span>+</span><input id="qi" maxlength="200" placeholder="${T('quickPh')}"></div>
-    ${ideasHintSeen ? '' : `<div class="tip" id="tip2"><span>${T('ideasHint')}</span>
-        <button data-tip="2">${T('gotIt')}</button></div>`}
     ${box('ideas', T('ideas'), T('ideasEmpty'))}
     ${rd.length ? `<div class="nudge" data-rd="1">
         <div class="h">${T('rediscover')}</div>
@@ -2700,11 +2696,11 @@ function statsOf(){
 function yearRecord(y, dm){
   const doneY = [...dm.values()].reduce((a,b)=>a+b, 0);
   return `<div class="ylegend">
-    <span>${T('activity')} · ${T('actLegend')}</span>
+    <span>${T('actLegend')}</span>
     <span class="sp"></span>
     <i></i><i class="a1"></i><i class="a2"></i><i class="a3"></i>
     <span class="yhas"><u></u>${T('yHas')}</span>
-    <span class="n">${T('activeDays')} ${dm.size} · ${y} ${doneY}</span></div>`;
+    ${doneY ? `<span class="n">${T('yearSum')(doneY, dm.size)}</span>` : ''}</div>`;
 }
 
 /* 기록 = 평가가 아니라 회고. 연속 일수·점수처럼 압박을 주는 숫자는 두지 않는다. */
@@ -3996,7 +3992,7 @@ async function countries(){
 
 async function renderCfg(){
   $('#cfgTitle').textContent = T('settings');
-  $('#cfgSub').textContent = T('cfgSub');
+  $('#cfgSub').textContent = T('cfgSub'); $('#cfgSub').hidden = !T('cfgSub');
   $('#cfgClose').textContent = T('close');
   const cs = await countries();
   const cname = new Intl.DisplayNames([loc()], {type:'region'});
