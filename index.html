@@ -1036,6 +1036,23 @@ html[data-vt=next]::view-transition-new(side),html[data-vt=prev]::view-transitio
   #cal .cell .hn{font-size:13px}
 }
 
+
+/* ── 시간 지정 (설정에서 켠 때만 보인다) ── */
+.qadd.main #qd{min-width:0}
+.qadd.main .qtime{flex:none;width:104px;min-width:0;border:1px solid var(--line);border-radius:9px;background:var(--bg);padding:4px 4px 4px 7px;
+  font-size:12.5px;font-weight:600;color:var(--sub);outline:none;font-family:inherit}
+.qadd.main .qtime::-webkit-calendar-picker-indicator{margin:0 0 0 2px;padding:0;width:14px;opacity:.55}
+.qadd.main .qtime:focus{border-color:var(--accent);color:var(--ink)}
+li .tm{flex:none;font-size:11.5px;font-weight:700;color:var(--sub);background:var(--fill);border-radius:6px;padding:1px 6px;line-height:1.5}
+.wcard .wl .e .tm{flex:none;font-size:12px;font-weight:700;color:var(--sub);background:none;padding:0}
+.timerow{display:flex;align-items:center;gap:10px}
+.timerow span{flex:1;font-weight:600}
+.timerow input[type=time]{flex:none;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--ink);
+  padding:6px 8px;font-size:13px;outline:none;font-family:inherit}
+.timerow .tclr{flex:none;width:28px;height:28px;border-radius:50%;color:var(--sub);font-size:16px;line-height:1}
+#menu .timerow{padding:4px 10px;font-size:13px}
+#sheet .timerow{min-height:52px;padding:0 14px;font-size:15px}
+#sheet .timerow input[type=time]{font-size:15px;padding:8px 10px;border-radius:12px}
 </style>
 </head>
 <body>
@@ -1165,7 +1182,7 @@ html[data-vt=next]::view-transition-new(side),html[data-vt=prev]::view-transitio
 const SUPABASE_URL = 'https://cjhwxjznuleyfcbwwvtb.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_acxKbtekhqwFZwI0EUtArg_3FSj5AHh';
 const VAPID_PUBLIC = 'BItluVUoPAOjdIacpE7-6Ko45leNKobu8SbCNP1L6zdozMUrtFBNjh7ncFVZGSvwdHf4vNkYQKj5BarWq01G0hE';
-const BUILD = '2026-10-01.46';
+const BUILD = '2026-10-01.47';
 /* Daynua 앱(Android 껍데기) 안이면 위젯·알림·내보내기를 앱에 맡긴다. 아니면 null */
 const APP = typeof DaynuaApp !== 'undefined' ? DaynuaApp : null;
 const ARRIVED_BY_LINK = /access_token|type=(signup|recovery|magiclink|invite)|[?&]code=/.test(location.hash + location.search);
@@ -1345,6 +1362,10 @@ const I18N = {
   firstHint:'할 일을 적고 Enter 만 누르면 됩니다. 날짜와 분류는 나중에 정해도 돼요.',
   firstHintTouch:'할 일을 적고 키보드의 완료(↵)를 누르면 됩니다. 날짜와 분류는 나중에 정해도 돼요.',
   allTime:'전체', thisYear:'올해', recent:'최근 했던 일', activity:'활동',
+  timeLbl:'시간 지정', timeHint:'켜면 할 일에 시각을 붙일 수 있어요. 시각은 정하지 않아도 되고, 정한 것만 그 시각에 알려 줘요.',
+  timeHintWeb:' 앱을 닫아 두면 알림이 오지 않을 수 있어요. 안드로이드 앱에서는 닫아 두어도 와요.',
+  timeLead:['정시','10분 전','30분 전','1시간 전'], timeSet:'시간', timeClear:'시간 지우기',
+  timeBody:(tm,l)=> l ? `${tm} · ${l}분 전` : tm,
   actLegend:'끝낸 일이 많을수록 진해져요', yearSum:(n,d)=>`${d}일에 걸쳐 ${n}개를 끝냈어요`, yHas:'남은 할 일', weekNone:'비어 있음',
   saveFail:'저장 공간이 부족합니다. 설정 → 데이터 → 내보내기로 백업해주세요.',
   tint:'배경 물들이기', tintHint:'강조색을 배경에 섞습니다. 0%면 기본 종이색입니다.',
@@ -1489,6 +1510,10 @@ const I18N = {
   firstHint:'Type and press Enter. Dates and categories can wait.',
   firstHintTouch:'Type, then tap Done on the keyboard. Dates and categories can wait.',
   allTime:'All time', thisYear:'This year', recent:'Recently done', activity:'Activity',
+  timeLbl:'Time of day', timeHint:'Turn on to give tasks a time. Optional per task; only the ones you set will notify you.',
+  timeHintWeb:' Notifications may not arrive while the app is closed. The Android app delivers them even when closed.',
+  timeLead:['On time','10 min before','30 min before','1 hour before'], timeSet:'Time', timeClear:'Clear time',
+  timeBody:(tm,l)=> l ? `${tm} · in ${l} min` : tm,
   actLegend:'Darker = more tasks finished', yearSum:(n,d)=>`${n} done over ${d} day${d===1?'':'s'}`, yHas:'still to do', weekNone:'Nothing planned',
   saveFail:'Storage is full. Back up via Settings → Data → Export.',
   tint:'Background tint', tintHint:'Blends your accent into the background. 0% is plain paper.',
@@ -1886,7 +1911,7 @@ const UI_DEFAULT = {theme:'auto', accent:'', tint:0,
                     lang: /^ko/i.test(NAV) ? 'ko' : 'en',
                     country: (NAV.split('-')[1] || (/^ko/i.test(NAV) ? 'KR' : '')).toUpperCase(),
                     weekStart: /^ko|^ja|^zh|^en-US|^pt-BR/i.test(NAV) ? 0 : 1,
-                    notify:false, notifyAt:'09:00',
+                    notify:false, notifyAt:'09:00', timeOn:false, timeLead:0,
                     rollover:false};     // 못 끝낸 일을 다음 날로 자동으로 넘기지 않는다 (했는데 체크를 안 한 날도 있어서)
 /* 카테고리는 선택 사항이므로 처음엔 하나도 만들지 않는다 (필요해지면 사용자가 만든다) */
 const FRESH = () => ({ts:0, rev:0, ui:{...UI_DEFAULT},
@@ -2255,7 +2280,7 @@ const cellRank = t => (t.s && !t.d) ? 0 : (!t.d && !t.sk && !t.w) ? 1 : t.d ? 2 
 const cellOrder = list => [...list].sort((a,b) => cellRank(a) - cellRank(b));
 const monthName = m => new Intl.DateTimeFormat(loc(), {month:'long'}).format(new Date(2024, m, 1));
 const evHTML = (t, i) => { const c = catOf(t.c);
-  return `<span class="e ${t.d||t.sk?'done':''}" data-i="${i}" style="--c:${c?stripColor(c.c):'var(--faint)'}"><i></i><span class="et">${esc(t.t)}</span>${t.s && !t.d ? '<b class="star">★</b>' : ''}</span>`; };
+  return `<span class="e ${t.d||t.sk?'done':''}" data-i="${i}" style="--c:${c?stripColor(c.c):'var(--faint)'}"><i></i>${doc.ui.timeOn && t.tm ? `<b class="tm mono">${t.tm}</b>` : ''}<span class="et">${esc(t.t)}</span>${t.s && !t.d ? '<b class="star">★</b>' : ''}</span>`; };
 
 /* 제목은 보기마다 다르다 — 주는 기간, 월은 달, 년은 해 */
 function viewTitle(){
@@ -2548,6 +2573,7 @@ function rowHTML(t, from, opt = {}){
   return `<li class="${cls}" data-id="${t.id}" data-from="${from}" style="color:${col}"
       ${canMove ? 'draggable="true"' : ''}>
     <button class="ck"></button>
+    ${doc.ui.timeOn && t.tm ? `<span class="tm mono">${t.tm}</span>` : ''}
     <span class="tx" spellcheck="false">${esc(t.t)}</span>
     ${t.r?`<span class="rp" title="${T('routines')}">${ICON.repeat}</span>`:''}
     ${t.w?`<span class="wi" title="${T('waiting')}">${ICON.wait}</span>`:''}
@@ -2621,7 +2647,8 @@ function renderDay(tk){
           ${canDrag ? 'draggable="true"' : ''}><i style="background:${stripColor(c.c)}"></i>${esc(c.n)}</button>`).join('')}
       <button data-q="+" class="newc">${doc.cats.length ? '+' : T('addCat')}</button>
     </div>
-    <div class="qadd main"><span>+</span><input id="qd" maxlength="200" placeholder="${T('quickAdd')}"></div>
+    <div class="qadd main"><span>+</span><input id="qd" maxlength="200" placeholder="${T('quickAdd')}">${
+      doc.ui.timeOn ? `<input type="time" id="qt" class="qtime" aria-label="${T('timeSet')}" title="${T('timeSet')}">` : ''}</div>
     ${tipNow() ? `<div class="tip" id="tip${tipNow().id}"><span>${tipNow().text}</span>
         <button data-tip="${tipNow().id}">${T('gotIt')}</button></div>` : ''}
     ${!sm.all ? `<div class="dayempty"><b>${T('dayEmpty')}</b><span>${T('dayEmptyHint')}</span></div>`
@@ -3242,6 +3269,7 @@ $('#side').addEventListener('keydown', e=>{
     return touch();
   }
   if(e.target.id === 'qi' || e.target.id === 'qd') return addQuick(e.target, true);
+  if(e.target.id === 'qt' && $('#qd')) return addQuick($('#qd'), true);
 });
 
 /* 새 할 일 만들기 — Enter 로도, 다른 곳을 눌러 빠져나가도 똑같이 만들어진다.
@@ -3255,14 +3283,18 @@ function addQuick(el, keep){
   const ideas = el.id === 'qi';
   const c = !ideas && catOf(quickCat) ? quickCat : undefined;
   const nid = uid();
+  const tm = !ideas && doc.ui.timeOn ? ($('#qt')?.value || '') : '';      // 시각은 고른 때만 붙는다
+  if($('#qt')) $('#qt').value = '';
   (doc.todos[ideas ? 'ideas' : sel] ||= []).push(
     ideas ? {id:nid, t, d:false, cr:todayKey(), mv:0}
-          : {id:nid, t, d:false, c, o:sel, cr:todayKey(), mv:0});
+          : {id:nid, t, d:false, c, o:sel, cr:todayKey(), mv:0, ...(tm ? {tm} : {})});
   firstRun = false;
   animate(`li[data-id="${nid}"]`);
   if(keep){ touch(); (ideas ? $('#qi') : $('#qd'))?.focus(); }
   else touchSoon();
 }
+
+$('#side').addEventListener('change', e=>{ if(e.target.id === 'qt') $('#qd')?.focus(); });   // 시각을 고르면 다시 제목 칸으로
 
 let searchTimer = null;
 $('#side').addEventListener('input', e=>{
@@ -3274,8 +3306,13 @@ $('#side').addEventListener('input', e=>{
 
 $('#side').addEventListener('focusout', e=>{
   if(e.target.id === 'qd' || e.target.id === 'qi'){
-    if(e.relatedTarget?.closest('#qcat')) return;     // 분류 칩을 고르는 중이면 아직 만들지 않는다
+    if(e.relatedTarget?.closest('#qcat') || e.relatedTarget?.id === 'qt') return;     // 분류·시각을 고르는 중이면 아직 만들지 않는다
     return addQuick(e.target, false);
+  }
+  if(e.target.id === 'qt'){                           // 시각만 고르고 다른 곳으로 나가면 지금까지 적은 것으로 만든다
+    if(e.relatedTarget?.id === 'qd' || e.relatedTarget?.closest('#qcat')) return;
+    const q = $('#qd'); if(q?.value.trim()) addQuick(q, false);
+    return;
   }
   if(e.target.id === 'dayNote'){
     const v = e.target.value.trim();
@@ -3361,6 +3398,8 @@ function flash(msg, canUndo){
 
 /* ─── 빠른 이동 메뉴 ─── */
 let menuCtx = null, menuCats = false, menuMore = false, menuAt = [0,0];
+const timeRow = t => `<div class="timerow"><span>${T('timeSet')}</span>
+  <input type="time" id="menuTime" value="${t.tm || ''}">${t.tm ? `<button data-a="timeclear" class="tclr" aria-label="${T('timeClear')}">×</button>` : ''}</div>`;
 const md2 = k => { const d = dOf(k); return (d.getMonth()+1) + '/' + d.getDate(); };
 
 /* 폰의 ⋯ 시트. 위에서 아래로: 머리(무슨 할 일인가) → 날짜 옮기기 타일 → 항목 → 위/아래 → 삭제.
@@ -3405,6 +3444,7 @@ function todoSheetHTML(t, from, spot){
            <input type="date" id="menuDate" value="${isDateKey(from) ? from : tk}"></label>
        </div>`
     + row('edit', SI.edit, T('edit'))
+    + (doc.ui.timeOn ? timeRow(t) : '')
     + row('cats', SI.tag, T('category'), `${esc(c?.n || T('noCat'))}${SI.chev}`)
     + row('more', menuMore ? SI.up : SI.down, T(menuMore ? 'menuLess' : 'menuMore'))
     + (menuMore ? more : '')
@@ -3457,6 +3497,7 @@ function openMenu(x, y, from, id){
     opts.map(([a,label,k])=>`<button data-a="${a}">${label}<span class="k">${k.slice(5)}</span></button>`).join('') +
     `<input type="date" id="menuDate" value="${isDateKey(from)?from:tk}">
      ${from!=='later' ? `<button data-a="later">${T('later')}</button>` : ''}
+     ${doc.ui.timeOn ? timeRow(t) : ''}
      <div class="sep"></div>
      <button data-a="cats">${T('category')}<span class="k">${esc(catOf(t.c)?.n || T('noCat'))}</span></button>
      <button data-a="more">${T(menuMore ? 'menuLess' : 'menuMore')}<span class="k">${menuMore ? '▴' : '▾'}</span></button>
@@ -3511,6 +3552,7 @@ const onTodoAction = e=>{
     if(btn.dataset.cat) t.c = btn.dataset.cat; else delete t.c;
     return touch();
   }
+  if(a === 'timeclear'){ closeMenu(); if(t){ delete t.tm; touch(); } return; }
   if(a === 'more'){ menuMore = !menuMore; return openMenu(menuAt[0], menuAt[1], from, id); }
   if(a === 'cats'){ menuCats = true; return openMenu(menuAt[0], menuAt[1], from, id); }
   if(a === 'back'){ menuCats = false; return openMenu(menuAt[0], menuAt[1], from, id); }
@@ -3538,6 +3580,12 @@ const onTodoAction = e=>{
 $('#menu').addEventListener('click', onTodoAction);
 $('#sheet').addEventListener('click', onTodoAction);
 const onTodoDate = e=>{
+  if(e.target.id === 'menuTime' && menuCtx){
+    const {from, id} = menuCtx, t = bucket(from).find(v=>v.id===id);
+    closeMenu();
+    if(t){ if(e.target.value) t.tm = e.target.value; else delete t.tm; touch(); }
+    return;
+  }
   if(e.target.id !== 'menuDate' || !menuCtx) return;
   const {from, id} = menuCtx, to = e.target.value;
   closeMenu();
@@ -4100,6 +4148,17 @@ async function renderCfg(){
         : doc.ui.notify && pushWhy === 'dberr' ? T('pushDbErr')
         : doc.ui.notify && !pushOn ? T('notifyLocal') : T('notifyNote')}</div></div>
     </div>
+    <div class="grp wide"><span class="lbl">${T('timeLbl')}</span>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <div class="seg" data-k="timeOn" style="flex:1;min-width:160px">
+          <button data-v="0" class="${doc.ui.timeOn?'':'on'}">${T('off')}</button>
+          <button data-v="1" class="${doc.ui.timeOn?'on':''}">${T('on')}</button>
+        </div>
+        ${doc.ui.timeOn ? `<select id="selLead" style="width:auto;flex:none">${T('timeLead').map((l,i)=>
+          { const v = [0,10,30,60][i]; return `<option value="${v}" ${(doc.ui.timeLead|0)===v?'selected':''}>${l}</option>`; }).join('')}</select>` : ''}
+      </div>
+      <div class="hint">${T('timeHint')}${APP ? '' : T('timeHintWeb')}</div></div>
+    </div>
     <div class="cfgsec">${T('secData')}</div><div class="grid2">
     <div class="grp wide">
       <button class="chip" id="expBtn">${T('export')}</button>
@@ -4138,6 +4197,9 @@ async function renderCfg(){
       if(v === '1' && !(await askNotify())) return renderCfg();
       doc.ui.notify = v === '1';
       await syncPush(); scheduleNotify();
+    } else if(k === 'timeOn'){
+      if(v === '1') await askNotify();                    // 시각 알림도 알림 허용이 있어야 울린다
+      doc.ui.timeOn = v === '1';
     } else {
       doc.ui[k] = k==='weekStart' ? +v : k==='rollover' ? v === '1' : v;
       if(k==='lang'){ resetHolidays(); loadHolidays(cur.getFullYear()); }
@@ -4170,6 +4232,7 @@ async function renderCfg(){
     await syncPush(); scheduleNotify(); touch(); renderCfg();
   });
   $('#notifyTest')?.addEventListener('click', ()=>fireNotify(true));
+  $('#selLead')?.addEventListener('change', e=>{ doc.ui.timeLead = +e.target.value; touch(); renderCfg(); });
   $('#notifyAllow')?.addEventListener('click', async ()=>{        // 설정은 기기 사이에 따라오지만 '허용'은 기기마다 따로다
     if(await askNotify()){ await syncPush(); scheduleNotify(); }
     renderCfg();
@@ -4322,7 +4385,48 @@ async function askNotify(){
   if(Notification.permission === 'denied') return false;
   return (await Notification.requestPermission()) === 'granted';
 }
+/* 시각을 정한 할 일의 알림. 앱이면 폰 알람으로 맡기고, 웹은 열려 있는 동안만 울린다.
+   앞으로 2주, 아직 안 끝낸 것만. 보낸 목록이 같으면 다시 보내지 않는다. */
+let timedSent = null, timedTimer = null;
+function timedList(){
+  if(!doc.ui.timeOn) return [];
+  const now = Date.now(), lead = doc.ui.timeLead|0, out = [];
+  for(const [k, list] of Object.entries(doc.todos)){
+    if(!isDateKey(k)) continue;
+    const day = dOf(k).getTime();
+    if(day < now - 864e5 || day > now + 14 * 864e5) continue;
+    for(const t of list){
+      if(!t.tm || t.d || t.sk || t.w) continue;
+      const [h, m] = t.tm.split(':').map(Number);
+      const at = new Date(dOf(k)).setHours(h || 0, m || 0, 0, 0) - lead * 60000;
+      if(at > now) out.push({id:t.id, at, title:t.t, body:T('timeBody')(t.tm, lead)});
+    }
+  }
+  return out.sort((a,b) => a.at - b.at).slice(0, 60);
+}
+function syncTimed(){
+  const list = timedList();
+  if(APP){
+    const js = JSON.stringify(list);
+    if(js === timedSent) return;
+    timedSent = js;
+    try{ if(APP.setTimed) APP.setTimed(js); }catch{}
+    return;
+  }
+  clearTimeout(timedTimer);
+  const first = list[0];
+  if(!first || typeof Notification === 'undefined' || Notification.permission !== 'granted') return;
+  const wait = first.at - Date.now();
+  if(wait > 2e9) return;
+  timedTimer = setTimeout(async ()=>{
+    const reg = await navigator.serviceWorker?.getRegistration();
+    const o = {body:first.body, icon:'icon-192.png', badge:'icon-192.png', tag:'daynua-t-' + first.id};
+    if(reg?.showNotification) reg.showNotification(first.title, o); else new Notification(first.title, o);
+    syncTimed();
+  }, Math.max(0, wait));
+}
 async function writeSummary(){
+  syncTimed();
   if(!('caches' in window)) return;
   try{
     const open = actionable(todayKey());
@@ -4505,6 +4609,8 @@ function watch(){
 }
 /* 동기화는 '있으면 좋은 것'이다. CDN 이 막히거나 인터넷이 없어도
    할 일 앱 본체는 반드시 뜬다 — 그래서 여기서 실패해도 조용히 넘어간다. */
+/* 라이브러리를 받는 동안 화면을 기다리게 하지 않는다 — 비동기로 돌리고, 꼭 필요한 곳(로그인 확인)만 syncReady 를 기다린다 */
+const syncReady = (async()=>{
 try{
   if(SUPABASE_URL && SUPABASE_ANON_KEY){
     const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
@@ -4523,6 +4629,7 @@ try{
   }
 }catch(e){ console.warn('동기화를 쓸 수 없습니다 (오프라인이어도 앱은 그대로 동작합니다)', e); sb = null; }
 setAcct();
+})();
 
 /* 계정이 바뀌면 저장 칸도 바뀐다. 게스트로 적어둔 것은 처음 로그인할 때 한 번만 넘어간다. */
 async function useSlot(){
@@ -4830,11 +4937,22 @@ function gateReopen(){                                   // 로그아웃·탈퇴
   gate.classList.add('static'); gateMsg('');
   gateLogin(true);
 }
+/* 저장된 로그인이 있는 기기 — 라이브러리가 아직 안 와도 '로그인돼 있을 것'으로 보고 먼저 연다 */
+const hadToken = () => Object.keys(localStorage).some(k => /^sb-.+-auth-token$/.test(k));
 async function gateStart(){
   window.__gate = 1;
+  const left = () => Math.max(0, GATE_DRAW - (performance.now() - gateT0));
+  if(!ARRIVED_BY_LINK && hadToken() && autoOn() && localStorage.getItem('daynua.guest') !== '1'){
+    sessionStorage.setItem('daynua.sess', '1');
+    await wait(left()); gateEnter();
+    await syncReady;
+    if(sb && !user) gateReopen();                          // 알고 보니 로그인이 만료됐다
+    return;
+  }
+  if(!hadToken() && localStorage.getItem('daynua.guest') === '1'){ await wait(left()); return gateEnter(); }
+  await syncReady;
   if(user && ARRIVED_BY_LINK) sessionStorage.setItem('daynua.sess', '1');
   const sessOK = sessionStorage.getItem('daynua.sess') === '1';
-  const left = () => Math.max(0, GATE_DRAW - (performance.now() - gateT0));
   if(user && sb){
     if(autoOn() || sessOK){ sessionStorage.setItem('daynua.sess', '1'); await wait(left()); return gateEnter(); }
     await sb.auth.signOut().catch(()=>{});               // 자동 로그인을 끈 채 다시 켰다
@@ -4849,6 +4967,7 @@ $('#gGuest').onclick = ()=>{ localStorage.setItem('daynua.guest', '1'); gateEnte
 $('#gReset').onclick = async ()=>{
   const email = gE.value.trim();
   if(!email) return gateMsg(T('needEmail'));
+  await syncReady;
   const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: location.origin + location.pathname });
   gateMsg(error ? trErr(error.message) : T('sent'), !error);
 };
@@ -4857,6 +4976,7 @@ gGo.onclick = async ()=>{
   if(!email || !pw) return gateMsg(T('needBoth'));
   gGo.disabled = true; gateMsg('');
   try{
+    await syncReady;
     if(gateMode === 'up'){
       const { data, error } = await sb.auth.signUp({ email, password:pw,
         options:{ emailRedirectTo: location.origin + location.pathname } });
