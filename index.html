@@ -266,76 +266,6 @@ input,select,textarea{font:inherit;color:inherit}
   .strip{height:4px;margin:7px 4px 0}
 }
 
-/* ── 주간 ──
-   모바일은 7줄 카드, PC 는 7칸. 시간축은 없다 — 그 날에 '무엇을' 하기로 했는지만 본다. */
-.week{display:flex;flex-direction:column;gap:5px;min-width:0}
-.wcard{background:var(--fill);border:1.5px solid transparent;border-radius:10px;cursor:pointer;
-  padding:7px 10px;display:grid;grid-template-columns:auto 1fr;gap:2px 10px;align-items:center;
-  min-height:46px;user-select:none;-webkit-touch-callout:none;
-  transition:border-color var(--mo) var(--ease),background var(--mo-fast) var(--ease)}
-@media (hover:hover){.wcard:hover{background:var(--line)}}
-.wcard.over{border-color:var(--accent);border-style:dashed}
-.wh{display:flex;align-items:center;gap:5px;min-width:74px}
-.wh .wd{font-size:11px;font-weight:700;color:var(--sub)}
-.wh .wn{font-size:15px;font-weight:800;line-height:1.1}
-.wh .wsp{flex:1}
-.wh .wleft{font-size:10px;font-weight:800;color:var(--sub);background:var(--card);
-  border-radius:7px;padding:1px 6px;line-height:1.5}
-.wcard .chk{position:static}
-.wcard .strip{grid-column:1/-1;margin:3px 0 0;height:3px}
-.wl{display:flex;align-items:center;gap:8px;min-width:0;overflow:hidden;white-space:nowrap}
-.wl .e{font-size:12px;font-weight:600;color:var(--ink);padding-left:6px;border-left:2px solid var(--c);
-  overflow:hidden;text-overflow:ellipsis;min-width:0;line-height:1.4}
-.wl .e.done{opacity:.72;text-decoration:line-through}
-.wl .e[data-i="3"],.wl .e[data-i="4"]{display:none}
-.wl .more{display:inline;font-size:10.5px;font-weight:700;color:var(--sub);flex:none}
-.wl .more.d{display:none}
-.whn{grid-column:2;font-size:10.5px;font-weight:700;color:var(--sun)}
-/* 넉넉한 폭에서는 한 줄에 더 보여준다 (가로 카드 그대로) */
-@media (min-width:600px){
-  .wl .e[data-i="3"]{display:block}
-  .wl .more.m{display:none}
-  .wl .more.d{display:inline}
-}
-/* 폰·좁은 창의 주 보기는 '일정 목록' — 모바일은 격자보다 목록을 좋아한다.
-   날짜 머리(요일·날짜·오늘, 오른쪽에 ✓ 또는 남은 개수) 아래에 제목을 세로로 쌓는다.
-   예전엔 제목 두 개가 옆으로 나란히 잘리고, 개수·✓ 가 카드마다 다른 자리에 떠 있었다. */
-@media (max-width:1099px){
-  .wcard{display:flex;flex-direction:column;align-items:stretch;gap:8px;padding:11px 14px;min-height:52px}
-  .wh{min-width:0;gap:7px;align-items:baseline}
-  .wh .wd{font-size:12.5px}
-  .wh .wn{font-size:19px;line-height:1}
-  .wtoday{font-size:10.5px;font-weight:800;color:var(--accent-ink);background:var(--card);
-    border-radius:6px;padding:1px 6px;line-height:1.5;align-self:center}
-  .wh .whn{font-size:11px;font-weight:700;color:var(--sun);min-width:0;white-space:nowrap;
-    overflow:hidden;text-overflow:ellipsis}
-  .wh .wsp{flex:1}
-  .wh .wleft{display:flex;align-items:baseline;gap:3px;font-size:13px;color:var(--ink);
-    background:var(--card);border-radius:8px;padding:2px 8px;align-self:center}
-  .wh .wleft small{font-size:10.5px;font-weight:700;color:var(--sub)}
-  .wh .chk{align-self:center}
-  .wcard .strip{display:none}
-  .wcard.today .wn::after{display:none}
-  .wcard.today{box-shadow:inset 3px 0 0 var(--accent)}
-  .wl{flex-direction:column;align-items:stretch;gap:5px;white-space:normal;overflow:visible}
-  .wl .e{display:block;font-size:13.5px;line-height:1.4;padding-left:9px;border-left-width:3px;
-    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .wl .more{font-size:11.5px;padding-left:12px}
-}
-/* 7칸이 나란히 서도 글자가 읽히는 폭부터 세로 칸으로 — 1024 에서 억지로 7칸을 만들지 않는다 */
-@media (min-width:1100px){
-  .week{flex-direction:row;gap:6px;align-items:stretch}
-  .wcard{flex:1 1 0;min-width:0;overflow:hidden;display:flex;flex-direction:column;align-items:stretch;
-    gap:0;min-height:236px;padding:8px 8px 10px;border-radius:12px}
-  .wh{min-width:0}
-  .wh .wd{font-size:11.5px}
-  .wcard .chk{margin-left:auto}
-  .wcard .strip{margin:7px 0 0}
-  .wl{flex-direction:column;align-items:stretch;gap:3px;margin-top:7px;white-space:normal;overflow:hidden}
-  .wl .e{font-size:11px;white-space:nowrap}
-  .whn{font-size:10px;margin-top:0;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-}
-
 /* ── 1년 ──
    12개의 작은 달력. 색은 '그날 끝낸 일의 수' 하나만 말한다 (분류 색은 월·주의 몫).
    여기서는 할 일을 적지 않는다 — 날짜를 누르면 그 달로 내려간다. */
@@ -850,24 +780,6 @@ dialog input:focus,dialog select:focus{border-color:var(--accent)}
   #cal .cell .n{font-size:15px}
 }
 @media (min-width:1600px){ #cal .cell .chk{width:30px;height:30px} }
-/* 주간 카드의 ✓ 도 월 달력과 같은 모양(동그라미 없이 갈고리) */
-.wcard .chk{width:22px;height:22px;padding:0;border:0;border-radius:0;background:none;color:var(--ink)}
-.wcard .chk path{stroke-width:2.6}
-.wcard.fin.soft .chk{border:0;background:none;opacity:.5}
-/* 7칸 주간(1100px~): 좁은 칸에서 '오늘'·'2남음' 이 세로로 꺾이던 것을 막고, 칸은 창 높이만큼 자란다 */
-@media (min-width:1100px){
-  .wcard .chk{width:18px;height:18px}
-  .wtoday{display:none}
-  .wh{flex-wrap:nowrap;gap:4px}
-  .wh .wleft{white-space:nowrap}
-  .wh .wleft small{display:none}
-  .wcard{min-height:clamp(236px, calc(100dvh - 270px), 620px)}
-}
-@media (min-width:1500px){
-  .wtoday{display:inline-block;white-space:nowrap}
-  .wh .wleft small{display:inline}
-}
-
 /* ── 첫 화면: 로고가 써지고 → 로그인 → 앱이 켜지듯 열린다 ── */
 html.gating body > :not(#gate):not(script){visibility:hidden}
 #gate{position:fixed;inset:0;z-index:3000;background:var(--bg);overflow-y:auto;
@@ -1000,6 +912,67 @@ html.entering #app,html.entering #fab{animation:appIn .65s cubic-bezier(.2,.8,.2
   #cal .cell.today .n{width:32px;height:32px}
   #cal .cell .n .chk{width:34px;height:34px}
 }
+
+/* ── 1년: 아직 할 일이 남은 날은 숫자 아래 점 ── */
+.yd.has{padding-bottom:6px}
+.yd.has::after{content:"";position:absolute;left:50%;bottom:3px;width:5px;height:5px;margin-left:-2.5px;
+  border-radius:50%;background:currentColor;opacity:.9}
+.ylegend .yhas{display:inline-flex;align-items:center;gap:5px;margin-left:8px}
+.ylegend .yhas u{display:block;width:5px;height:5px;border-radius:50%;background:var(--sub)}
+
+/* ── 주간: 하루가 한 줄. 왼쪽에 날짜, 오른쪽에 그날 할 일. 비어 있는 날은 낮게 ── */
+#cal:has(> .week){background:none;border:0;box-shadow:none;padding:0}
+.week{display:flex;flex-direction:column;gap:6px;min-width:0}
+.wcard{position:relative;display:grid;grid-template-columns:46px minmax(0,1fr) auto;gap:2px 12px;align-items:start;
+  min-height:58px;padding:11px 14px 11px 10px;background:var(--card);border:1.5px solid transparent;border-radius:16px;
+  cursor:pointer;user-select:none;-webkit-touch-callout:none;
+  transition:border-color var(--mo-fast) var(--ease),background var(--mo-fast) var(--ease)}
+@media (hover:hover){ .wcard:hover{background:var(--card);border-color:var(--line)} }
+.wcard.today{background:color-mix(in srgb,var(--accent) 7%,var(--card))}
+.wcard.sel{border-color:var(--ink)}
+.wcard.over{border-color:var(--accent);border-style:dashed}
+.wcard .wh{display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0}
+.wcard .wd{font-size:11.5px;font-weight:700;color:var(--nc,var(--sub));line-height:1}
+.wcard .wn{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:16px;font-weight:700;line-height:1;position:relative;color:var(--nc,var(--ink));background:var(--tc,transparent)}
+#cal .wcard.today .wn{background:var(--accent);color:var(--on-accent)!important;font-weight:800}
+.wcard.empty .wn{font-weight:600}
+.wcard .wn::after{display:none}
+.wcard .wn .chk{position:absolute;right:-5px;top:-2px;bottom:auto;width:15px;height:15px;padding:3px;margin:0;border:0;
+  border-radius:50%;background:var(--ink);color:var(--bg)}
+.wcard .wn .chk path{stroke-width:3.2}
+.wcard.fin.soft .wn .chk{opacity:.55}
+.wcard .wl{display:flex;flex-direction:column;gap:6px;min-width:0;overflow:visible;white-space:normal;align-items:stretch;
+  padding-top:2px}
+.wcard .whn{grid-column:1/-1;font-size:11.5px;font-weight:700;color:var(--sun);margin:0}
+.wcard .none{grid-column:1/-1;font-size:13px;font-weight:500;color:var(--faint);padding:7px 0}
+.wcard .wl .e{display:flex;align-items:center;gap:9px;min-width:0;padding:0;border:0;font-size:14.5px;line-height:1.35;
+  font-weight:500;color:var(--ink);opacity:1;text-decoration:none;white-space:nowrap;overflow:visible}
+.wcard .wl .e i{flex:none;width:8px;height:8px;border-radius:50%;background:var(--c)}
+.wcard .wl .e .et{min-width:0;overflow:hidden;text-overflow:ellipsis}
+.wcard .wl .e .star{flex:none;font-size:12px;color:var(--accent-ink)}
+.wcard .wl .e.done .et{text-decoration:line-through;text-decoration-thickness:1px;color:var(--sub)}
+.wcard .wl .e.done i{opacity:.4}
+.wcard .wl .e[data-i="4"],.wcard .wl .e[data-i="5"]{display:none}
+.wcard .wl .more{grid-column:1/-1;display:block;font-size:12px;font-weight:700;color:var(--sub);padding:0 0 0 17px;margin:0}
+.wcard .wl .more.d{display:none}
+.wcard .wleft{align-self:center;font-size:13px;font-weight:800;color:var(--ink);background:var(--fill);border-radius:999px;
+  padding:3px 10px;white-space:nowrap;line-height:1.4}
+.wcard .wleft small{font-size:11px;font-weight:700;color:var(--sub);margin-left:3px}
+@media (min-width:720px){
+  .week{gap:8px;min-height:calc(100dvh - 232px)}
+  .wcard{flex:1 1 auto;grid-template-columns:62px minmax(0,1fr) auto;gap:2px 18px;align-items:center;
+    min-height:62px;padding:12px 20px 12px 14px;border-radius:18px}
+  .wcard .wh{gap:4px}
+  .wcard .wd{font-size:12.5px}
+  .wcard .wn{width:40px;height:40px;font-size:17px}
+  .wcard .wl{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:7px 24px;padding:0}
+  .wcard .wl .e{font-size:15px}
+  .wcard .wl .e[data-i="4"],.wcard .wl .e[data-i="5"]{display:flex}
+  .wcard .wl .more.m{display:none}
+  .wcard .wl .more.d{display:block}
+  .wcard .wleft{font-size:13.5px;padding:4px 12px}
+}
 </style>
 </head>
 <body>
@@ -1129,7 +1102,7 @@ html.entering #app,html.entering #fab{animation:appIn .65s cubic-bezier(.2,.8,.2
 const SUPABASE_URL = 'https://cjhwxjznuleyfcbwwvtb.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_acxKbtekhqwFZwI0EUtArg_3FSj5AHh';
 const VAPID_PUBLIC = 'BItluVUoPAOjdIacpE7-6Ko45leNKobu8SbCNP1L6zdozMUrtFBNjh7ncFVZGSvwdHf4vNkYQKj5BarWq01G0hE';
-const BUILD = '2026-10-01.37';
+const BUILD = '2026-10-01.38';
 /* Daynua 앱(Android 껍데기) 안이면 위젯·알림·내보내기를 앱에 맡긴다. 아니면 null */
 const APP = typeof DaynuaApp !== 'undefined' ? DaynuaApp : null;
 const ARRIVED_BY_LINK = /access_token|type=(signup|recovery|magiclink|invite)|[?&]code=/.test(location.hash + location.search);
@@ -1310,7 +1283,7 @@ const I18N = {
   firstHint:'할 일을 적고 Enter 만 누르면 됩니다. 날짜와 분류는 나중에 정해도 돼요.',
   firstHintTouch:'할 일을 적고 키보드의 완료(↵)를 누르면 됩니다. 날짜와 분류는 나중에 정해도 돼요.',
   allTime:'전체', thisYear:'올해', recent:'최근 했던 일', activity:'활동',
-  actLegend:'그날 끝낸 일의 수',
+  actLegend:'그날 끝낸 일의 수', yHas:'남은 할 일', weekNone:'비어 있음',
   saveFail:'저장 공간이 부족합니다. 설정 → 데이터 → 내보내기로 백업해주세요.',
   tint:'배경 물들이기', tintHint:'강조색을 배경에 섞습니다. 0%면 기본 종이색입니다.',
   subs:'하위 항목', subPh:'하위 항목 추가',
@@ -1455,7 +1428,7 @@ const I18N = {
   firstHint:'Type and press Enter. Dates and categories can wait.',
   firstHintTouch:'Type, then tap Done on the keyboard. Dates and categories can wait.',
   allTime:'All time', thisYear:'This year', recent:'Recently done', activity:'Activity',
-  actLegend:'tasks finished that day',
+  actLegend:'tasks finished that day', yHas:'still to do', weekNone:'Nothing planned',
   saveFail:'Storage is full. Back up via Settings → Data → Export.',
   tint:'Background tint', tintHint:'Blends your accent into the background. 0% is plain paper.',
   subs:'Checklist', subPh:'add an item',
@@ -2220,8 +2193,7 @@ const cellRank = t => (t.s && !t.d) ? 0 : (!t.d && !t.sk && !t.w) ? 1 : t.d ? 2 
 const cellOrder = list => [...list].sort((a,b) => cellRank(a) - cellRank(b));
 const monthName = m => new Intl.DateTimeFormat(loc(), {month:'long'}).format(new Date(2024, m, 1));
 const evHTML = (t, i) => { const c = catOf(t.c);
-  return `<span class="e ${t.d||t.sk?'done':''}" data-i="${i}"
-    style="--c:${c?stripColor(c.c):'var(--faint)'}">${esc(t.t)}</span>`; };
+  return `<span class="e ${t.d||t.sk?'done':''}" data-i="${i}" style="--c:${c?stripColor(c.c):'var(--faint)'}"><i></i><span class="et">${esc(t.t)}</span>${t.s && !t.d ? '<b class="star">★</b>' : ''}</span>`; };
 
 /* 제목은 보기마다 다르다 — 주는 기간, 월은 달, 년은 해 */
 function viewTitle(){
@@ -2405,32 +2377,37 @@ function renderWeek(tk){
   materialize(days.map(dOf));
   const wdS = new Intl.DateTimeFormat(loc(), {weekday:'short'});
   const fmtDay = new Intl.DateTimeFormat(loc(), {month:'long', day:'numeric'});
-  const MAX = 4, MOBILE = 3;
+  const MAX = 6, MOBILE = 4;
   const cards = days.map(k=>{
     const d = dOf(k), s = sumOf(k), list = bucket(k);
     const hn = holName(k), w = d.getDay();
     const nc = hn || w===0 ? 'var(--sun)' : w===6 ? 'var(--sat)' : '';
     const dist = catDist(list, doc.cats);
     const ord = cellOrder(list);
+    /* 끝낸 날은 월 달력과 같게 — 날짜 원이 분류 색으로 물든다 (n 개면 n 등분) */
+    let tc = '';
+    if(s.cleared && dist.length){
+      const cs = dist.map(x => `color-mix(in srgb,${x.color ? stripColor(x.color) : 'var(--faint)'} 56%,transparent)`);
+      const n = cs.length;
+      tc = n === 1 ? cs[0] : `conic-gradient(${cs.map((c,i)=>`${c} ${i*100/n}% ${(i+1)*100/n}%`).join(',')})`;
+    }
     const label = !list.length ? fmtDay.format(d)
       : s.complete ? `${fmtDay.format(d)}, ${T('aTasks')(list.length)}, ${T('aAllDone')}`
       : s.cleared ? `${fmtDay.format(d)}, ${T('aTasks')(list.length)}, ${T('aCleared')}`
       : `${fmtDay.format(d)}, ${T('aSomeDone')(list.length, s.done)}`;
     const restD = Math.max(0, ord.length - MAX), restM = Math.max(0, ord.length - MOBILE);
+    const st = (tc ? `--tc:${tc};` : '') + (nc ? `--nc:${nc}` : '');
     return `<div class="wcard${k===tk?' today':''}${k===sel?' sel':''}${
-        s.cleared ? (s.complete ? ' fin' : ' fin soft') : ''}" data-k="${k}" role="button"
-        tabindex="0" aria-pressed="${k===sel}" aria-label="${esc(label)}">
+        s.cleared ? (s.complete ? ' fin' : ' fin soft') : ''}${list.length ? '' : ' empty'}" data-k="${k}" role="button"
+        tabindex="0" aria-pressed="${k===sel}" aria-label="${esc(label)}"${st ? ` style="${st}"` : ''}>
       <div class="wh"><span class="wd">${esc(wdS.format(d))}</span>
-        <span class="wn mono" ${nc?`style="color:${nc}"`:''}>${d.getDate()}</span>
-        ${k===tk ? `<span class="wtoday">${T('today')}</span>` : ''}
+        <span class="wn mono">${d.getDate()}${s.cleared ? CHK : ''}</span></div>
+      <div class="wl">
         ${hn ? `<span class="whn">${esc(hn)}</span>` : ''}
-        <span class="wsp"></span>
-        ${s.cleared ? CHK : s.actionable ? `<span class="wleft">${s.actionable}<small>${T('leftTag')}</small></span>` : ''}</div>
-      ${dist.length?`<div class="strip">${dist.map(x=>
-        `<i class="${x.color?'':'none'}" style="--c:${x.color?stripColor(x.color):'var(--faint)'};flex:${x.ratio}"></i>`).join('')}</div>`:''}
-      <div class="wl">${ord.slice(0, MAX).map(evHTML).join('')}
+        ${ord.length ? ord.slice(0, MAX).map(evHTML).join('') : `<span class="none">${T('weekNone')}</span>`}
         ${restM?`<span class="more m">${T('more')(restM)}</span>`:''}
         ${restD?`<span class="more d">${T('more')(restD)}</span>`:''}</div>
+      ${!s.cleared && s.actionable ? `<span class="wleft">${s.actionable}<small>${T('leftTag')}</small></span>` : ''}
     </div>`;
   }).join('');
   $('#cal').innerHTML = `<div class="week">${cards}</div>`;
@@ -2438,30 +2415,33 @@ function renderWeek(tk){
 
 /* ── 1년: 성적표가 아니라 활동 기록. 12개의 작은 달력 + 그 해의 기록. ──
    색은 '그날 끝낸 일의 수' 하나만 말한다 (분류 색은 월/주의 몫). */
-/* 연도 전체를 한 번만 훑어 날짜별 완료 수를 만든다 (날짜마다 다시 세지 않게) */
+/* 연도 전체를 한 번만 훑는다 (날짜마다 다시 세지 않게).
+   월·주 화면과 같은 기준 — 할 일이 놓인 '그 날짜' 칸에 센다.
+   done = 끝낸 수(색), open = 아직 남은 날, any = 할 일이 있는 날(점) */
 function doneMap(y){
-  const pre = String(y), m = new Map();
+  const pre = String(y) + '-', done = new Map(), open = new Set(), any = new Set();
   for(const [k, list] of Object.entries(doc.todos)){
+    if(!k.startsWith(pre) || !isDateKey(k)) continue;
     for(const t of list){
-      if(!t.d) continue;
-      const day = t.dd || (isDateKey(k) ? k : null);
-      if(day && day.startsWith(pre)) m.set(day, (m.get(day) || 0) + 1);
+      any.add(k);
+      if(t.d) done.set(k, (done.get(k) || 0) + 1);
+      else if(!t.sk) open.add(k);
     }
   }
-  return m;
+  return {done, open, any};
 }
 
 function renderYear(tk){
   const y = cur.getFullYear();
-  const dm = doneMap(y);
+  const ym = doneMap(y), dm = ym.done;
   const wd = wdNames().map(w => w.replace(/요일$/, '').slice(0, 1));
   const fmtDay = new Intl.DateTimeFormat(loc(), {month:'long', day:'numeric'});
   const months = Array.from({length:12}, (_, m)=>{
     const cells = monthGrid(y, m, ws()).map(d=>{
       if(d.getMonth() !== m) return '<span class="yd out"></span>';
-      const k = key(d), n = dm.get(k) || 0, lv = actLevel(n);
-      const lab = `${fmtDay.format(d)}${n ? ` · ${T('impDone')} ${n}` : ''}`;
-      return `<button class="yd${lv?' a'+lv:''}${k===tk?' today':''}" data-k="${k}" tabindex="-1"
+      const k = key(d), n = dm.get(k) || 0, lv = actLevel(n), left = ym.open.has(k);
+      const lab = `${fmtDay.format(d)}${n ? ` · ${T('impDone')} ${n}` : ''}${left ? ` · ${T('yHas')}` : ''}`;
+      return `<button class="yd${lv?' a'+lv:''}${left?' has':''}${k===tk?' today':''}" data-k="${k}" tabindex="-1"
         title="${esc(lab)}" aria-label="${esc(lab)}">${d.getDate()}</button>`;
     }).join('');
     return `<section class="ym">
@@ -2660,6 +2640,7 @@ function yearRecord(y, dm){
     <span>${T('activity')} · ${T('actLegend')}</span>
     <span class="sp"></span>
     <i></i><i class="a1"></i><i class="a2"></i><i class="a3"></i>
+    <span class="yhas"><u></u>${T('yHas')}</span>
     <span class="n">${T('activeDays')} ${dm.size} · ${y} ${doneY}</span></div>`;
 }
 
