@@ -1036,12 +1036,6 @@ html[data-vt=next]::view-transition-new(side),html[data-vt=prev]::view-transitio
   #cal .cell .hn{font-size:13px}
 }
 
-/* 폰에서도 공휴일 이름 — 칸이 좁아서 한 줄로 두고 넘치면 …, 숫자 아래 아주 작게 */
-@media (max-width:719px){
-  #cal .cell .hn{display:block;max-width:100%;padding:0 1px;margin:1px 0 0;font-size:10px;line-height:1.15;font-weight:700;
-    text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--sun)}
-  #cal .cell.out .hn{opacity:.6}
-}
 </style>
 </head>
 <body>
@@ -1171,7 +1165,7 @@ html[data-vt=next]::view-transition-new(side),html[data-vt=prev]::view-transitio
 const SUPABASE_URL = 'https://cjhwxjznuleyfcbwwvtb.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_acxKbtekhqwFZwI0EUtArg_3FSj5AHh';
 const VAPID_PUBLIC = 'BItluVUoPAOjdIacpE7-6Ko45leNKobu8SbCNP1L6zdozMUrtFBNjh7ncFVZGSvwdHf4vNkYQKj5BarWq01G0hE';
-const BUILD = '2026-10-01.45';
+const BUILD = '2026-10-01.46';
 /* Daynua 앱(Android 껍데기) 안이면 위젯·알림·내보내기를 앱에 맡긴다. 아니면 null */
 const APP = typeof DaynuaApp !== 'undefined' ? DaynuaApp : null;
 const ARRIVED_BY_LINK = /access_token|type=(signup|recovery|magiclink|invite)|[?&]code=/.test(location.hash + location.search);
