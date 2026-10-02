@@ -1041,28 +1041,10 @@ html[data-vt=next]::view-transition-new(side),html[data-vt=prev]::view-transitio
 .qadd.main #qd{min-width:0}
 li .tm{flex:none;font-size:11.5px;font-weight:700;color:var(--sub);background:var(--fill);border-radius:6px;padding:1px 6px;line-height:1.5}
 .wcard .wl .e .tm{flex:none;font-size:12px;font-weight:700;color:var(--sub);background:none;padding:0}
-.tsel{display:inline-flex;align-items:center;gap:3px;flex:none}
-.tsel i{font-style:normal;color:var(--faint);font-weight:700}
-.tsel .tbtn{display:inline-flex;align-items:center;gap:5px;padding:6px 8px;border:1px solid var(--line);border-radius:9px;
-  background:var(--bg);color:var(--ink);font-size:13px;font-weight:700;white-space:nowrap;font-variant-numeric:tabular-nums}
-.tsel .tbtn::after{content:"";width:5px;height:5px;border-right:1.6px solid currentColor;border-bottom:1.6px solid currentColor;
-  transform:rotate(45deg) translateY(-1px);opacity:.5}
-.tsel .tbtn:disabled{opacity:.45}
-@media (hover:hover){ .tsel .tbtn:not(:disabled):hover{border-color:var(--faint)} }
-/* 열리는 목록: 6칸 높이에서 끊고 안에서 내린다 */
-#tpop{position:fixed;z-index:3500;max-height:216px;overflow-y:auto;overscroll-behavior:contain;touch-action:pan-y;
-  background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:4px;
-  box-shadow:0 10px 30px rgba(0,0,0,.22);animation:moMenu 120ms var(--ease);scrollbar-width:thin;user-select:none}
-#tpop[hidden]{display:none}
-#tpop button{display:block;width:100%;min-height:34px;padding:7px 14px;border-radius:8px;text-align:left;
-  font-size:14px;font-weight:700;color:inherit;font-variant-numeric:tabular-nums}
-@media (hover:hover){ #tpop button:hover{background:var(--fill)} }
-#tpop button.on{background:var(--ink);color:var(--bg)}
 .timerow{display:flex;align-items:center;gap:10px;justify-content:space-between}
 .timerow>span:first-child{font-weight:600}
 #menu .timerow{padding:4px 10px;font-size:13px}
 #sheet .timerow{min-height:52px;padding:0 14px;font-size:15px}
-#sheet .tsel .tbtn{font-size:15px;padding:9px 10px;border-radius:12px}
 #sheet #tpop button{font-size:16px;min-height:42px}
 
 /* ── 글자 한 단계 키움 (너무 작던 것들) ── */
@@ -1078,7 +1060,6 @@ li .tm{flex:none;font-size:11.5px;font-weight:700;color:var(--sub);background:va
 li .tm{font-size:12px}
 @media (min-width:900px){ .ywd span{font-size:11.5px} .yd{font-size:12.5px} }
 /* 시간 칸은 손가락으로 누르기 쉽게 */
-@media (hover:none){ .tsel .tbtn{padding:8px 10px;font-size:14px} .qadd.main .tsel{gap:2px} }
 
 /* ── 추가창의 시간: 아이콘 하나 → 고르면 시각 칩 ── */
 .qadd.main .qtbtn{flex:none;display:inline-flex;align-items:center;gap:6px;padding:6px 8px;border-radius:9px;border:1px solid transparent;
@@ -1087,10 +1068,33 @@ li .tm{font-size:12px}
 .qadd.main .qtbtn.set{color:var(--ink);background:var(--fill);border-color:var(--line)}
 .qadd.main .qtbtn.auto{border-style:dashed;border-color:var(--accent)}
 .qadd.main .qtbtn .qx{font-size:16px;line-height:1;opacity:.55;padding:0 1px}
-#tpop.two{display:flex;gap:2px;max-height:none;overflow:visible;padding:4px}
-#tpop.two .tcol{max-height:208px;overflow-y:auto;overscroll-behavior:contain;touch-action:pan-y;scrollbar-width:thin;min-width:56px}
-#tpop.two .tcol+.tcol{border-left:1px solid var(--line);padding-left:2px}
-#tpop.two.nohour .tcol+.tcol{opacity:.4}
+
+/* ── 시간 버튼과 알람식 선택창 ── */
+.tsel{display:inline-flex;align-items:center;flex:none}
+.tsel .tbtn{padding:6px 11px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--ink);
+  font-size:13px;font-weight:700;white-space:nowrap;font-variant-numeric:tabular-nums}
+@media (hover:hover){ .tsel .tbtn:hover{border-color:var(--faint)} }
+@media (hover:none){ .tsel .tbtn{padding:8px 12px;font-size:14px} }
+#sheet .tsel .tbtn{font-size:15px;padding:9px 13px;border-radius:12px}
+#tpop{position:fixed;z-index:3500;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:16px;
+  padding:10px;box-shadow:0 12px 34px rgba(0,0,0,.24);animation:moMenu 120ms var(--ease);user-select:none;-webkit-user-select:none}
+#tpop[hidden]{display:none!important}
+#tpop .wrow{position:relative;display:flex;gap:6px;align-items:stretch}
+#tpop .wper{display:flex;flex-direction:column;justify-content:center;gap:6px;width:56px}
+#tpop .wper button{padding:10px 0;border-radius:10px;background:var(--fill);color:var(--sub);font-size:14px;font-weight:700}
+#tpop .wper button.on{background:var(--ink);color:var(--bg)}
+#tpop .wcol{position:relative;z-index:1;width:56px;height:180px;overflow-y:auto;scroll-snap-type:y mandatory;overscroll-behavior:contain;
+  touch-action:pan-y;scrollbar-width:none;outline:none}
+#tpop .wcol::-webkit-scrollbar{display:none}
+#tpop .wpad{display:block;height:72px}
+#tpop .wi{height:36px;line-height:36px;text-align:center;scroll-snap-align:center;font-size:17px;font-weight:600;
+  font-variant-numeric:tabular-nums;opacity:.14;transition:opacity 90ms}
+#tpop .wi[data-d="0"]{opacity:1;font-size:21px;font-weight:800}
+#tpop .wi[data-d="1"]{opacity:.55}
+#tpop .wi[data-d="2"]{opacity:.28}
+#tpop .wband{position:absolute;left:62px;right:0;top:72px;height:36px;border-radius:10px;background:var(--fill);pointer-events:none}
+#tpop .wact{display:flex;gap:8px;margin-top:10px}
+#tpop .wact button{flex:1;padding:10px;border-radius:10px;font-size:14px;font-weight:700}
 </style>
 </head>
 <body>
@@ -1220,7 +1224,7 @@ li .tm{font-size:12px}
 const SUPABASE_URL = 'https://cjhwxjznuleyfcbwwvtb.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_acxKbtekhqwFZwI0EUtArg_3FSj5AHh';
 const VAPID_PUBLIC = 'BItluVUoPAOjdIacpE7-6Ko45leNKobu8SbCNP1L6zdozMUrtFBNjh7ncFVZGSvwdHf4vNkYQKj5BarWq01G0hE';
-const BUILD = '2026-10-01.52';
+const BUILD = '2026-10-01.53';
 /* Daynua 앱(Android 껍데기) 안이면 위젯·알림·내보내기를 앱에 맡긴다. 아니면 null */
 const APP = typeof DaynuaApp !== 'undefined' ? DaynuaApp : null;
 const ARRIVED_BY_LINK = /access_token|type=(signup|recovery|magiclink|invite)|[?&]code=/.test(location.hash + location.search);
@@ -1402,7 +1406,7 @@ const I18N = {
   allTime:'전체', thisYear:'올해', recent:'최근 했던 일', activity:'활동',
   timeAlertLbl:'시간 일정 알림', timeAlertHint:'시각을 정한 할 일을, 고른 시점에 알려 줘요.',
   timeHintWeb:' 앱을 닫아 두면 알림이 오지 않을 수 있어요. 안드로이드 앱에서는 닫아 두어도 와요.',
-  timeLead:['알림 없음','정시','10분 전','30분 전','1시간 전'], timeSet:'시간', timeNone:'시간 없음', timeH:'시', timeM:'분',
+  timeLead:['알림 없음','정시','10분 전','30분 전','1시간 전'], timeSet:'시간', timeNone:'시간 없음', timeOk:'확인', timeH:'시', timeM:'분',
   timeBody:(tm,l)=> l ? `${tm} · ${l}분 전` : tm,
   actLegend:'끝낸 일이 많을수록 진해져요', yearSum:(n,d)=>`${d}일에 걸쳐 ${n}개를 끝냈어요`, yHas:'남은 할 일', weekNone:'비어 있음',
   saveFail:'저장 공간이 부족합니다. 설정 → 데이터 → 내보내기로 백업해주세요.',
@@ -1550,7 +1554,7 @@ const I18N = {
   allTime:'All time', thisYear:'This year', recent:'Recently done', activity:'Activity',
   timeAlertLbl:'Timed task alerts', timeAlertHint:'Notifies you about tasks that have a time, at the moment you choose.',
   timeHintWeb:' Notifications may not arrive while the app is closed. The Android app delivers them even when closed.',
-  timeLead:['No alert','On time','10 min before','30 min before','1 hour before'], timeSet:'Time', timeNone:'No time', timeH:'Hour', timeM:'Minute',
+  timeLead:['No alert','On time','10 min before','30 min before','1 hour before'], timeSet:'Time', timeNone:'No time', timeOk:'Done', timeH:'Hour', timeM:'Minute',
   timeBody:(tm,l)=> l ? `${tm} · in ${l} min` : tm,
   actLegend:'Darker = more tasks finished', yearSum:(n,d)=>`${n} done over ${d} day${d===1?'':'s'}`, yHas:'still to do', weekNone:'Nothing planned',
   saveFail:'Storage is full. Back up via Settings → Data → Export.',
@@ -2318,7 +2322,7 @@ const cellRank = t => (t.s && !t.d) ? 0 : (!t.d && !t.sk && !t.w) ? 1 : t.d ? 2 
 const cellOrder = list => [...list].sort((a,b) => cellRank(a) - cellRank(b));
 const monthName = m => new Intl.DateTimeFormat(loc(), {month:'long'}).format(new Date(2024, m, 1));
 const evHTML = (t, i) => { const c = catOf(t.c);
-  return `<span class="e ${t.d||t.sk?'done':''}" data-i="${i}" style="--c:${c?stripColor(c.c):'var(--faint)'}"><i></i>${t.tm ? `<b class="tm mono">${t.tm}</b>` : ''}<span class="et">${esc(t.t)}</span>${t.s && !t.d ? '<b class="star">★</b>' : ''}</span>`; };
+  return `<span class="e ${t.d||t.sk?'done':''}" data-i="${i}" style="--c:${c?stripColor(c.c):'var(--faint)'}"><i></i>${t.tm ? `<b class="tm mono">${fmtTm(t.tm)}</b>` : ''}<span class="et">${esc(t.t)}</span>${t.s && !t.d ? '<b class="star">★</b>' : ''}</span>`; };
 
 /* 제목은 보기마다 다르다 — 주는 기간, 월은 달, 년은 해 */
 function viewTitle(){
@@ -2611,7 +2615,7 @@ function rowHTML(t, from, opt = {}){
   return `<li class="${cls}" data-id="${t.id}" data-from="${from}" style="color:${col}"
       ${canMove ? 'draggable="true"' : ''}>
     <button class="ck"></button>
-    ${t.tm ? `<span class="tm mono">${t.tm}</span>` : ''}
+    ${t.tm ? `<span class="tm mono">${fmtTm(t.tm)}</span>` : ''}
     <span class="tx" spellcheck="false">${esc(t.t)}</span>
     ${t.r?`<span class="rp" title="${T('routines')}">${ICON.repeat}</span>`:''}
     ${t.w?`<span class="wi" title="${T('waiting')}">${ICON.wait}</span>`:''}
@@ -3441,7 +3445,7 @@ function flash(msg, canUndo){
 let menuCtx = null, menuCats = false, menuMore = false, menuAt = [0,0];
 let qtVal = '', qtAuto = false, qtManual = false;   // 빠른 입력의 시각 (다시 그려도 남는다) · 글에서 읽음 · 직접 고름/지움
 const CLOCK = `<svg viewBox="0 0 16 16" width="17" height="17" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="5.8"/><path d="M8 4.8V8l2.2 1.4"/></svg>`;
-const qtInner = () => qtVal ? `${CLOCK}<b class="mono">${qtVal}</b><span class="qx" role="button" aria-label="${T('timeNone')}">×</span>` : CLOCK;
+const qtInner = () => qtVal ? `${CLOCK}<b class="mono">${fmtTm(qtVal)}</b><span class="qx" role="button" aria-label="${T('timeNone')}">×</span>` : CLOCK;
 const qtCls = () => 'qtbtn' + (qtVal ? ' set' : '') + (qtAuto && !qtManual ? ' auto' : '');
 const qtBtnHTML = () => `<button type="button" id="qt" class="${qtCls()}" aria-label="${T('timeSet')}" aria-haspopup="listbox">${qtInner()}</button>`;
 /* 글에서 시각 찾기 — '오후 3시 30분' · '3시 반' · '15:30' · '3:30pm' · '정오'. '3시간' 같은 길이는 시각이 아니다.
@@ -3466,116 +3470,131 @@ function parseTime(text){
   if(!rest) return null;                                // 시각만 쓴 글은 제목이 사라지므로 읽지 않는다
   return {tm: `${String(h).padStart(2, '0')}:${String(mi).padStart(2, '0')}`, text: rest};
 }
-/* 시와 분을 따로 고르는 칸 — 누르면 짧은 목록(6칸 높이)이 뜨고, 끌거나 휠로 내려서 고른다. 끝(00·23)에서 멈춘다.
-   분은 10분 단위만. (이미 있던 10분 단위가 아닌 값은 그 값만 하나 더 끼운다) req: 비워 둘 수 없는 칸.
-   값은 칸 바깥 span 의 data-h / data-m 에 있고, 바뀌면 그 span 에서 'tchange' 가 올라온다. */
+/* ── 시간 고르기: 알람 앱처럼 ──
+   [오전|오후] [시 1~12] [분 10분 단위] 를 아래로 끌어 맞춘다. 시를 넘기다 12를 지나면 오전·오후가 저절로 바뀐다.
+   값은 'HH:MM'(24시간)으로만 저장하고, 보여줄 때만 오전/오후로 바꾼다. */
 const p2t = n => String(n).padStart(2, '0');
-function timeSelHTML(id, v, req){
-  const ok = /^\d\d:\d\d$/.test(v || '');
-  const h = ok ? +v.slice(0, 2) : (req ? 9 : ''), m = ok ? +v.slice(3) : 0;
-  return `<span class="tsel" id="${id}" data-h="${h}" data-m="${m}" data-req="${req ? 1 : 0}">
-    <button type="button" class="tbtn" data-p="h" aria-label="${T('timeH')}" aria-haspopup="listbox">${h === '' ? T('timeSet') : p2t(h)}</button><i>:</i>
-    <button type="button" class="tbtn" data-p="m" aria-label="${T('timeM')}" aria-haspopup="listbox" ${h === '' ? 'disabled' : ''}>${p2t(m)}</button></span>`;
+function fmtTm(v){
+  const h = +v.slice(0, 2), m = v.slice(3), h12 = h % 12 || 12;
+  return doc.ui.lang === 'en' ? `${h12}:${m} ${h < 12 ? 'AM' : 'PM'}` : `${h < 12 ? '오전' : '오후'} ${h12}:${m}`;
 }
-const timeFrom = w => !w || w.dataset.h === '' ? '' : `${p2t(+w.dataset.h)}:${p2t(+w.dataset.m)}`;
-function tselShow(w, v){                              // 밖에서 값을 넣을 때
+function timeSelHTML(id, v, req){                       // 설정·메뉴의 시간 버튼 (누르면 선택창)
   const ok = /^\d\d:\d\d$/.test(v || '');
-  w.dataset.h = ok ? String(+v.slice(0, 2)) : ''; w.dataset.m = ok ? String(+v.slice(3)) : '0';
-  const [hb, mb] = w.querySelectorAll('.tbtn');
-  hb.textContent = ok ? p2t(+w.dataset.h) : T('timeSet'); mb.textContent = p2t(+w.dataset.m); mb.disabled = !ok;
+  return `<span class="tsel" id="${id}" data-v="${ok ? v : ''}" data-req="${req ? 1 : 0}"><button type="button" class="tbtn" aria-haspopup="dialog">${ok ? fmtTm(v) : T('timeSet')}</button></span>`;
 }
-/* 목록은 한 개를 돌려 쓴다. 설정 같은 모달 안에서도 눌리도록 열릴 때 그 안으로 옮긴다. */
+const timeFrom = w => w?.dataset.v || '';
+const ROW = 36;
 const tpop = document.createElement('div');
-tpop.id = 'tpop'; tpop.hidden = true; tpop.setAttribute('role', 'listbox');
+tpop.id = 'tpop'; tpop.hidden = true; tpop.setAttribute('role', 'dialog');
 document.body.appendChild(tpop);
-let tpFor = null, tpMoved = false;
-function tpClose(refocus){ tpop.hidden = true; if(refocus) tpFor?.focus(); tpFor = null; }
-function tpPlace(btn){
+let wh = null;                                          // 열려 있는 선택창의 상태 {btn, idx, mi, mins, dirty, req, onCommit}
+const whVal = () => `${p2t(wh.idx)}:${p2t(wh.mins[wh.mi])}`;
+/* mode: ok = 확인 · clear = 시간 없음 · out = 바깥을 눌러 닫음(만졌다면 그대로 적용) · esc = 취소 */
+function whClose(mode){
+  if(!wh) return;
+  const w = wh; wh = null; tpop.hidden = true;
+  if(mode === 'ok') w.onCommit(`${p2t(w.idx)}:${p2t(w.mins[w.mi])}`);
+  else if(mode === 'clear') w.onCommit('');
+  else if(mode === 'out' && w.dirty) w.onCommit(`${p2t(w.idx)}:${p2t(w.mins[w.mi])}`);
+  if(mode === 'esc') w.btn?.focus?.();
+}
+function whPaint(){
+  tpop.querySelectorAll('.wper button').forEach(b => b.classList.toggle('on', +b.dataset.per === (wh.idx >= 12 ? 1 : 0)));
+  for(const c of tpop.querySelectorAll('.wcol')){
+    const cur = c.dataset.c === 'h' ? wh.idx : wh.mi;
+    for(const it of c.querySelectorAll('.wi')) it.dataset.d = Math.min(3, Math.abs(+it.dataset.i - cur));
+  }
+}
+function whOpen(btn, cur, opt){
+  if(wh && wh.btn === btn) return whClose('out');       // 같은 버튼을 다시 누르면 닫는다
+  if(wh) whClose('out');
+  const ok = /^\d\d:\d\d$/.test(cur || ''), now = new Date();
+  const h = ok ? +cur.slice(0, 2) : (now.getMinutes() > 0 ? (now.getHours() + 1) % 24 : now.getHours()), m = ok ? +cur.slice(3) : 0;
+  const mins = [0, 10, 20, 30, 40, 50]; if(!mins.includes(m)) mins.push(m), mins.sort((a, b) => a - b);
+  wh = {btn, req:!!opt.req, onCommit:opt.onCommit, idx:h, mi:mins.indexOf(m), mins, dirty:false, touched:false};
+  const en = doc.ui.lang === 'en';
+  tpop.className = 'wheel';
+  tpop.innerHTML = `<div class="wrow">
+      <div class="wper"><button type="button" data-per="0">${en ? 'AM' : '오전'}</button><button type="button" data-per="1">${en ? 'PM' : '오후'}</button></div>
+      <div class="wcol" data-c="h" tabindex="0" aria-label="${T('timeH')}"><i class="wpad"></i>${
+        Array.from({length:24}, (_, i) => `<div class="wi" data-i="${i}">${i % 12 || 12}</div>`).join('')}<i class="wpad"></i></div>
+      <div class="wcol" data-c="m" tabindex="0" aria-label="${T('timeM')}"><i class="wpad"></i>${
+        mins.map((x, i) => `<div class="wi" data-i="${i}">${p2t(x)}</div>`).join('')}<i class="wpad"></i></div>
+      <div class="wband"></div></div>
+    <div class="wact">${wh.req ? '' : `<button type="button" class="plain" data-w="clear">${T('timeNone')}</button>`}<button type="button" class="primary" data-w="ok">${T('timeOk')}</button></div>`;
+  (btn.closest('dialog') || document.body).appendChild(tpop);
+  tpop.hidden = false;
+  tpop.querySelector('[data-c=h]').scrollTop = h * ROW; tpop.querySelector('[data-c=m]').scrollTop = wh.mi * ROW;
+  whPaint();
   const r = btn.getBoundingClientRect(), pr = tpop.getBoundingClientRect();
-  let left = Math.min(r.left, innerWidth - pr.width - 8), top = r.bottom + 4;
-  if(top + pr.height > innerHeight - 8) top = Math.max(8, r.top - pr.height - 4);       // 아래가 모자라면 위로
+  let left = Math.min(Math.max(8, r.left), innerWidth - pr.width - 8), top = r.bottom + 6;
+  if(top + pr.height > innerHeight - 8) top = Math.max(8, r.top - pr.height - 6);        // 아래가 모자라면 위로
   tpop.style.left = left + 'px'; tpop.style.top = top + 'px';
-  const a = tpop.getBoundingClientRect();                                               // 변형된 조상 안이어도 어긋나지 않게 맞춘다
+  const a = tpop.getBoundingClientRect();                                                // 변형된 조상 안이어도 어긋나지 않게 맞춘다
   tpop.style.left = (left + (left - a.left)) + 'px'; tpop.style.top = (top + (top - a.top)) + 'px';
 }
-/* 시 · 분이 한 목록에 나란히 — 시를 누르면 바로 들어가고(분 00), 분을 누르면 닫힌다 */
-function tp2Show(btn){
-  const ok = /^\d\d:\d\d$/.test(qtVal), h0 = ok ? +qtVal.slice(0, 2) : null, m0 = ok ? +qtVal.slice(3) : null;
-  const mins = [0, 10, 20, 30, 40, 50]; if(ok && !mins.includes(m0)) mins.push(m0), mins.sort((a, b) => a - b);
-  tpop.className = 'two' + (ok ? '' : ' nohour');
-  tpop.style.minWidth = '';
-  tpop.innerHTML = `<div class="tcol" data-p="h">${Array.from({length:24}, (_, i) => `<button type="button" data-v="${i}" class="${h0 === i ? 'on' : ''}">${p2t(i)}</button>`).join('')}</div>
-    <div class="tcol" data-p="m">${mins.map(x => `<button type="button" data-v="${x}" class="${m0 === x ? 'on' : ''}">${p2t(x)}</button>`).join('')}</div>`;
-  (btn.closest('dialog') || document.body).appendChild(tpop);
-  tpFor = btn; tpop.hidden = false;
-  const hc = tpop.querySelector('[data-p=h]'), tg = hc.querySelector('.on') || hc.children[Math.min(23, new Date().getHours())];
-  hc.scrollTop = tg.offsetTop - hc.clientHeight / 2 + tg.offsetHeight / 2;
-  tpPlace(btn);
-}
-function tp2Pick(e){
-  const b = e.target.closest('button'); if(!b || tpMoved) return;
-  const col = b.parentElement.dataset.p, v = +b.dataset.v, ok = /^\d\d:\d\d$/.test(qtVal);
-  const h = col === 'h' ? v : (ok ? +qtVal.slice(0, 2) : null), m = col === 'm' ? v : (ok ? +qtVal.slice(3) : 0);
-  if(h === null) return;
-  qtVal = `${p2t(h)}:${p2t(m)}`; qtAuto = false; qtManual = true; syncQt();
-  tpop.classList.remove('nohour');
-  for(const c of tpop.querySelectorAll('.tcol')) for(const x of c.children) x.classList.toggle('on', +x.dataset.v === (c.dataset.p === 'h' ? h : m));
-  if(!ok) askTimeNotify();
-  if(col === 'm'){ tpClose(false); $('#qd')?.focus(); }
-}
-function tpShow(btn){
-  if(btn.disabled) return;
-  tpop.className = '';
-  const w = btn.closest('.tsel'), k = btn.dataset.p, req = w.dataset.req === '1', m = +w.dataset.m;
-  let items;
-  if(k === 'h') items = [...(req ? [] : [['', T('timeNone')]]), ...Array.from({length:24}, (_, i) => [String(i), p2t(i)])];
-  else { const mins = [0, 10, 20, 30, 40, 50]; if(!mins.includes(m)) mins.push(m), mins.sort((a, b) => a - b); items = mins.map(x => [String(x), p2t(x)]); }
-  const cur = k === 'h' ? w.dataset.h : String(m);
-  tpop.innerHTML = items.map(([v, l]) => `<button type="button" role="option" data-v="${v}" class="${v === cur ? 'on' : ''}">${l}</button>`).join('');
-  (btn.closest('dialog') || document.body).appendChild(tpop);
-  tpFor = btn; tpop.dataset.p = k; tpop.hidden = false;
-  tpop.style.minWidth = Math.max(btn.offsetWidth, 72) + 'px';
-  const on = tpop.querySelector('.on'); if(on) tpop.scrollTop = on.offsetTop - tpop.clientHeight / 2 + on.offsetHeight / 2;
-  tpPlace(btn);
-}
+/* 열기: 추가창의 시계 아이콘 · 설정/메뉴의 시간 버튼 */
+const commitQuick = v => { qtVal = v; qtAuto = false; qtManual = true; syncQt(); if(v) askTimeNotify(); $('#qd')?.focus(); };
 document.addEventListener('click', e => {
   const q = e.target.closest('#qt');
   if(q){
-    if(e.target.closest('.qx')){ qtVal = ''; qtAuto = false; qtManual = true; syncQt(); tpClose(); return; }   // × — 시각 없애기
-    if(!tpop.hidden && tpFor === q) return tpClose();
-    return tp2Show(q);
+    if(e.target.closest('.qx')){ qtVal = ''; qtAuto = false; qtManual = true; syncQt(); whClose('esc'); return; }   // × — 시각 없애기
+    return whOpen(q, qtVal, {onCommit:commitQuick});
   }
   const b = e.target.closest('.tsel .tbtn');
-  if(b){ if(!tpop.hidden && tpFor === b) return tpClose(); return tpShow(b); }
+  if(b){
+    const w = b.closest('.tsel');
+    whOpen(b, w.dataset.v, {req:w.dataset.req === '1', onCommit: v => {
+      w.dataset.v = v; b.textContent = v ? fmtTm(v) : T('timeSet');
+      w.dispatchEvent(new CustomEvent('tchange', {bubbles:true}));
+    }});
+  }
 });
 document.addEventListener('mousedown', e => {          // 눌러도 제목 칸의 포커스(= 키보드)를 빼앗지 않는다
   if(e.target.closest('.tsel .tbtn, #qt, #tpop')) e.preventDefault();
 });
-tpop.addEventListener('click', e => {
-  if(tpop.classList.contains('two')) return tp2Pick(e);
-  const b = e.target.closest('button'); if(!b || tpMoved || !tpFor) return;
-  const w = tpFor.closest('.tsel'), k = tpop.dataset.p;
-  if(k === 'h') w.dataset.h = b.dataset.v; else w.dataset.m = b.dataset.v;
-  tselShow(w, w.dataset.h === '' ? '' : `${p2t(+w.dataset.h)}:${p2t(+w.dataset.m)}`);
-  tpClose(false);
-  w.dispatchEvent(new CustomEvent('tchange', {bubbles:true, detail:{k}}));
-});
-tpop.addEventListener('keydown', e => {
-  const bs = [...tpop.querySelectorAll('button')], i = bs.indexOf(document.activeElement);
-  if(e.key === 'ArrowDown'){ e.preventDefault(); bs[Math.min(bs.length - 1, i + 1)]?.focus(); }
-  if(e.key === 'ArrowUp'){ e.preventDefault(); bs[Math.max(0, i - 1)]?.focus(); }
-});
-document.addEventListener('keydown', e => { if(e.key === 'Escape' && !tpop.hidden){ e.stopPropagation(); tpClose(true); } }, true);
-document.addEventListener('pointerdown', e => { if(!tpop.hidden && !e.target.closest('#tpop, .tsel .tbtn, #qt')) tpClose(); });
-addEventListener('resize', () => tpClose());
-addEventListener('scroll', e => { if(!tpop.hidden && !(e.target instanceof Node && tpop.contains(e.target))) tpClose(); }, true);
-/* 마우스로도 끌어서 내린다 (터치는 기본 스크롤이 한다) */
+document.addEventListener('pointerdown', e => { if(wh && !e.target.closest('#tpop, .tsel .tbtn, #qt')) whClose('out'); });
+document.addEventListener('keydown', e => { if(e.key === 'Escape' && wh){ e.stopPropagation(); whClose('esc'); } }, true);
+addEventListener('resize', () => whClose('out'));
+addEventListener('scroll', e => { if(wh && !(e.target instanceof Node && tpop.contains(e.target))) whClose('out'); }, true);
+/* 끌어서 맞추기 — 스크롤이 멈추는 칸이 곧 값이다 (손가락은 기본 스크롤, 마우스는 아래에서 직접 끈다) */
+tpop.addEventListener('scroll', e => {
+  const c = e.target.closest?.('.wcol'); if(!c || !wh || !wh.touched) return;
+  const max = c.dataset.c === 'h' ? 23 : wh.mins.length - 1, i = Math.max(0, Math.min(max, Math.round(c.scrollTop / ROW)));
+  if(c.dataset.c === 'h'){ if(i === wh.idx) return; wh.idx = i; } else { if(i === wh.mi) return; wh.mi = i; }
+  wh.dirty = true; whPaint();                           // 시가 12를 지나면 wh.idx 가 12 쪽으로 넘어가 오전·오후도 같이 바뀐다
+}, true);
+for(const ev of ['pointerdown', 'wheel', 'touchstart', 'keydown']) tpop.addEventListener(ev, () => { if(wh) wh.touched = true; }, {passive:true});
+let whMoved = false;
 tpop.addEventListener('pointerdown', e => {
   if(e.pointerType !== 'mouse' || e.button !== 0) return;
-  const sc = e.target.closest('.tcol') || tpop, y0 = e.clientY, s0 = sc.scrollTop; tpMoved = false;
-  const mv = ev => { const dy = ev.clientY - y0; if(Math.abs(dy) > 4) tpMoved = true; sc.scrollTop = s0 - dy; };
-  const up = () => { removeEventListener('pointermove', mv); removeEventListener('pointerup', up); setTimeout(() => { tpMoved = false; }, 0); };
+  const c = e.target.closest('.wcol'); if(!c) return;
+  const y0 = e.clientY, s0 = c.scrollTop; whMoved = false;
+  const mv = ev => { const dy = ev.clientY - y0; if(Math.abs(dy) > 4) whMoved = true; c.scrollTop = s0 - dy; };
+  const up = () => {
+    removeEventListener('pointermove', mv); removeEventListener('pointerup', up);
+    c.scrollTo({top:Math.round(c.scrollTop / ROW) * ROW, behavior:'smooth'});
+    setTimeout(() => { whMoved = false; }, 0);
+  };
   addEventListener('pointermove', mv); addEventListener('pointerup', up);
+});
+tpop.addEventListener('click', e => {
+  if(!wh) return;
+  const b = e.target.closest('button');
+  if(b?.dataset.w === 'ok') return whClose('ok');
+  if(b?.dataset.w === 'clear') return whClose('clear');
+  if(b?.dataset.per !== undefined){                     // 오전/오후를 직접 고르면 같은 시각의 반대쪽으로
+    wh.idx = wh.idx % 12 + (+b.dataset.per) * 12; wh.dirty = true;
+    tpop.querySelector('[data-c=h]').scrollTop = wh.idx * ROW; whPaint(); return;
+  }
+  const it = e.target.closest('.wi');
+  if(it && !whMoved){ it.parentElement.scrollTo({top:+it.dataset.i * ROW, behavior:'smooth'}); wh.dirty = true; }
+});
+tpop.addEventListener('keydown', e => {
+  const c = e.target.closest?.('.wcol'); if(!c) return;
+  if(e.key === 'ArrowDown'){ e.preventDefault(); c.scrollBy({top:ROW, behavior:'smooth'}); }
+  if(e.key === 'ArrowUp'){ e.preventDefault(); c.scrollBy({top:-ROW, behavior:'smooth'}); }
+  if(e.key === 'Enter'){ e.preventDefault(); whClose('ok'); }
 });
 /* 시각을 처음 붙일 때, 알림 허용이 아직이면 그때 한 번 묻는다 */
 const askTimeNotify = () => { if((doc.ui.timeLead ?? 0) >= 0 && permDefault()) askNotify(); };
@@ -4573,7 +4592,7 @@ function timedList(){
       if(!t.tm || t.d || t.sk || t.w) continue;
       const [h, m] = t.tm.split(':').map(Number);
       const at = new Date(dOf(k)).setHours(h || 0, m || 0, 0, 0) - lead * 60000;
-      if(at > now) out.push({id:t.id, at, title:t.t, body:T('timeBody')(t.tm, lead)});
+      if(at > now) out.push({id:t.id, at, title:t.t, body:T('timeBody')(fmtTm(t.tm), lead)});
     }
   }
   return out.sort((a,b) => a.at - b.at).slice(0, 60);
