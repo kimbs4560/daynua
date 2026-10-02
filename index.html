@@ -1149,7 +1149,7 @@ html[data-vt=next]::view-transition-new(side),html[data-vt=prev]::view-transitio
 const SUPABASE_URL = 'https://cjhwxjznuleyfcbwwvtb.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_acxKbtekhqwFZwI0EUtArg_3FSj5AHh';
 const VAPID_PUBLIC = 'BItluVUoPAOjdIacpE7-6Ko45leNKobu8SbCNP1L6zdozMUrtFBNjh7ncFVZGSvwdHf4vNkYQKj5BarWq01G0hE';
-const BUILD = '2026-10-01.41';
+const BUILD = '2026-10-01.42';
 /* Daynua 앱(Android 껍데기) 안이면 위젯·알림·내보내기를 앱에 맡긴다. 아니면 null */
 const APP = typeof DaynuaApp !== 'undefined' ? DaynuaApp : null;
 const ARRIVED_BY_LINK = /access_token|type=(signup|recovery|magiclink|invite)|[?&]code=/.test(location.hash + location.search);
@@ -1606,11 +1606,12 @@ function catDist(list, cats, max = 4){
 /* 제목이 같은 것을 한 흐름으로 — 완료 날짜와 그때 메모까지 */
 const norm = s => String(s).toLowerCase().replace(/\s+/g,' ').trim();
 function searchTodos(todos, q){
-  const nq = norm(q); if(!nq) return [];
+  const sp = x => norm(x).replace(/ /g, '');          // 띄어쓰기가 달라도 찾는다 ("코드리뷰" = "코드 리뷰")
+  const nq = sp(q); if(!nq) return [];
   const by = new Map();
   for(const [k, list] of Object.entries(todos)){
     for(const t of list){
-      if(!norm(t.t).includes(nq) && !norm(t.nt||'').includes(nq)) continue;
+      if(!sp(t.t).includes(nq) && !sp(t.nt||'').includes(nq)) continue;
       const g = by.get(norm(t.t)) || {title:t.t, cat:t.c, done:[], open:[]};
       if(t.d) g.done.push({k: t.dd || (isDateKey(k) ? k : null), nt: t.nt || ''});
       else if(isDateKey(k)) g.open.push(k);
@@ -2737,12 +2738,13 @@ function renderStats(){
       }).join('')}</ul>` : ''}`}`;
 }
 
-function renderSearch(){
+/* partial: 글자를 치는 중에는 입력칸을 그대로 두고 결과만 바꾼다 (칸을 새로 그리면 한글 조합이 끊기고 깜빡인다) */
+function renderSearch(partial){
   const res = query.trim() ? searchTodos(doc.todos, query) : [];
   const tk = todayKey();
-  const nq = norm(query);
+  const nq = norm(query).replace(/ /g, '');
   const noteHits = query.trim()
-    ? Object.entries(doc.notes).filter(([,v])=>norm(v).includes(nq)).sort().reverse().slice(0,5) : [];
+    ? Object.entries(doc.notes).filter(([,v])=>norm(v).replace(/ /g, '').includes(nq)).sort().reverse().slice(0,5) : [];
   const body = !query.trim() ? `<div class="empty">${T('searchHint')}</div>`
     : (!res.length && !noteHits.length) ? `<div class="empty">${T('noResult')}</div>`
     : res.slice(0,40).map(g=>{
@@ -2761,10 +2763,12 @@ function renderSearch(){
       }).join('')
       + noteHits.map(([k,v])=>`<div class="res"><div class="t" style="font-size:13px;font-weight:600">
           <b data-k="${k}" style="cursor:pointer">${k}</b> · <i style="color:var(--sub)">${esc(v)}</i></div></div>`).join('');
+  const box = $('#sres');
+  if(partial && box && $('#sq')){ box.innerHTML = body; return; }
   $('#side').innerHTML = `
     <div class="dh"><b>${T('search')}</b></div>
     <div class="qadd"><span>${ICON.search}</span><input id="sq" placeholder="${T('searchPh')}" value="${esc(query)}"></div>
-    ${body}`;
+    <div id="sres">${body}</div>`;
   const el = $('#sq');
   el.focus(); el.setSelectionRange(query.length, query.length);
 }
@@ -3246,7 +3250,7 @@ $('#side').addEventListener('input', e=>{
   if(e.target.id !== 'sq') return;
   query = e.target.value;
   clearTimeout(searchTimer);
-  searchTimer = setTimeout(()=>{ renderSearch(); once($('#side'), 'vfade', 130); }, 160);
+  searchTimer = setTimeout(()=>renderSearch(true), 120);
 });
 
 $('#side').addEventListener('focusout', e=>{
