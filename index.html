@@ -1020,6 +1020,21 @@ html[data-vt=prev]::view-transition-old(cal){animation-name:vtOutR}
 html[data-vt=prev]::view-transition-new(cal){animation-name:vtInR}
 html[data-vt=next]::view-transition-new(side),html[data-vt=prev]::view-transition-new(side){animation-name:vtRise}
 @media (prefers-reduced-motion:reduce){ ::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important} }
+
+/* ── 글자 조금 키움 (달력 숫자·공휴일 이름) ── */
+#cal .cell .n{font-size:16px}
+@media (min-width:720px){
+  #cal .cell .n{font-size:16px}
+  #cal .cell .hn{display:block;font-size:11px;margin:3px 0 0 4px}
+}
+@media (min-width:1000px){
+  #cal .cell .n{font-size:17px}
+  #cal .cell .hn{font-size:12px}
+}
+@media (min-width:1600px){
+  #cal .cell .n{font-size:19px}
+  #cal .cell .hn{font-size:13px}
+}
 </style>
 </head>
 <body>
@@ -1149,7 +1164,7 @@ html[data-vt=next]::view-transition-new(side),html[data-vt=prev]::view-transitio
 const SUPABASE_URL = 'https://cjhwxjznuleyfcbwwvtb.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_acxKbtekhqwFZwI0EUtArg_3FSj5AHh';
 const VAPID_PUBLIC = 'BItluVUoPAOjdIacpE7-6Ko45leNKobu8SbCNP1L6zdozMUrtFBNjh7ncFVZGSvwdHf4vNkYQKj5BarWq01G0hE';
-const BUILD = '2026-10-01.43';
+const BUILD = '2026-10-01.44';
 /* Daynua 앱(Android 껍데기) 안이면 위젯·알림·내보내기를 앱에 맡긴다. 아니면 null */
 const APP = typeof DaynuaApp !== 'undefined' ? DaynuaApp : null;
 const ARRIVED_BY_LINK = /access_token|type=(signup|recovery|magiclink|invite)|[?&]code=/.test(location.hash + location.search);
@@ -2561,7 +2576,7 @@ function renderDay(tk){
   const done = list.filter(t=>t.d), skipped = list.filter(t=>t.sk && !t.d);
   const waiting = list.filter(t=>!t.d && !t.sk && t.w);
   const open = list.filter(t=>!t.d && !t.sk && !t.w);
-  const sm = sumOf(sel), miss = sm.missed, tot = sm.total;
+  const sm = sumOf(sel), miss = sm.missed, tot = sm.done + sm.actionable;   // 분모는 그날 실제 할 일 — 다른 날로 미룬 개수까지 더하지 않는다
   const hn = holName(sel), note = doc.notes[sel] || '';
   const must = open.filter(t=>t.s);
   const rest = open.filter(t=>!t.s);
@@ -2595,7 +2610,7 @@ function renderDay(tk){
       <button class="dnbtn ${note||noteShow?'on':''}" id="dnToggle" title="${T('dayNotePh')}"
         aria-label="${T('dayNotePh')}">${ICON.pencil}</button>
       ${tot?`<span class="pct mono">${done.length}/${tot}</span>`:''}</div>
-    ${tot?`<div class="pbar"><i style="width:${sm.cleared ? 100 : done.length / tot * 100}%"></i></div>`:''}
+    ${tot?`<div class="pbar"><i style="width:${done.length / tot * 100}%"></i></div>`:''}
     ${note && !noteShow ? `<div class="daynote ro" id="dnRead">${esc(note)}</div>` : ''}
     ${noteShow ? `<div class="daynote"><input id="dayNote" maxlength="120"
         placeholder="${T('dayNotePh')}" value="${esc(note)}"></div>` : ''}
@@ -2637,7 +2652,7 @@ function renderDay(tk){
 
   /* 막대는 처음부터 제 길이로 그린다. 2/5 → 3/5 가 순간이동하지 않게 지난 비율에서 제 길이까지 '움직이기만' 한다 —
      예전엔 지난 비율로 그려 놓고 다음 프레임에 늘렸는데, 그 프레임이 오지 않으면 (화면 전환 중·백그라운드) 엉뚱한 길이로 멈췄다. */
-  const pct = sm.cleared ? 100 : tot ? done.length / tot * 100 : 0;   // 할 일을 다 끝낸 날은 미룬 게 있어도 가득 찬다
+  const pct = tot ? done.length / tot * 100 : 0;
   const bar = $('.pbar i');
   if(bar && !reduceMo() && Math.abs(barPct - pct) > .5 && bar.animate)
     bar.animate([{width: barPct + '%'}, {width: pct + '%'}], {duration: 240, easing: 'cubic-bezier(.2,0,0,1)'});
