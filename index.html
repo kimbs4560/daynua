@@ -1000,6 +1000,26 @@ html.entering #app,html.entering #fab{animation:appIn .65s cubic-bezier(.2,.8,.2
   .wcard.empty .wn{width:28px;height:28px;font-size:14px}
   .wcard.empty .none{padding:0}
 }
+
+/* ── 화면 전환: 옛 화면과 새 화면이 겹쳐 흐른다 ── */
+#cal{view-transition-name:cal}
+#side{view-transition-name:side}
+html[data-vt]::view-transition-group(*),html[data-vt]::view-transition-old(*),html[data-vt]::view-transition-new(*){
+  animation-duration:300ms;animation-timing-function:var(--ease)}
+html[data-vt=pick]::view-transition-group(*),html[data-vt=pick]::view-transition-old(*),html[data-vt=pick]::view-transition-new(*){
+  animation-duration:200ms}
+@keyframes vtRise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes vtOutL{to{opacity:0;transform:translateX(-32px)}}
+@keyframes vtInL{from{opacity:0;transform:translateX(32px)}to{opacity:1;transform:none}}
+@keyframes vtOutR{to{opacity:0;transform:translateX(32px)}}
+@keyframes vtInR{from{opacity:0;transform:translateX(-32px)}to{opacity:1;transform:none}}
+html[data-vt=swap]::view-transition-new(cal),html[data-vt=swap]::view-transition-new(side){animation-name:vtRise}
+html[data-vt=next]::view-transition-old(cal){animation-name:vtOutL}
+html[data-vt=next]::view-transition-new(cal){animation-name:vtInL}
+html[data-vt=prev]::view-transition-old(cal){animation-name:vtOutR}
+html[data-vt=prev]::view-transition-new(cal){animation-name:vtInR}
+html[data-vt=next]::view-transition-new(side),html[data-vt=prev]::view-transition-new(side){animation-name:vtRise}
+@media (prefers-reduced-motion:reduce){ ::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important} }
 </style>
 </head>
 <body>
@@ -1129,7 +1149,7 @@ html.entering #app,html.entering #fab{animation:appIn .65s cubic-bezier(.2,.8,.2
 const SUPABASE_URL = 'https://cjhwxjznuleyfcbwwvtb.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_acxKbtekhqwFZwI0EUtArg_3FSj5AHh';
 const VAPID_PUBLIC = 'BItluVUoPAOjdIacpE7-6Ko45leNKobu8SbCNP1L6zdozMUrtFBNjh7ncFVZGSvwdHf4vNkYQKj5BarWq01G0hE';
-const BUILD = '2026-10-01.39';
+const BUILD = '2026-10-01.40';
 /* Daynua 앱(Android 껍데기) 안이면 위젯·알림·내보내기를 앱에 맡긴다. 아니면 null */
 const APP = typeof DaynuaApp !== 'undefined' ? DaynuaApp : null;
 const ARRIVED_BY_LINK = /access_token|type=(signup|recovery|magiclink|invite)|[?&]code=/.test(location.hash + location.search);
@@ -2268,8 +2288,23 @@ function once(el, cls, ms = 200){
   el.classList.add(cls);
   setTimeout(()=>el.classList.remove(cls), ms);
 }
-const fade = sel => once($(sel), 'vfade', 200);
-const calStep = n => once($('#cal'), n > 0 ? 'stepL' : 'stepR', 220);
+/* 화면을 바꾸는 동작(보기 전환·이전/다음·오늘·날짜 선택)은 한 번에 갈아끼우지 않고 부드럽게 이어 준다.
+   브라우저의 View Transitions 가 옛 화면과 새 화면을 겹쳐 흘려 준다. 지원하지 않으면 예전 효과 그대로.
+   mode: next/prev = 달력이 그 방향으로 밀려 들어온다 · swap = 다른 화면 · pick = 같은 화면 안에서 날짜만 */
+let vtOn = false;
+function smooth(fn, mode = 'swap', after){
+  if(!document.startViewTransition || reduceMo()){ fn(); after?.(); return; }
+  const h = document.documentElement;
+  const end = () => { vtOn = false; delete h.dataset.vt; };
+  h.dataset.vt = mode; vtOn = true;
+  let t;
+  try{ t = document.startViewTransition(fn); }catch{ end(); fn(); after?.(); return; }
+  t.ready.catch(()=>{});
+  t.finished.then(end, end);
+  if(after) t.finished.then(after, after);
+}
+const fade = sel => { if(!vtOn) once($(sel), 'vfade', 200); };
+const calStep = n => { if(!vtOn) once($('#cal'), n > 0 ? 'stepL' : 'stepR', 220); };
 
 /* 다이얼로그는 다 사라진 뒤에 닫는다. 닫는 중에 다시 열면 닫기를 취소한다 —
    그래야 애니메이션이 안 보이거나 InvalidStateError 가 나는 일이 없다. */
@@ -2795,13 +2830,14 @@ $('#cal').addEventListener('click', e=>{
   const mt = e.target.closest('.ymt');                 // 1년 화면의 월 이름 → 그 달로
   if(mt){ cur = new Date(cur.getFullYear(), +mt.dataset.m, 1); return setCalView('month'); }
   const k = e.target.closest('[data-k]')?.dataset.k; if(!k) return;
-  sel = k; cur = dOf(k); view = 'day';
   /* 1년에서 날짜를 누르면 그 달로 내려간다 — 기록을 보다가 바로 그날을 정리할 수 있게 */
   const zoom = calView === 'year';
-  if(zoom){ calView = 'month'; localStorage.setItem('daynua.calView','month'); }
-  render();
-  if(zoom){ fade('#cal'); fade('#side'); }
-  revealDay();
+  smooth(() => {
+    sel = k; cur = dOf(k); view = 'day';
+    if(zoom){ calView = 'month'; localStorage.setItem('daynua.calView','month'); }
+    render();
+    if(zoom){ fade('#cal'); fade('#side'); }
+  }, zoom ? 'swap' : 'pick', revealDay);
 });
 /* 달력 칸도 키보드로 — Enter·Space 는 브라우저가 button 에만 주므로 div 에는 직접 붙인다 */
 $('#cal').addEventListener('keydown', e=>{
@@ -3781,13 +3817,15 @@ function copyDay(from, to){
 function navigatePeriod(n){ cur = stepPeriod(calView, cur, n); render(); }
 /* 보기를 바꾼다. 검색·보관함을 보고 있었다면 달력으로 돌아온다. */
 function setCalView(v){
-  if(!VIEWS.includes(v)) return;
-  calView = v;
-  localStorage.setItem('daynua.calView', v);
-  view = 'day';
-  render();
-  fade('#cal'); fade('#side');          // 주·월·년은 좌우로 밀지 않는다 — 다른 화면이니 갈아끼운다
-  scrollTo({top:0, behavior:'auto'});
+  if(!VIEWS.includes(v) || v === calView && view === 'day') return;
+  smooth(() => {
+    calView = v;
+    localStorage.setItem('daynua.calView', v);
+    view = 'day';
+    render();
+    fade('#cal'); fade('#side');          // 주·월·년은 좌우로 밀지 않는다 — 다른 화면이니 갈아끼운다
+    scrollTo({top:0, behavior:'auto'});
+  });
 }
 /* 모바일에서 날짜를 눌렀는데 그날 목록이 화면 밖이면 그때만 살짝 올려준다 — 스크롤을 빼앗지 않는다 */
 function revealDay(){
@@ -3798,14 +3836,21 @@ function revealDay(){
     el.scrollIntoView({behavior: reduceMo() ? 'auto' : 'smooth', block:'start'});
 }
 /* 화살표로 넘길 때만 아주 작게 이어준다 (7px). 휙 넘기기는 손가락을 따라온 만큼 제 폭이 따로 있다 */
-$('#prev').onclick = ()=>{ navigatePeriod(-1); calStep(-1); };
-$('#next').onclick = ()=>{ navigatePeriod(1); calStep(1); };
+$('#prev').onclick = ()=> smooth(()=>{ navigatePeriod(-1); calStep(-1); }, 'prev');
+$('#next').onclick = ()=> smooth(()=>{ navigatePeriod(1); calStep(1); }, 'next');
 /* '오늘'은 보기가 아니라 이동이다 — 보던 보기를 그대로 두고 오늘이 든 기간으로 간다 */
-$('#today').onclick = ()=>{ view='day'; cur=new Date(); sel=key(cur); render(); revealDay(); };
+$('#today').onclick = ()=>{
+  /* 지금 보는 기간보다 오늘이 앞이면 앞쪽에서, 뒤면 뒤쪽에서 들어온다. 같은 기간이면 날짜만 옮긴다 */
+  const per = d => calView === 'year' ? String(d.getFullYear()) : calView === 'month' ? key(d).slice(0,7) : weekGrid(key(d), ws())[0];
+  const now = new Date(), a = per(cur), b = per(now);
+  smooth(()=>{ view='day'; cur=now; sel=key(now); render(); },
+    a === b ? 'pick' : a < b ? 'next' : 'prev',
+    () => { revealDay(); if(calView === 'year') $('#cal .yd.today')?.scrollIntoView({block:'center', behavior: reduceMo() ? 'auto' : 'smooth'}); });
+};
 $('#viewSeg').onclick = e=>{ const v = e.target.closest('button')?.dataset.v; if(v) setCalView(v); };
-$('#btnIdeas').onclick = ()=>{ view = view==='ideas' ? 'day' : 'ideas'; ideasFocus = view==='ideas' && canDrag; render(); fade('#side'); if(view !== 'day') revealDay(); };
-$('#btnSearch').onclick = ()=>{ view = view==='search' ? 'day' : 'search'; render(); fade('#side'); if(view !== 'day') revealDay(); };
-$('#btnStats').onclick = ()=>{ view = view==='stats' ? 'day' : 'stats'; render(); fade('#side'); if(view !== 'day') revealDay(); };
+$('#btnIdeas').onclick = ()=> smooth(()=>{ view = view==='ideas' ? 'day' : 'ideas'; ideasFocus = view==='ideas' && canDrag; render(); fade('#side'); }, 'swap', ()=>{ if(view !== 'day') revealDay(); });
+$('#btnSearch').onclick = ()=> smooth(()=>{ view = view==='search' ? 'day' : 'search'; render(); fade('#side'); }, 'swap', ()=>{ if(view !== 'day') revealDay(); });
+$('#btnStats').onclick = ()=> smooth(()=>{ view = view==='stats' ? 'day' : 'stats'; render(); fade('#side'); }, 'swap', ()=>{ if(view !== 'day') revealDay(); });
 
 /* ─── 카테고리 ─── */
 let catEdit = null, catColor = PALETTE[0], catArmed = false, catForTodo = null, catForQuick = false;
