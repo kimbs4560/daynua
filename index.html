@@ -129,6 +129,8 @@ input,select,textarea{font:inherit;color:inherit}
   .acct.out{padding:4px 10px 4px 4px} }
 .acct.out{border-color:var(--accent);color:var(--accent)}
 .acct.out .av{background:transparent;border:1px dashed var(--accent);color:var(--accent)}
+.acct.bad{border-color:var(--danger)}
+.acct.bad .av{background:var(--danger);color:#fff}
 
 #fab{position:fixed;right:20px;bottom:calc(20px + env(safe-area-inset-bottom));
   width:52px;height:52px;border-radius:17px;background:var(--ink);border:0;
@@ -1256,7 +1258,7 @@ li .tm{font-size:12px}
 const SUPABASE_URL = 'https://cjhwxjznuleyfcbwwvtb.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_acxKbtekhqwFZwI0EUtArg_3FSj5AHh';
 const VAPID_PUBLIC = 'BItluVUoPAOjdIacpE7-6Ko45leNKobu8SbCNP1L6zdozMUrtFBNjh7ncFVZGSvwdHf4vNkYQKj5BarWq01G0hE';
-const BUILD = '2026-10-01.55';
+const BUILD = '2026-10-05.56';
 /* Daynua 앱(Android 껍데기) 안이면 위젯·알림·내보내기를 앱에 맡긴다. 아니면 null */
 const APP = typeof DaynuaApp !== 'undefined' ? DaynuaApp : null;
 const ARRIVED_BY_LINK = /access_token|type=(signup|recovery|magiclink|invite)|[?&]code=/.test(location.hash + location.search);
@@ -1442,6 +1444,8 @@ const I18N = {
   timeBody:(tm,l)=> l ? `${tm} · ${l}분 전` : tm,
   actLegend:'끝낸 일이 많을수록 진해져요', yearSum:(n,d)=>`${d}일에 걸쳐 ${n}개를 끝냈어요`, yHas:'남은 할 일', weekNone:'비어 있음',
   saveFail:'저장 공간이 부족합니다. 설정 → 데이터 → 내보내기로 백업해주세요.',
+  syncFail:'서버에 올리지 못했어요. 이 기기에는 저장돼 있고, 연결되면 다시 올립니다.',
+  aDone:'완료', aSubs:'하위 항목', aStar:'오늘 꼭', aSubDone:'하위 항목 완료', aSubDel:'하위 항목 삭제',
   tint:'배경 물들이기', tintHint:'강조색을 배경에 섞습니다. 0%면 기본 종이색입니다.',
   subs:'하위 항목', subPh:'하위 항목 추가',
   privacy:'개인정보처리방침', delAcct:'계정 삭제',
@@ -1590,6 +1594,8 @@ const I18N = {
   timeBody:(tm,l)=> l ? `${tm} · in ${l} min` : tm,
   actLegend:'Darker = more tasks finished', yearSum:(n,d)=>`${n} done over ${d} day${d===1?'':'s'}`, yHas:'still to do', weekNone:'Nothing planned',
   saveFail:'Storage is full. Back up via Settings → Data → Export.',
+  syncFail:"Couldn't upload to the server. It's saved on this device and will retry when connected.",
+  aDone:'Done', aSubs:'Sub-items', aStar:'Must do today', aSubDone:'Sub-item done', aSubDel:'Delete sub-item',
   tint:'Background tint', tintHint:'Blends your accent into the background. 0% is plain paper.',
   subs:'Checklist', subPh:'add an item',
   privacy:'Privacy policy', delAcct:'Delete account',
@@ -2648,21 +2654,21 @@ function rowHTML(t, from, opt = {}){
   const canMove = canDrag && !t.d && !t.sk && !subOpen && editId !== t.id;
   return `<li class="${cls}" data-id="${t.id}" data-from="${from}" style="color:${col}"
       ${canMove ? 'draggable="true"' : ''}>
-    <button class="ck"></button>
+    <button class="ck" role="checkbox" aria-checked="${t.d?'true':'false'}" aria-label="${T('aDone')}"></button>
     ${t.tm ? `<span class="tm mono">${fmtTm(t.tm)}</span>` : ''}
     <span class="tx" spellcheck="false">${esc(t.t)}</span>
     ${t.r?`<span class="rp" title="${T('routines')}">${ICON.repeat}</span>`:''}
     ${t.w?`<span class="wi" title="${T('waiting')}">${ICON.wait}</span>`:''}
     ${t.d && t.dd && t.o && daysBetween(t.o, t.dd) >= 1
         ? `<span class="took">${T('tookN')(daysBetween(t.o, t.dd))}</span>` : ''}
-    ${subs.length ? `<button class="subn">${subs.filter(s=>s.d).length}/${subs.length}</button>` : ''}
-    ${opt.star ? `<button class="st ${t.s?'on':''}">${t.s?'★':'☆'}</button>` : ''}
+    ${subs.length ? `<button class="subn" aria-expanded="${subOpen}" aria-label="${T('aSubs')}">${subs.filter(s=>s.d).length}/${subs.length}</button>` : ''}
+    ${opt.star ? `<button class="st ${t.s?'on':''}" aria-pressed="${!!t.s}" aria-label="${T('aStar')}">${t.s?'★':'☆'}</button>` : ''}
     <button class="mv" title="${T('moveTo')}" aria-label="${T('moveTo')}">⋯</button>
     ${subOpen ? `<div class="subs">
         ${subs.map((s,i)=>`<div class="s ${s.d?'d':''}" data-i="${i}">
-          <button class="sck"></button>
+          <button class="sck" role="checkbox" aria-checked="${!!s.d}" aria-label="${T('aSubDone')}"></button>
           <span contenteditable="plaintext-only" spellcheck="false">${esc(s.t)}</span>
-          <button class="sx">×</button></div>`).join('')}
+          <button class="sx" aria-label="${T('aSubDel')}">×</button></div>`).join('')}
         <input class="subadd" maxlength="120" placeholder="${T('subPh')}"></div>` : ''}
     ${noteOpen ? `<span class="note" contenteditable="plaintext-only" spellcheck="false"
           data-ph="${T('notePh')}">${esc(t.nt||'')}</span>`
@@ -3468,6 +3474,7 @@ function flash(msg, canUndo){
   clearTimeout(undoTimer);
   const el = document.createElement('div');
   el.className = 'toast';
+  el.setAttribute('role', 'status');            // 화면 읽기 도구가 '되돌리기' 알림을 읽어준다
   el.innerHTML = `<span>${esc(msg)}</span>${canUndo ? `<button>${T('undo')}</button>` : ''}`;
   const bye = ()=>{ el.classList.add('out'); setTimeout(()=>el.remove(), 150); };
   el.querySelector('button')?.addEventListener('click', ()=>{ bye(); undo(); });
@@ -4914,6 +4921,7 @@ $('#routClose').onclick = ()=>{ $('#rout').close(); render(); };
 let sb = null, user = null, timer = null, syncAt = 0;
 let pulling = false;                       // 아래 함수들이 부팅 중에 먼저 불린다 —
 let chan = null, live = false, pullTimer = null;   // 선언이 그보다 앞에 있어야 한다
+let pushDirty = false, pushFails = 0;              // 올리기 재시도 (아래 push)
 /* 실시간 반영 — 다른 기기가 서버에 쓰면 기다리지 않고 바로 받아온다.
    RLS 가 그대로 걸려 있어서 내 행의 변경만 온다. 연달아 오면 한 번만 읽는다. */
 const pullSoon = () => { clearTimeout(pullTimer); pullTimer = setTimeout(pull, 350); };
@@ -4978,6 +4986,7 @@ document.addEventListener('visibilitychange', ()=>{
   const tz = -new Date().getTimezoneOffset();     // 여행·서머타임 뒤에도 제 시각에 울리게
   if(tz !== lastTz){ lastTz = tz; syncPush(); }
   if(user && !live) watch();                     // 자는 동안 끊긴 연결을 되살린다
+  if(user && pushDirty) push();                  // 못 올린 것이 있으면 지금 다시
   if(user) pull(); else render();
 });
 
@@ -4985,6 +4994,8 @@ function setAcct(){
   const on = !!(user && sb);
   const name = on ? user.email.split('@')[0] : (sb ? T('login') : T('guest'));
   $('#acct').classList.toggle('out', !on);
+  $('#acct').classList.toggle('bad', on && pushFails >= 2);
+  $('#acct').title = on && pushFails >= 2 ? T('syncFail') : '';
   $('#acct').innerHTML =
     `<span class="av">${on ? esc(name[0].toUpperCase()) : '·'}</span><span class="nm">${esc(name)}</span>`;
 }
@@ -5029,16 +5040,28 @@ async function pull(){
   }catch(e){ console.warn(e); }
   finally{ pulling = false; }
 }
+/* 올리기가 실패하면(오프라인 등) 그대로 두지 않는다 — 표시를 남기고, 연결이 돌아오거나 화면에 다시 돌아오면,
+   아니면 점점 늘려가며 다시 시도한다. 안 그러면 다음에 또 고치기 전까지 서버에 영영 안 올라간다. */
 function push(){
   if(!sb || !user) return;
+  pushDirty = true;
   clearTimeout(timer);
   timer = setTimeout(pushNow, 800);
 }
+const pushFailed = () => {
+  pushDirty = true; pushFails++;
+  clearTimeout(timer);
+  timer = setTimeout(pushNow, Math.min(300000, 15000 * 2 ** (pushFails - 1)));   // 15초 → 30초 → … 최대 5분
+  if(pushFails === 2) flash(T('syncFail'));                                      // 한 번은 조용히, 두 번째부터 알린다
+  setAcct();
+};
+addEventListener('online', ()=>{ if(pushDirty) push(); });
 
 /* 쓰기 직전에 서버를 한 번 더 본다. 그 사이 다른 기기가 썼으면 합치고 나서 쓴다.
    순서 판정은 시계가 아니라 rev — 기기 시간이 틀려도 한쪽이 영원히 이기지 않는다. */
 async function pushNow(){
   if(!sb || !user) return;
+  pushDirty = false;
   try{
     /* 쓰기 전에 서버의 개정 번호만 본다 — 문서 전체(수백 KB)를 매번 내려받지 않는다.
        내가 최신이면 그대로 쓰고, 뒤처졌을 때만 받아서 합친다.
@@ -5061,10 +5084,11 @@ async function pushNow(){
     doc.rev = Math.max(doc.rev|0, srvRev) + 1;
     const { error } = await sb.from('state')
       .upsert({ user_id:user.id, doc, updated_at:new Date().toISOString() });
-    if(error) return console.warn(error);
+    if(error){ console.warn(error); return pushFailed(); }
     syncAt = Date.now();
+    if(pushFails){ pushFails = 0; setAcct(); }
     save();
-  }catch(e){ console.warn(e); }
+  }catch(e){ console.warn(e); pushFailed(); }
 }
 
 /* ─── 계정 ─── */
