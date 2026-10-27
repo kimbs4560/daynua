@@ -1,7 +1,7 @@
 /* Daynua — 설치형(PWA) + 오프라인 + 앱이 꺼져 있을 때의 알림.
    network-first, 실패하면 캐시. 알림 문구는 페이지가 남겨둔 로컬 요약으로 만든다
    (서버는 "울릴 시각"만 알고, 할 일 내용은 기기 밖으로 나가지 않는다). */
-const C = 'daynua-v59';
+const C = 'daynua-v60';
 const STATE = 'daynua-state';          // 페이지가 써 두는 오늘 요약 (지우지 않음)
 const SUMMARY = '/__summary';
 const SHELL = ['./', './index.html', './manifest.json', './privacy.html',
@@ -76,8 +76,7 @@ self.addEventListener('fetch', e => {
     const give = r => { if(!done && r){ done = true; clearTimeout(timer); resolve(r); } };
     const timer = setTimeout(() => caches.match(e.request).then(give), 900);
     fetch(e.request, { cache: 'no-cache' }).then(r => {
-      const copy = r.clone();
-      caches.open(C).then(c => c.put(e.request, copy));       // 늦게 와도 다음 번을 위해 저장
+      if(r.ok){ const copy = r.clone(); caches.open(C).then(c => c.put(e.request, copy)); }   // 늦게 와도 다음 번을 위해 저장 (오류 응답은 저장하지 않는다)
       give(r);
     }).catch(() => caches.match(e.request).then(r => { if(r) give(r); else if(!done){ done = true; clearTimeout(timer); resolve(Response.error()); } }));
   }));

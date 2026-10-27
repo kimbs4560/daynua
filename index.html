@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#fff8f1">
+<meta name="theme-color" content="#faf9f6">
 <title>Daynua</title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon-192.png">
@@ -16,7 +16,7 @@ setTimeout(function(){ if(!window.__gate) document.documentElement.classList.rem
 </script>
 <style>
 :root{
-  --bg:#faf9f6; --card:#fff; --ink:#1b1b20; --sub:#63626c; --faint:#8a877f;
+  --bg:#faf9f6; --card:#fff; --ink:#1b1b20; --sub:#63626c; --faint:#6f6c64;
   --line:#e3e0d9; --fill:#efece5; --accent:#c9502f; --accent-ink:#b4441f; --on-accent:#fff;
   --sat:#35619f; --sun:#b4441f; --danger:#c93f2b;
   --r:14px;
@@ -24,14 +24,14 @@ setTimeout(function(){ if(!window.__gate) document.documentElement.classList.rem
 }
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){
-    --bg:#131316; --card:#1c1c21; --ink:#edece8; --sub:#a2a1ac; --faint:#78777f;
+    --bg:#131316; --card:#1c1c21; --ink:#edece8; --sub:#a2a1ac; --faint:#8d8c95;
     --line:#33333c; --fill:#26262d; --accent:#e8714d; --accent-ink:#e8714d; --on-accent:#111;
     --sat:#7ea6e8; --sun:#e8714d; --danger:#f2705a;
     color-scheme:dark;
   }
 }
 :root[data-theme="dark"]{
-  --bg:#131316; --card:#1c1c21; --ink:#edece8; --sub:#a2a1ac; --faint:#78777f;
+  --bg:#131316; --card:#1c1c21; --ink:#edece8; --sub:#a2a1ac; --faint:#8d8c95;
   --line:#33333c; --fill:#26262d; --accent:#e8714d; --accent-ink:#e8714d; --on-accent:#111;
   --sat:#7ea6e8; --sun:#e8714d; --danger:#f2705a;
   color-scheme:dark;
@@ -81,10 +81,10 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;paddin
 input,select,textarea{font:inherit;color:inherit}
 .mono{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
 
-#app{max-width:560px;margin:0 auto;padding:18px 16px 84px}
+#app{max-width:560px;margin:0 auto;padding:18px max(16px, env(safe-area-inset-right)) calc(84px + env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left))}
 /* 오른쪽 아래 설정 단추가 목록의 마지막 줄을 덮고 있었다 */
 @media (min-width:600px){ #app{max-width:640px} }      /* 큰 폰·좁은 창: 560 에 갇혀 양옆이 비지 않게 */
-@media (max-width:719px){ #app{padding-bottom:72px} }
+@media (max-width:719px){ #app{padding-bottom:calc(72px + env(safe-area-inset-bottom))} }
 /* 2단(달력 + 옆 패널)은 720px 부터. 설치한 앱 창이 800px 쯤으로 열려도 세로 한 줄로 좁아지지 않는다.
    옆 패널은 좁은 창에서는 340px, 넓어지면 400px. */
 @media (min-width:720px){
@@ -215,7 +215,7 @@ input,select,textarea{font:inherit;color:inherit}
 .mk i{display:block;box-sizing:border-box;width:8px;height:8px;border-radius:50%;border:1.6px solid var(--c);background:none}
 .mk i.ok{background:var(--c)}
 .mk i.fd{opacity:.4}
-.mk b{font-size:9px;line-height:1;font-weight:700;color:var(--sub);margin-left:1px}
+.mk b{font-size:10.5px;line-height:1;font-weight:700;color:var(--sub);margin-left:1px}
 /* ✓ 는 동그라미 없이 갈고리만 — 칸 크기에 맞춰 키운다 */
 .cell .chk{position:static;width:20px;height:20px;padding:0;flex:none;border:0;border-radius:0;background:none}
 .cell .chk path{stroke-width:2.6}
@@ -424,9 +424,9 @@ li.edin{animation:moFade 150ms var(--ease)}
 /* 윗줄 버튼도 마찬가지 — 보이는 크기는 그대로 두고 위아래로만 넓힌다.
    (좌우로 넓히면 나란히 선 주/월/년이 서로의 터치를 가져간다) */
 @media (hover:none){
-  .nav,.chip,.acct,.vseg button,.qcat button{position:relative}
+  .nav,.chip,.acct,.vseg button,.qcat button,.qtbtn{position:relative}
   .nav::after,.chip::after,.iconbtn::after,.acct::after,
-  .vseg button::after,.qcat button::after{content:"";position:absolute;left:0;right:0;top:-8px;bottom:-8px}
+  .vseg button::after,.qcat button::after,.qtbtn::after{content:"";position:absolute;left:0;right:0;top:-8px;bottom:-8px}
 }
 /* 보이는 크기는 그대로 두고 누르는 범위만 넓힌다 — 손가락으로도 빗나가지 않게 */
 li .ck,li .st,li .mv,.dnbtn,li .subn,.subs .s .sck,.subs .s .sx{position:relative}
@@ -462,6 +462,7 @@ li .mv{opacity:0;font-weight:800;transition:opacity var(--mo-fast) var(--ease)}
    (꾹 누르기에 메뉴까지 얹으면 우클릭처럼 떠서 끌려던 손이 메뉴를 만난다) */
 li:hover .mv{opacity:1}}
 @media (hover:none){li .mv{opacity:1}}
+li:focus-within .mv,.ch:focus-within .edit{opacity:1}           /* 키보드로 닿았는데 안 보이면 못 쓴다 */
 .note{flex-basis:100%;margin-left:27px;font-size:12px;line-height:1.5;color:var(--sub);outline:none;
   padding:1px 0 2px;min-height:15px;text-decoration:none!important}
 .note:empty::before{content:attr(data-ph);color:var(--faint)}
@@ -1241,9 +1242,9 @@ li .dcn{font-size:11px;font-weight:700;color:var(--sub);margin-left:3px}
 </div>
 <button id="fab"></button>
 <div id="menu" hidden></div>
-<div id="sheetWrap" hidden><div class="sbd"></div><div id="sheet"></div></div>
+<div id="sheetWrap" hidden><div class="sbd"></div><div id="sheet" role="dialog" aria-modal="true" aria-label="Daynua"></div></div>
 
-<dialog id="acctDlg">
+<dialog id="acctDlg" aria-labelledby="acctTitle">
   <h3 id="acctTitle"></h3>
   <p id="acctSub"></p>
   <div class="err" id="acctMsg" hidden></div>
@@ -1251,7 +1252,7 @@ li .dcn{font-size:11px;font-weight:700;color:var(--sub);margin-left:3px}
   <div class="row"><button class="plain" id="acctCloseBtn"></button></div>
 </dialog>
 
-<dialog id="pwDlg">
+<dialog id="pwDlg" aria-labelledby="pwTitle">
   <h3 id="pwTitle"></h3>
   <p id="pwSub"></p>
   <div class="err" id="pwMsg" hidden></div>
@@ -1262,7 +1263,7 @@ li .dcn{font-size:11px;font-weight:700;color:var(--sub);margin-left:3px}
   </div>
 </dialog>
 
-<dialog id="cat">
+<dialog id="cat" aria-labelledby="catTitle">
   <h3 id="catTitle"></h3>
   <div class="preview" id="catPrev"><span class="sq"></span><span class="t"></span></div>
   <input id="catName" type="text" maxlength="20">
@@ -1275,14 +1276,14 @@ li .dcn{font-size:11px;font-weight:700;color:var(--sub);margin-left:3px}
   <div class="alt"><button class="danger" id="catDel"></button><span></span></div>
 </dialog>
 
-<dialog id="cfg">
+<dialog id="cfg" aria-labelledby="cfgTitle">
   <h3 id="cfgTitle"></h3>
   <p id="cfgSub"></p>
   <div class="scroll" id="cfgBody"></div>
   <div class="row"><button class="plain" id="cfgClose"></button></div>
 </dialog>
 
-<dialog id="auth">
+<dialog id="auth" aria-labelledby="authTitle">
   <h3 id="authTitle"></h3>
   <p id="authSub"></p>
   <div class="err" id="authErr" hidden></div>
@@ -1295,7 +1296,7 @@ li .dcn{font-size:11px;font-weight:700;color:var(--sub);margin-left:3px}
   <div class="alt"><button id="authSwap"></button><button id="authReset"></button></div>
 </dialog>
 
-<dialog id="rout">
+<dialog id="rout" aria-labelledby="routTitle">
   <h3 id="routTitle"></h3>
   <p id="routSub"></p>
   <div class="scroll" id="routList"></div>
@@ -1308,7 +1309,7 @@ li .dcn{font-size:11px;font-weight:700;color:var(--sub);margin-left:3px}
   </div>
 </dialog>
 
-<dialog id="tDlg">
+<dialog id="tDlg" aria-labelledby="tdT">
   <h3 id="tdT"></h3>
   <p id="tdS"></p>
   <div class="err" id="tdE" hidden></div>
@@ -1316,7 +1317,7 @@ li .dcn{font-size:11px;font-weight:700;color:var(--sub);margin-left:3px}
   <div class="row" id="tdR"></div>
 </dialog>
 
-<dialog id="imp">
+<dialog id="imp" aria-labelledby="impTitle">
   <h3 id="impTitle"></h3>
   <p id="impSub"></p>
   <div id="impBody"></div>
@@ -1332,7 +1333,7 @@ li .dcn{font-size:11px;font-weight:700;color:var(--sub);margin-left:3px}
 const SUPABASE_URL = 'https://cjhwxjznuleyfcbwwvtb.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_acxKbtekhqwFZwI0EUtArg_3FSj5AHh';
 const VAPID_PUBLIC = 'BItluVUoPAOjdIacpE7-6Ko45leNKobu8SbCNP1L6zdozMUrtFBNjh7ncFVZGSvwdHf4vNkYQKj5BarWq01G0hE';
-const BUILD = '2026-10-27.61';
+const BUILD = '2026-10-27.62';
 /* Daynua 앱(Android 껍데기) 안이면 위젯·알림·내보내기를 앱에 맡긴다. 아니면 null */
 const APP = typeof DaynuaApp !== 'undefined' ? DaynuaApp : null;
 const ARRIVED_BY_LINK = /access_token|type=(signup|recovery|magiclink|invite)|[?&]code=/.test(location.hash + location.search);
@@ -2218,7 +2219,7 @@ function touchSoon(){ doc.ts = Date.now(); save(); push(); renderSoon(); }
 /* 되돌리기 — 지우는 동작 직전의 문서를 한 벌만 들고 있는다 */
 /* 실수를 두 번 해도 첫 번째를 되돌릴 수 있게 다섯 단계까지 쌓아둔다.
    문자열로 들고 있어 통째 복사보다 싸고, 오래된 것부터 버린다. */
-let undoStack = [], undoTimer = null;
+let undoStack = [], undoTimer = null, doneRT = null;
 const UNDO_MAX = 5;
 function snapshot(){
   undoStack.push(JSON.stringify(doc));
@@ -2240,6 +2241,12 @@ document.addEventListener('keydown', e=>{
   if(!undoStack.length) return;
   e.preventDefault(); undo();
 });
+/* Esc 로 메뉴·시트를 닫는다 (대화상자는 브라우저가 알아서 닫는다) */
+document.addEventListener('keydown', e=>{
+  if(e.key !== 'Escape' || e.isComposing) return;
+  if(!$('#menu').hidden) closeMenu();
+  else if(!$('#sheetWrap').hidden) closeSheet();
+});
 const ws = () => doc.ui.weekStart|0;
 const todayKey = () => key(new Date());
 const bucket = k => { const l = doc.todos[k] || [];
@@ -2251,7 +2258,7 @@ function runRollover(){
   if(!doc.ui.rollover || teamOn) return;             // 기본: 그날에 그대로. 안 한 일도, 체크 안 한 일도 제 날짜에 남는다
   if(rollover(doc.todos, doc.miss, todayKey())){ doc.ts = Date.now(); save(); push(); }
 }
-const esc = s => String(s ?? '').replace(/[&<>"]/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+const esc = s => String(s ?? '').replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 const catOf = id => doc.cats.find(c=>c.id===id);
 
 /* ─── 색 대비 보정 ─── */
@@ -2362,9 +2369,9 @@ const TINT_BASE = {
 /* 배경을 물들이면 이 글자색들이 무너질 수 있다. 물들인 배경에 맞춰 되돌린다.
    [변수, 목표 대비] — 본문 7, 보조 4.5, 아이콘 3 */
 const INK_BASE = {
-  light:{'--ink':['#1b1b20',7], '--sub':['#63626c',4.5], '--faint':['#8a877f',3],
+  light:{'--ink':['#1b1b20',7], '--sub':['#63626c',4.5], '--faint':['#6f6c64',4.5],
          '--sun':['#b4441f',4.5], '--sat':['#35619f',4.5]},
-  dark: {'--ink':['#edece8',7], '--sub':['#a2a1ac',4.5], '--faint':['#78777f',3],
+  dark: {'--ink':['#edece8',7], '--sub':['#a2a1ac',4.5], '--faint':['#8d8c95',4.5],
          '--sun':['#e8714d',4.5], '--sat':['#7ea6e8',4.5]}
 };
 function applyUI(){
@@ -2536,7 +2543,15 @@ for(const d of document.querySelectorAll('dialog')){
   d.showModal = () => { clearTimeout(t); d.classList.remove('closing'); if(!d.open) nShow(); };
 }
 
+/* 다시 그리면 눌렀던 버튼이 사라져 키보드 포커스가 body 로 날아간다 — 같은 버튼을 찾아 돌려놓는다 */
+function focusSel(a){
+  const li = a.closest('li[data-id]'), c = a.closest('.cell,.wcard'), k = ['ck','st','mv','subn'].find(x => a.classList.contains(x));
+  if(li && k) return `li[data-id="${CSS.escape(li.dataset.id)}"][data-from="${CSS.escape(li.dataset.from || '')}"] .${k}`;
+  if(c && a === c && c.dataset.k) return `.${c.classList[0]}[data-k="${CSS.escape(c.dataset.k)}"]`;
+  return '';
+}
 function render(){
+  const fs = document.activeElement && document.activeElement !== document.body ? focusSel(document.activeElement) : '';
   const tk = todayKey();
   sumCache = new Map();
   readBase();          // 대비 보정의 기준 배경은 '지금' 배경이어야 한다
@@ -2578,6 +2593,7 @@ function render(){
      : view === 'stats' ? renderStats() : renderDay(tk);
   flushAnim();                 // 이번 변화에만 해당하는 효과를 붙인다 (그리고 비운다)
   writeSummary();
+  if(fs && document.activeElement === document.body) document.querySelector(fs)?.focus({preventScroll:true});
 }
 
 const CHK = `<svg class="chk" width="10" height="10" viewBox="0 0 16 16" aria-hidden="true"><path
@@ -2750,7 +2766,7 @@ function rowHTML(t, from, opt = {}){
   const canMove = canDrag && !t.d && !t.sk && !subOpen && editId !== t.id;
   return `<li class="${cls}" data-id="${t.id}" data-from="${from}" style="color:${col}"
       ${canMove ? 'draggable="true"' : ''}>
-    <button class="ck" role="checkbox" aria-checked="${t.d?'true':'false'}" aria-label="${T('aDone')}"></button>
+    <button class="ck" role="checkbox" aria-checked="${t.d?'true':'false'}" aria-label="${T('aDone')}: ${esc(t.t)}"></button>
     ${t.tm ? `<span class="tm mono">${fmtTm(t.tm)}</span>` : ''}
     <span class="tx" spellcheck="false">${esc(t.t)}</span>
     ${teamOn ? whoChips(t) : ''}
@@ -3328,6 +3344,7 @@ $('#side').addEventListener('click', e=>{
   if(nudge?.dataset.id && e.target.dataset.a){
     const id = nudge.dataset.id, a = e.target.dataset.a;
     const to = a==='tomorrow' ? shift(tk,1) : a==='d2' ? shift(tk,2) : a==='later' ? 'later' : null;
+    if(a === 'del'){ snapshot(); moveTodo(sel, id, to); return flash(T('del'), true); }   // 옆 버튼과 붙어 있어 잘못 눌러도 되돌릴 수 있게
     return moveTodo(sel, id, to);
   }
   if(e.target.closest('#showAll')){ dayAll = sel; return render(); }
@@ -3375,12 +3392,13 @@ $('#side').addEventListener('click', e=>{
         animate('.dayempty.done .chk, .cell.sel .chk, .wcard.sel .chk', 'pop');
       /* 끝낸 일은 접힌 '완료' 로 빠진다 — 바로 사라지면 어색하니, 체크 · 취소선이 보인 다음 부드럽게 접는다.
          저장은 지금 하고 화면만 늦춘다. 그 사이 다른 걸 눌러도 다시 그려지며 정리된다. */
-      if(t.d && !doneOpen && !reduceMo()){
+      if(t.d && !doneOpen && !reduceMo() && isDateKey(from)){     // 보관함·나중에 화면은 완료도 그대로 보여 주니 접지 않는다
         doc.ts = Date.now(); save(); push();
         li.classList.add('doing');
+        li.querySelector('.ck')?.setAttribute('aria-checked', 'true');
         li.style.maxHeight = li.offsetHeight + 'px';
         setTimeout(() => { li.classList.add('gone'); li.style.maxHeight = '0px'; }, 380);
-        setTimeout(render, 640);
+        clearTimeout(doneRT); doneRT = setTimeout(renderKeepInput, 640);   // 연달아 체크해도 타이머는 하나, 쓰던 입력은 지키며 다시 그린다
         return;
       }
       return touch();
@@ -3441,7 +3459,11 @@ function fitNote(){                                       // field-sizing 을 �
   const n = $('#dayNote'); if(!n) return;
   n.style.height = 'auto'; n.style.height = n.scrollHeight + 'px';
 }
-$('#side').addEventListener('input', e=>{ if(e.target.id === 'dayNote') fitNote(); });
+$('#side').addEventListener('input', e=>{
+  if(e.target.id !== 'dayNote') return;
+  if(/\n/.test(e.target.value)) e.target.value = e.target.value.replace(/\s*\n\s*/g, ' ');   // 붙여넣기로 들어온 줄바꿈
+  fitNote();
+});
 $('#side').addEventListener('keydown', e=>{
   if(e.isComposing || e.keyCode === 229) return;          // 한글 조합 중에는 아무것도 확정하지 않는다
   if(e.key === 'Escape'){
@@ -3520,7 +3542,7 @@ $('#side').addEventListener('focusout', e=>{
     const v = e.target.value.trim();
     noteShow = false;                                 // 다 적었으면 한 줄로 접힌다
     if((doc.notes[sel]||'') === v) return renderSoon();
-    if(v) doc.notes[sel] = v; else delete doc.notes[sel];
+    doc.notes[sel] = v;                               // 지워도 '' 로 남긴다 — 키를 없애면 다른 기기의 옛 메모가 합치다 되살아난다
     return touchSoon();
   }
   const li = e.target.closest('li');
@@ -3633,6 +3655,7 @@ function parseTime(text){
    값은 'HH:MM'(24시간)으로만 저장하고, 보여줄 때만 오전/오후로 바꾼다. */
 const p2t = n => String(n).padStart(2, '0');
 function fmtTm(v){
+  if(!/^\d\d:\d\d$/.test(v || '')) return '';             // 팀 데이터가 그대로 화면에 들어간다 — 'HH:MM' 이 아니면 찍지 않는다
   const h = +v.slice(0, 2), m = v.slice(3), h12 = h % 12 || 12;
   return doc.ui.lang === 'en' ? `${h12}:${m} ${h < 12 ? 'AM' : 'PM'}` : `${h < 12 ? '오전' : '오후'} ${h12}:${m}`;
 }
@@ -5116,7 +5139,7 @@ async function useSlot(){
   if(teamOn) teamLeave(true);                     // 다른 계정으로 바뀌면 팀 화면부터 걷는다
   save();
   const carry = slot === GUEST_SLOT && hasContent(doc) ? doc : null;
-  slot = next;
+  slot = next; undoStack.length = 0;
   localStorage.setItem('daynua.slot', slot);
   doc = migrate(readSlot(slot) || FRESH());
   if(carry){
@@ -5162,7 +5185,7 @@ const sameDoc = (a, b) => canon({...a, rev:0, ts:0}) === canon({...b, rev:0, ts:
 /* 동기화가 화면을 다시 그려야 할 때도, 적던 칸(빠른 추가·검색)의 포커스·글자·커서는 그대로 둔다 */
 function renderKeepInput(){
   const a = document.activeElement;
-  const keep = a && ['qd','qi','sq','tlogIn'].includes(a.id)
+  const keep = a && ['qd','qi','sq','tlogIn','dayNote'].includes(a.id)
     ? {id:a.id, v:a.value, s:a.selectionStart, e:a.selectionEnd} : null;
   if(keep) a.value = '';                      // 사라지는 칸이 빠져나가며 반쯤 쓴 글을 할 일로 만들지 않게
   render();
@@ -5531,7 +5554,7 @@ async function enterTeam1(){
 }
 function activateTeam(t){
   localStorage.setItem('daynua.team', t.id);
-  pdoc = doc; teamOn = true;
+  pdoc = doc; teamOn = true; undoStack.length = 0;      // 다른 문서의 되돌리기가 이 문서를 덮지 않게
   meId = user?.id || localStorage.getItem('daynua.lastUid') || '';
   team = {id:t.id, name:t.name, code:t.code, role:t.role, myName:t.myName, member_add:t.member_add};
   tslot = 'daynua.doc.team.' + t.id;
@@ -5554,7 +5577,7 @@ function teamLeave(quiet){
   save();
   const back = pdoc;
   teamOn = false; team = null; pdoc = null; tbase = {}; tbaseOK = false; qWho = [];
-  doc = back;
+  doc = back; undoStack.length = 0;
   if(!quiet){ applyUI(); render(); pull(); syncTimed(); }
 }
 function setMode(m){
@@ -5671,7 +5694,7 @@ async function teamPull(force){
   try{
     if(!force){ await teamFlush(); if(tfails) return; }       // 못 올린 내 변경이 남았으면 서버 것으로 덮지 않는다
     const ts0 = doc.ts, id = team.id;
-    const [tr, mem, items, logs, inbox] = await Promise.all([
+    const [tr, mem, itemsAll, logsAll, inbox] = await Promise.all([
       sb.from('teams').select('*').eq('id', id).maybeSingle(),
       sb.from('team_members').select('*').eq('team_id', id),
       fetchAll(() => sb.from('team_items').select('*').eq('team_id', id).order('day').order('id')),
@@ -5682,6 +5705,10 @@ async function teamPull(force){
     if(mem.error) throw mem.error;
     if(inbox.error) throw inbox.error;
     if(!tr.data || !mem.data.some(m => m.user_id === meId)) return teamGone();
+    /* 아이디는 화면 속성에 그대로 들어간다 — 앱이 만든 모양(uuid)이 아니면 내려받지 않는다 */
+    const okId = r => /^[\w-]{1,64}$/.test(r?.id || '');
+    const items = itemsAll.filter(okId), logs = logsAll.filter(okId);
+    if(Array.isArray(tr.data.cats)) tr.data.cats = tr.data.cats.filter(c => /^[\w-]{1,64}$/.test(c?.id || ''));
     if(!force && doc.ts !== ts0){ tpullSoon(); return; }       // 받는 사이 새로 적은 게 있다 — 지우지 않고 다음에
     if(!teamOn || team.id !== id) return;
 
@@ -5967,7 +5994,7 @@ function openTeamDlg(){
         team.code = data; refresh();
       });
       b.querySelectorAll('#tdMA button').forEach(x => x.onclick = async () => {
-        const { error } = await sb.from('teams').update({member_add: x.dataset.v === '1'}).eq('id', team.id);
+        const { error } = await sb.rpc('set_member_add', {p_team: team.id, p_on: x.dataset.v === '1'});
         if(error) return tdErr(teamErr(error));
         refresh();
       });
