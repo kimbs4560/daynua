@@ -3,6 +3,7 @@
   "short_name": "Daynua",
   "description": "날짜 중심의 가벼운 할 일 달력 — 무엇을 할지뿐 아니라 무엇을 했는지를 남깁니다.",
   "lang": "ko",
+  "id": "./",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

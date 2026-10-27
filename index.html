@@ -1291,7 +1291,7 @@ li .tm{font-size:12px}
 const SUPABASE_URL = 'https://cjhwxjznuleyfcbwwvtb.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_acxKbtekhqwFZwI0EUtArg_3FSj5AHh';
 const VAPID_PUBLIC = 'BItluVUoPAOjdIacpE7-6Ko45leNKobu8SbCNP1L6zdozMUrtFBNjh7ncFVZGSvwdHf4vNkYQKj5BarWq01G0hE';
-const BUILD = '2026-10-27.63';
+const BUILD = '2026-10-27.64';
 /* Daynua 앱(Android 껍데기) 안이면 위젯·알림·내보내기를 앱에 맡긴다. 아니면 null */
 const APP = typeof DaynuaApp !== 'undefined' ? DaynuaApp : null;
 const ARRIVED_BY_LINK = /access_token|type=(signup|recovery|magiclink|invite)|[?&]code=/.test(location.hash + location.search);
@@ -2514,7 +2514,10 @@ function render(){
   sumCache = new Map();
   readBase();          // 대비 보정의 기준 배경은 '지금' 배경이어야 한다
                        // (테마가 바뀐 직후 applyUI 보다 render 가 먼저 와도 색이 틀어지지 않게)
-  loadHolidays(cur.getFullYear());
+  const hy = cur.getFullYear();
+  loadHolidays(hy);
+  if(cur.getMonth() === 11) loadHolidays(hy + 1);       // 12월 달력·주간에 보이는 다음 해 1월 칸의 공휴일
+  if(cur.getMonth() === 0) loadHolidays(hy - 1);
   $('#title').innerHTML = viewTitle();
   $('#prev').setAttribute('aria-label', T('aPrev')[calView]);
   $('#next').setAttribute('aria-label', T('aNext')[calView]);
