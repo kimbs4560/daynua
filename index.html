@@ -70,6 +70,7 @@ input[type=date]::-webkit-calendar-picker-indicator,
 input[type=time]::-webkit-calendar-picker-indicator{opacity:.75;cursor:pointer}
 @media (hover:hover){input[type=date]:hover::-webkit-calendar-picker-indicator,input[type=time]:hover::-webkit-calendar-picker-indicator{opacity:1}}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}                 /* display:flex 같은 규칙에 hidden 이 지지 않게 (가입 화면에서 자동 로그인·'로그인 없이 시작'이 안 가려지던 것) */
 html,body{margin:0;background:var(--bg);color:var(--ink);font-size:16px;
   font-family:-apple-system,BlinkMacSystemFont,"Pretendard","Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",sans-serif;
   font-variant-numeric:tabular-nums;letter-spacing:-.01em;
@@ -825,6 +826,15 @@ html.gating body > :not(#gate):not(script){visibility:hidden}
 .g-err.ok{color:var(--accent-ink)}
 .g-auto{display:flex;align-items:center;gap:9px;margin:4px 2px 14px;font-size:14px;color:var(--sub);cursor:pointer;user-select:none}
 .g-auto input{width:18px;height:18px;margin:0;accent-color:var(--accent);flex:none}
+/* 가입할 때의 동의 항목 (첫 화면과 로그인 창이 같이 쓴다) */
+.cs{margin:2px 2px 12px;font-size:13px;color:var(--sub);text-align:left}
+.cs[hidden]{display:none}
+.cs label{display:flex;align-items:flex-start;gap:9px;padding:5px 0;cursor:pointer;line-height:1.45;user-select:none}
+.cs input{width:18px;height:18px;margin:1px 0 0;accent-color:var(--accent);flex:none}
+.cs em{font-style:normal;font-weight:800;color:var(--accent-ink)}
+.cs .cs-all{font-weight:700;color:var(--ink);padding-bottom:7px;margin-bottom:3px;border-bottom:1px solid var(--line)}
+.cs a{color:var(--ink);text-decoration:underline;text-underline-offset:2px;white-space:nowrap}
+.cs .cs-note{margin:6px 0 0 27px;font-size:12px;line-height:1.55;color:var(--faint)}
 .g-go{display:block;width:100%;padding:14px;font:inherit;font-size:16px;font-weight:700;border:0;border-radius:14px;
   background:var(--accent);color:var(--on-accent);cursor:pointer;transition:transform .12s var(--ease),opacity .15s}
 .g-go:active{transform:scale(.98)} .g-go:disabled{opacity:.6}
@@ -1169,6 +1179,7 @@ li .tm{font-size:12px}
       <div class="g-err" id="gErr" hidden></div>
       <input id="gEmail" type="email" autocomplete="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore>
       <input id="gPw" type="password" autocomplete="new-password" data-lpignore="true" data-1p-ignore>
+      <div class="cs" id="gCs" hidden></div>
       <label class="g-auto" id="gAutoRow"><input type="checkbox" id="gAuto"><span id="gAutoTx"></span></label>
       <button class="g-go" id="gGo"></button>
       <div class="g-alt"><button id="gSwap"></button><button id="gReset"></button></div>
@@ -1249,6 +1260,7 @@ li .tm{font-size:12px}
   <div class="err" id="authErr" hidden></div>
   <input id="email" type="email" autocomplete="off" data-lpignore="true" data-1p-ignore>
   <input id="pw" type="password" autocomplete="new-password" data-lpignore="true" data-1p-ignore>
+  <div class="cs" id="authCs" hidden></div>
   <div class="row">
     <button class="plain" id="authClose"></button>
     <button class="primary" id="authGo"></button>
@@ -1291,7 +1303,7 @@ li .tm{font-size:12px}
 const SUPABASE_URL = 'https://cjhwxjznuleyfcbwwvtb.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_acxKbtekhqwFZwI0EUtArg_3FSj5AHh';
 const VAPID_PUBLIC = 'BItluVUoPAOjdIacpE7-6Ko45leNKobu8SbCNP1L6zdozMUrtFBNjh7ncFVZGSvwdHf4vNkYQKj5BarWq01G0hE';
-const BUILD = '2026-10-27.64';
+const BUILD = '2026-10-27.65';
 /* Daynua 앱(Android 껍데기) 안이면 위젯·알림·내보내기를 앱에 맡긴다. 아니면 null */
 const APP = typeof DaynuaApp !== 'undefined' ? DaynuaApp : null;
 const ARRIVED_BY_LINK = /access_token|type=(signup|recovery|magiclink|invite)|[?&]code=/.test(location.hash + location.search);
@@ -1373,6 +1385,9 @@ const I18N = {
   lag:n=>`${n}일째`, lagTip:'주말·공휴일은 빼고 센 미룬 날수',
   sent:'메일을 보냈습니다. 받은 편지함을 확인하세요.',
   confirmSent:'인증 메일을 보냈습니다. 링크를 누르면 바로 로그인됩니다.',
+  csAll:'전체 동의', csReq:'[필수]', csView:'보기', csAge:'만 14세 이상입니다', csTerms:'이용약관에 동의합니다', csPriv:'개인정보 수집·이용에 동의합니다',
+  csNote:'수집 항목: 이메일, 할 일 데이터(기기 간 동기화용), 알림 구독 정보 · 이용 목적: 로그인과 동기화 · 보관: 계정을 삭제할 때까지. 동의하지 않아도 로그인 없이 쓸 수 있어요.',
+  csNeed:'필수 항목에 모두 동의해야 가입할 수 있어요.',
   needBoth:'이메일과 비밀번호를 모두 입력하세요.', needEmail:'이메일을 먼저 입력하세요.',
   localOnly:'이 기기에만 저장',
   ideas:'떠오른 일', later:'나중에', search:'검색',
@@ -1523,6 +1538,9 @@ const I18N = {
   lag:n=>`${n}d late`, lagTip:'Working days late (weekends & holidays excluded)',
   sent:'Email sent. Check your inbox.',
   confirmSent:'Confirmation email sent. Click the link and you are in.',
+  csAll:'Agree to all', csReq:'[Required]', csView:'View', csAge:'I am 14 or older', csTerms:'I agree to the Terms of Service', csPriv:'I agree to the collection and use of my personal data',
+  csNote:'Collected: email, your task data (to sync devices), reminder subscription · Purpose: sign-in and sync · Kept until you delete your account. You can still use the app without signing in.',
+  csNeed:'You need to agree to all required items to sign up.',
   needBoth:'Enter both email and password.', needEmail:'Enter your email first.',
   localOnly:'This device only',
   ideas:'Ideas', later:'Someday', search:'Search',
@@ -5322,6 +5340,29 @@ $('#pwGo').onclick = async ()=>{
 };
 $('#pwDlg').addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); $('#pwGo').click(); } });
 
+/* ─── 가입 동의 ───
+   가입할 때만 받는다: 만 14세 이상 · 이용약관 · 개인정보 수집·이용 (모두 필수, 광고·마케팅 수신 동의는 받지 않는다).
+   동의한 사실은 계정(user_metadata.consent)에 버전·시각과 함께 남긴다. 약관·방침을 고치면 CONSENT_VER 와 두 문서의 버전을 같이 올린다. */
+const CONSENT_VER = '2026-10-27';
+const consentHTML = () => `
+  <label class="cs-all"><input type="checkbox" data-cs="all"><span>${T('csAll')}</span></label>
+  <label><input type="checkbox" data-cs="age"><span><em>${T('csReq')}</em> ${T('csAge')}</span></label>
+  <label><input type="checkbox" data-cs="terms"><span><em>${T('csReq')}</em> ${T('csTerms')} <a href="terms.html" target="_blank" rel="noopener">${T('csView')}</a></span></label>
+  <label><input type="checkbox" data-cs="priv"><span><em>${T('csReq')}</em> ${T('csPriv')} <a href="privacy.html" target="_blank" rel="noopener">${T('csView')}</a></span></label>
+  <p class="cs-note">${T('csNote')}</p>`;
+const consentItems = box => [...box.querySelectorAll('[data-cs]:not([data-cs="all"])')];
+const consentOK = box => { const l = consentItems(box); return l.length === 3 && l.every(i => i.checked); };
+const consentData = () => ({consent:{ver:CONSENT_VER, age14:true, terms:true, privacy:true, at:new Date().toISOString()}});
+function showConsent(box, on){                    // 가입 모드일 때만 보이고, 한 번 그리면 체크 상태를 지키며 언어가 바뀌면 다시 그린다
+  box.hidden = !on;
+  if(on && box.dataset.lang !== (doc.ui.lang || 'ko')){ box.innerHTML = consentHTML(); box.dataset.lang = doc.ui.lang || 'ko'; }
+}
+document.addEventListener('change', e => {
+  const c = e.target.closest?.('[data-cs]'); if(!c) return;
+  const box = c.closest('.cs'), all = box.querySelector('[data-cs="all"]'), items = consentItems(box);
+  if(c === all) items.forEach(i => i.checked = all.checked); else all.checked = items.every(i => i.checked);
+});
+
 /* ─── 로그인 / 회원가입 ─── */
 let authMode = 'in';
 function openAuth(m){ authMode = m; authMsg(''); renderAuth(); $('#auth').showModal(); }
@@ -5334,6 +5375,7 @@ function renderAuth(){
   $('#authClose').textContent = T('close');
   $('#authSwap').textContent = up ? T('toLogin') : T('toSignup');
   $('#authReset').textContent = T('forgot');
+  showConsent($('#authCs'), up);
   $('#email').placeholder = T('emailPh');
   $('#pw').placeholder = T('pwPh');
   $('#pw').autocomplete = 'new-password';
@@ -5343,8 +5385,9 @@ $('#authClose').onclick = ()=>$('#auth').close();
 $('#authGo').onclick = async ()=>{
   const email = $('#email').value.trim(), pw = $('#pw').value;
   if(!email || !pw) return authMsg(T('needBoth'));
+  if(authMode === 'up' && !consentOK($('#authCs'))) return authMsg(T('csNeed'));
   $('#authGo').disabled = true;
-  const opts = { emailRedirectTo: location.origin + location.pathname };
+  const opts = { emailRedirectTo: location.origin + location.pathname, ...(authMode === 'up' ? {data: consentData()} : {}) };
   const { data, error } = authMode==='up'
     ? await sb.auth.signUp({ email, password:pw, options:opts })
     : await sb.auth.signInWithPassword({ email, password:pw });
@@ -5447,6 +5490,7 @@ function gateRender(){
   $('#gReset').textContent = T('forgot'); $('#gReset').hidden = up;
   $('#gAutoTx').textContent = T('autoLogin'); $('#gAutoRow').hidden = up;
   $('#gGuest').textContent = T('guestGo'); $('#gGuest').hidden = up;
+  showConsent($('#gCs'), up);
   gP.autocomplete = 'new-password';                    // 브라우저가 저장된 비밀번호를 끼워 넣지 않게
 }
 function gateEnter(){
@@ -5509,15 +5553,17 @@ $('#gReset').onclick = async ()=>{
 gGo.onclick = async ()=>{
   const email = gE.value.trim(), pw = gP.value;
   if(!email || !pw) return gateMsg(T('needBoth'));
+  if(gateMode === 'up' && !consentOK($('#gCs'))) return gateMsg(T('csNeed'));
   gGo.disabled = true; gateMsg('');
   try{
     await syncReady;
     if(gateMode === 'up'){
       const { data, error } = await sb.auth.signUp({ email, password:pw,
-        options:{ emailRedirectTo: location.origin + location.pathname } });
+        options:{ emailRedirectTo: location.origin + location.pathname, data: consentData() } });
       if(error) return gateMsg(trErr(error.message));
       if(data.session) await sb.auth.signOut();          // 가입 뒤에는 로그인 화면으로 — 한 번 더 로그인한다
       localStorage.setItem('daynua.email', email);
+      $('#gCs').innerHTML = ''; $('#gCs').dataset.lang = '';        // 가입이 끝났다 — 체크는 다음에 다시 받는다
       gateMode = 'in'; gateRender(); gP.value = '';
       return gateMsg(data.session ? T('signedUp') : T('confirmSent'), true);
     }
