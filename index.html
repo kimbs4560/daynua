@@ -90,7 +90,7 @@ input,select,textarea{font:inherit;color:inherit}
 @media (min-width:720px){
   #app{max-width:1180px;padding:26px 24px 40px;display:grid;gap:0 20px;
     grid-template-columns:minmax(0,1fr) 340px;grid-template-areas:"top top" "team team" "bar bar" "cal side";align-items:start}
-  .top{grid-area:top} .teambar{grid-area:team} .bar2{grid-area:bar;margin-bottom:14px}
+  .top{grid-area:top} .spbar{grid-area:team} .bar2{grid-area:bar;margin-bottom:14px}
   #cal{grid-area:cal;margin:0;padding:16px;min-width:0}
   #side{grid-area:side;position:sticky;top:26px;max-height:calc(100vh - 52px);overflow-y:auto;padding:16px}
   /* 주간은 7칸이 나란히 서야 하므로 달력 쪽에 조금 더 준다 */
@@ -1138,37 +1138,14 @@ li .tm{font-size:12px}
   font-size:14px;font-weight:600;color:var(--ink)}
 .leadbtn svg{color:var(--faint)}
 
-/* ── 팀 ── */
-.teambar{display:flex;align-items:center;gap:8px;margin:-6px 0 12px}
-.teambar .tname{display:inline-flex;align-items:center;gap:7px;min-width:0;padding:6px 11px 6px 9px;border-radius:999px;
-  border:1px solid var(--line);font-size:13px;font-weight:800;color:var(--ink);max-width:62%}
-.teambar .tname b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:800}
-.teambar .tname svg{flex:none;color:var(--accent-ink)}
-.teambar .chip{margin-left:auto}
-.teambar .tbell{position:relative}
-.wc{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;flex:none;
-  background:var(--c,#999);color:#fff;font-size:10.5px;font-weight:800;font-style:normal;line-height:1}
-li .who{display:inline-flex;align-items:center;gap:3px;flex:none}
-li .who .wc{width:16px;height:16px;font-size:9.5px;margin-left:-2px;box-shadow:0 0 0 1.5px var(--card)}
-li .who .wc:first-child{margin-left:0}
-li .dcn{font-size:11px;font-weight:700;color:var(--sub);margin-left:3px}
-.qadd.main .qwbtn{flex:none;display:inline-flex;align-items:center;gap:5px;padding:6px 8px;border-radius:9px;border:1px solid transparent;
-  color:var(--faint);font-size:12.5px;font-weight:700;white-space:nowrap;max-width:110px}
-.qadd.main .qwbtn b{overflow:hidden;text-overflow:ellipsis;font-weight:700}
-@media (hover:hover){ .qadd.main .qwbtn:hover{color:var(--ink);background:var(--fill)} }
-.qadd.main .qwbtn.set{color:var(--ink);background:var(--fill);border-color:var(--line)}
-.tlog{margin-top:18px}
-.tlog .tl{display:flex;gap:9px;padding:7px 0;align-items:flex-start}
-.tlog .tl .wc{margin-top:2px}
-.tlog .tb{flex:1;min-width:0}
-.tlog .th{font-size:12px;color:var(--sub);display:flex;gap:6px;align-items:center}
-.tlog .th b{color:var(--ink);font-weight:800}
-.tlog .th .mono{font-size:11px}
-.tlog .th .lx{margin-left:auto;color:var(--faint);font-size:16px;line-height:1;padding:0 4px}
-.tlog .tt{font-size:14px;line-height:1.55;white-space:pre-wrap;word-break:keep-all;overflow-wrap:break-word;margin-top:1px}
-.tlog .qadd{margin-top:8px}
-#tDlg{width:min(92vw,400px)}
-#tDlg .scroll{max-height:60vh}
+/* ── 공간 스위치: 개인 · 회사 ── */
+.spbar{display:flex;width:max-content;margin:-6px 0 12px;padding:3px;gap:2px;border-radius:999px;border:1px solid var(--line);background:var(--fill)}
+.spbar button{padding:5px 15px;border-radius:999px;font-size:13px;font-weight:700;color:var(--sub);
+  transition:background var(--mo-fast) var(--ease),color var(--mo-fast) var(--ease)}
+.spbar button.on{background:var(--ink);color:var(--bg)}
+.spbar button.work.on{background:var(--accent);color:var(--on-accent)}
+@media (hover:none){ .spbar button{padding:8px 17px} }
+#spDlg{width:min(92vw,400px)}
 .mseg{display:flex;gap:6px}
 .mseg button{flex:1;padding:9px 4px;border-radius:9px;background:var(--fill);font-size:12.5px;font-weight:700;color:var(--sub)}
 .mseg button.on{background:var(--ink);color:var(--bg)}
@@ -1178,23 +1155,6 @@ li .dcn{font-size:11px;font-weight:700;color:var(--sub);margin-left:3px}
 .modes .mode b{font-size:16px;font-weight:800}
 .modes .mode span{font-size:12.5px;color:var(--sub)}
 @media (hover:hover){ .modes .mode:hover{border-color:var(--accent)} }
-.whor,.tmr{display:flex;align-items:center;gap:10px;padding:9px 2px;font-size:14.5px}
-.whor input{width:18px;height:18px;accent-color:var(--accent);flex:none}
-.tmr .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.tmr select{width:auto;margin:0;padding:6px 8px;font-size:12.5px}
-.tmr .rl{font-size:11.5px;font-weight:700;color:var(--sub)}
-.tmr .kx{color:var(--faint);font-size:18px;padding:2px 6px}
-.tcode{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:10px;background:var(--fill);margin:4px 0 8px}
-.tcode b{flex:1;font-size:17px;letter-spacing:2px}
-.tsep{display:flex;align-items:center;gap:10px;color:var(--faint);font-size:11.5px;margin:14px 0 10px}
-.tsep::before,.tsep::after{content:"";flex:1;height:1px;background:var(--line)}
-.ibx{display:flex;flex-direction:column;align-items:flex-start;gap:2px;width:100%;text-align:left;padding:11px 12px;border-radius:11px;margin-bottom:6px;
-  background:var(--fill);font-size:13.5px;line-height:1.45}
-.ibx.un{box-shadow:inset 3px 0 0 var(--accent)}
-.ibx small{color:var(--sub);font-size:11.5px}
-.ibx b{font-weight:800}
-.tdanger{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
-.tdanger button{color:var(--danger)}
 </style>
 </head>
 <body>
@@ -1225,7 +1185,7 @@ li .dcn{font-size:11px;font-weight:700;color:var(--sub);margin-left:3px}
     <button class="iconbtn" id="btnCfg"></button>
     <button id="acct" class="acct"></button>
   </div>
-  <div class="teambar" id="teamBar" hidden></div>
+  <div class="spbar" id="spBar" role="group"></div>
   <div class="bar2">
     <button class="nav" id="prev">‹</button>
     <h1 id="title"></h1>
@@ -1309,12 +1269,10 @@ li .dcn{font-size:11px;font-weight:700;color:var(--sub);margin-left:3px}
   </div>
 </dialog>
 
-<dialog id="tDlg" aria-labelledby="tdT">
-  <h3 id="tdT"></h3>
-  <p id="tdS"></p>
-  <div class="err" id="tdE" hidden></div>
-  <div class="scroll" id="tdB"></div>
-  <div class="row" id="tdR"></div>
+<dialog id="spDlg" aria-labelledby="spT">
+  <h3 id="spT"></h3>
+  <p id="spS"></p>
+  <div class="modes" id="spB"></div>
 </dialog>
 
 <dialog id="imp" aria-labelledby="impTitle">
@@ -1333,7 +1291,7 @@ li .dcn{font-size:11px;font-weight:700;color:var(--sub);margin-left:3px}
 const SUPABASE_URL = 'https://cjhwxjznuleyfcbwwvtb.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_acxKbtekhqwFZwI0EUtArg_3FSj5AHh';
 const VAPID_PUBLIC = 'BItluVUoPAOjdIacpE7-6Ko45leNKobu8SbCNP1L6zdozMUrtFBNjh7ncFVZGSvwdHf4vNkYQKj5BarWq01G0hE';
-const BUILD = '2026-10-27.62';
+const BUILD = '2026-10-27.63';
 /* Daynua 앱(Android 껍데기) 안이면 위젯·알림·내보내기를 앱에 맡긴다. 아니면 null */
 const APP = typeof DaynuaApp !== 'undefined' ? DaynuaApp : null;
 const ARRIVED_BY_LINK = /access_token|type=(signup|recovery|magiclink|invite)|[?&]code=/.test(location.hash + location.search);
@@ -2136,16 +2094,23 @@ function mergeDocs(a, b){
   return out;
 }
 
-let doc = migrate(readSlot(slot) || FRESH());
-/* ─── 팀 모드의 상태 ───
-   팀 모드에서는 doc 이 '팀 문서'(서버의 팀 일정을 개인 문서와 같은 모양으로 펼친 것)가 되고,
-   개인 문서는 pdoc 에 잠시 맡겨 둔다. 화면 그리는 코드는 그대로 doc 을 읽는다. 아래 팀 구간(teamOn)을 보라. */
-let teamOn = false, team = null, pdoc = null, tslot = '', meId = '';
-let tbase = new Map(), tcatBase = '[]';            // 서버에 마지막으로 맞춘 모습 (바뀐 것만 올리려고)
-let tmem = [], tinbox = [], tlogs = {};            // 팀원 · 알림함 · 날짜별 기록
-let tchan = null, tpullT = null, tpushT = null, tpulling = false, tflushing = false, tagain = false, tfails = 0;
-let teamMine = localStorage.getItem('daynua.mine') === '1';   // '내 것만' 보기
-let qWho = [];                                     // 빠른 입력의 대상 (비면 전체)
+/* ─── 공간: 개인 · 회사 ───
+   같은 기능, 기록만 둘. 이 계정(게스트)이 마지막으로 쓰던 공간으로 연다.
+   저장 칸: 개인 = slot, 회사 = slot + '.work' (서버는 state / state_work). 아래 '공간' 구간을 보라. */
+const SPX = {
+  ko:{me:'개인', work:'회사', title:'어떻게 나눌까요?', sub:'기록을 둘로 나눠요. 나중에 화면 위쪽 스위치나 설정에서 바꿀 수 있어요.',
+      meSub:'내가 하고 싶은 것들', workSub:'회사에서 할 업무', lbl:'공간', aria:'공간 바꾸기', tag:'[회사] ',
+      needSql:'서버에 회사 공간이 아직 준비되지 않았어요. 지금은 이 기기에만 저장돼요.'},
+  en:{me:'Personal', work:'Work', title:'How do you want to split it?', sub:'Your lists are kept apart. You can switch later with the switch at the top or in Settings.',
+      meSub:'Things I want to do', workSub:'Tasks for work', lbl:'Space', aria:'Switch space', tag:'[Work] ',
+      needSql:'The Work space is not set up on the server yet. For now it is saved on this device only.'}
+};
+const SPT = k => (SPX[doc?.ui?.lang] || SPX.ko)[k];
+const isMissing = e => ['42P01','PGRST205','PGRST202','42883'].includes(e?.code) || /schema cache|does not exist/i.test(e?.message || '');
+let space = localStorage.getItem('daynua.space.' + slot) === 'work' ? 'work' : 'me', spaceWarned = false;
+const docKey = () => space === 'work' ? slot + '.work' : slot;
+const tbl = () => space === 'work' ? 'state_work' : 'state';
+let doc = migrate(readSlot(docKey()) || FRESH());
 let cur = new Date(), sel = key(new Date());
 let view = 'day';                    // 'day' | 'ideas' | 'search' | 'stats'
 let subFocus = null, noteShow = false, noteFocus = false, query = '', ideasFocus = false;
@@ -2181,18 +2146,12 @@ let hol = {};
 const holLoaded = new Set();
 
 function save(){
-  const k = teamOn ? tslot : slot;
-  try{ localStorage.setItem(k, JSON.stringify(doc)); if(teamOn) teamUiBack(); }
+  const k = docKey();
+  try{ localStorage.setItem(k, JSON.stringify(doc)); }
   catch(e){                                            // 용량이 모자라면 복구 지점부터 버린다
     try{ localStorage.removeItem('daynua.snaps'); localStorage.setItem(k, JSON.stringify(doc)); }
     catch{ console.warn(e); flash(T('saveFail')); }
   }
-}
-/* 팀 모드에서 바꾼 테마·언어·강조색은 개인 문서에도 되돌려 둔다 — 두 모드가 같은 모습으로 열리게 */
-function teamUiBack(){
-  if(!pdoc || JSON.stringify(doc.ui) === JSON.stringify(pdoc.ui)) return;
-  pdoc.ui = {...doc.ui}; pdoc.ts = Date.now();
-  try{ localStorage.setItem(slot, JSON.stringify(pdoc)); }catch{}
 }
 /* 되돌릴 수 없는 순간 직전의 문서를 몇 벌 남겨둔다 (설정 → 데이터 → 복구 지점) */
 function snapRing(why){
@@ -2249,13 +2208,12 @@ document.addEventListener('keydown', e=>{
 });
 const ws = () => doc.ui.weekStart|0;
 const todayKey = () => key(new Date());
-const bucket = k => { const l = doc.todos[k] || [];
-  return teamOn && teamMine ? l.filter(t => !t.a?.length || t.a.includes(meId)) : l; };   // 팀: '내 것만' 이면 남에게 지정된 것은 가린다
+const bucket = k => doc.todos[k] || [];
 const holName = k => hol[k] && (doc.ui.lang==='en' ? hol[k][1] : hol[k][0]);
 const offSet = () => new Set(Object.keys(hol));
 
 function runRollover(){
-  if(!doc.ui.rollover || teamOn) return;             // 기본: 그날에 그대로. 안 한 일도, 체크 안 한 일도 제 날짜에 남는다
+  if(!doc.ui.rollover) return;           // 기본: 그날에 그대로. 안 한 일도, 체크 안 한 일도 제 날짜에 남는다
   if(rollover(doc.todos, doc.miss, todayKey())){ doc.ts = Date.now(); save(); push(); }
 }
 const esc = s => String(s ?? '').replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
@@ -2577,9 +2535,7 @@ function render(){
   $('#btnStats').setAttribute('aria-label', T('stats'));
   const n = bucket('ideas').length;
   $('#btnIdeas').innerHTML = '💡' + (n ? `<span class="cnt">${n}</span>` : '');
-  $('#btnIdeas').hidden = teamOn;                       // 팀에는 '나중에·떠오른 일' 보관함이 없다 (날짜가 있는 일정만)
-  if(teamOn && view === 'ideas') view = 'day';
-  renderTeamBar();
+  renderSpaceBar();
 
   /* 1년은 훑어보는 화면이다 — 날짜 패널도 빠른 입력도 DOM 에서 아예 비운다
      (숨기기만 하면 Tab 으로 닿는 입력칸이 남는다). 검색·보관함을 연 동안만 옆칸이 살아난다. */
@@ -2769,7 +2725,6 @@ function rowHTML(t, from, opt = {}){
     <button class="ck" role="checkbox" aria-checked="${t.d?'true':'false'}" aria-label="${T('aDone')}: ${esc(t.t)}"></button>
     ${t.tm ? `<span class="tm mono">${fmtTm(t.tm)}</span>` : ''}
     <span class="tx" spellcheck="false">${esc(t.t)}</span>
-    ${teamOn ? whoChips(t) : ''}
     ${t.r?`<span class="rp" title="${T('routines')}">${ICON.repeat}</span>`:''}
     ${t.w?`<span class="wi" title="${T('waiting')}">${ICON.wait}</span>`:''}
     ${t.d && t.dd && t.o && daysBetween(t.o, t.dd) >= 1
@@ -2829,8 +2784,8 @@ function renderDay(tk){
     <div class="dh"><b>${fmt}</b>
       <span class="meta">${[calView === 'week' ? '' : wd, sel===tk ? T('today') : ''].filter(Boolean).join(' · ')
         }${hn?` · <i style="color:var(--sun);font-style:normal">${esc(hn)}</i>`:''}</span>
-      ${teamOn ? '' : `<button class="dnbtn ${note||noteShow?'on':''}" id="dnToggle" title="${T('dayNotePh')}"
-        aria-label="${T('dayNotePh')}">${ICON.pencil}</button>`}
+      <button class="dnbtn ${note||noteShow?'on':''}" id="dnToggle" title="${T('dayNotePh')}"
+        aria-label="${T('dayNotePh')}">${ICON.pencil}</button>
       ${tot?`<span class="pct mono">${done.length}/${tot}</span>`:''}</div>
     ${tot?`<div class="pbar"><i style="width:${done.length / tot * 100}%"></i></div>`:''}
     ${note && !noteShow ? `<div class="daynote ro" id="dnRead">${esc(note)}</div>` : ''}
@@ -2842,7 +2797,7 @@ function renderDay(tk){
           ${canDrag ? 'draggable="true"' : ''}><i style="background:${stripColor(c.c)}"></i>${esc(c.n)}</button>`).join('')}
       <button data-q="+" class="newc">${doc.cats.length ? '+' : T('addCat')}</button>
     </div>
-    <div class="qadd main"><span>+</span><input id="qd" maxlength="200" placeholder="${T('quickAdd')}">${qtBtnHTML()}${teamOn && canAssign() ? qwBtnHTML() : ''}</div>
+    <div class="qadd main"><span>+</span><input id="qd" maxlength="200" placeholder="${T('quickAdd')}">${qtBtnHTML()}</div>
     ${tipNow() ? `<div class="tip" id="tip${tipNow().id}"><span>${tipNow().text}</span>
         <button data-tip="${tipNow().id}">${T('gotIt')}</button></div>` : ''}
     ${!sm.all ? `<div class="dayempty"><b>${T('dayEmpty')}</b><span>${T('dayEmptyHint')}</span></div>`
@@ -2871,7 +2826,7 @@ function renderDay(tk){
         aria-expanded="${doneOpen?'true':'false'}">
         <span class="ar">${ICON.chev}</span>${T('doneLbl')}
         <span class="k">${done.length + skipped.length}</span></button>` : ''}
-    ${teamOn ? teamLogHTML(sel) : ''}`;
+    `;
 
   /* 막대는 처음부터 제 길이로 그린다. 2/5 → 3/5 가 순간이동하지 않게 지난 비율에서 제 길이까지 '움직이기만' 한다 —
      예전엔 지난 비율로 그려 놓고 다음 프레임에 늘렸는데, 그 프레임이 오지 않으면 (화면 전환 중·백그라운드) 엉뚱한 길이로 멈췄다. */
@@ -3502,12 +3457,9 @@ function addQuick(el, keep){
   let tm = !ideas ? qtVal : '';      // 시각은 고르거나 글에서 읽힌 때만 붙는다
   if(!ideas && qtAuto && !qtManual){ const r = parseTime(t); if(r){ t = r.text; tm = r.tm; } }   // 읽힌 시각은 제목에서 뺀다
   qtVal = ''; qtAuto = false; qtManual = false; syncQt();
-  const who = teamOn && !canEdit() ? [meId] : qWho;      // 멤버의 일정은 늘 '나에게' (역할이 바뀐 직후에도)
-  if(teamOn) qWho = defaultWho();
   (doc.todos[ideas ? 'ideas' : sel] ||= []).push(
     ideas ? {id:nid, t, d:false, cr:todayKey(), mv:0}
-          : {id:nid, t, d:false, c, o:sel, cr:todayKey(), mv:0, ...(tm ? {tm} : {}),
-             ...(teamOn ? {a: [...who], by: meId} : {})});
+          : {id:nid, t, d:false, c, o:sel, cr:todayKey(), mv:0, ...(tm ? {tm} : {})});
   firstRun = false;
   if(tm) askTimeNotify();
   animate(`li[data-id="${nid}"]`);
@@ -3898,14 +3850,14 @@ function todoSheetHTML(t, from, spot){
   const tiles = [];
   if(tk !== from)          tiles.push(['today',    T('today'),    md2(tk)]);
   if(shift(tk,1) !== from) tiles.push(['tomorrow', T('tomorrow'), md2(shift(tk,1))]);
-  if(from !== 'later' && !teamOn) tiles.push(['later',    T('later'),    T('qtNoDate')]);
+  if(from !== 'later') tiles.push(['later',    T('later'),    T('qtNoDate')]);
   const row = (a, icon, label, k, cls = '') =>
     `<button data-a="${a}" ${cls ? `class="${cls}"` : ''}>${icon}<span>${label}</span>${k ? `<span class="k">${k}</span>` : ''}</button>`;
   /* 자주 쓰는 것만 위에 — 나머지는 '더보기' 안에. 순서 바꾸기는 꾹 눌러 끌면 되므로 뺐다. */
   const more = row('sub', SI.list, T('subs'))
     + row('note', SI.note, T('note'))
     + (t.r && !t.d ? row('skip', SI.skip, T('skip')) : '')
-    + (from !== 'ideas' && !teamOn ? row('ideas', SI.bulb, T('toIdeas')) : '');
+    + (from !== 'ideas' ? row('ideas', SI.bulb, T('toIdeas')) : '');
 
   return head(t.t || '', where + (c ? ' · ' + esc(c.n) : ''), false)
     + `<div class="qlbl">${T('sheetMove')}</div>
@@ -3917,7 +3869,6 @@ function todoSheetHTML(t, from, spot){
     + row('edit', SI.edit, T('edit'))
     + `<div class="timerow">${SI.clock}<span>${T('timeSet')}</span>${timeSelHTML('menuT', t.tm)}</div>`
     + row('cats', SI.tag, T('category'), `${esc(c?.n || T('noCat'))}${SI.chev}`)
-    + (teamOn && canAssign() ? row('who', SI.user, TM('who'), `${esc(whoLabel(t.a))}${SI.chev}`) : '')
     + row('more', menuMore ? SI.up : SI.down, T(menuMore ? 'menuLess' : 'menuMore'))
     + (menuMore ? more : '')
     + `<div class="sep"></div>` + row('del', SI.trash, T('del'), '', 'rm');
@@ -3968,16 +3919,15 @@ function openMenu(x, y, from, id){
     : `<button data-a="edit">${T('edit')}</button><div class="sep"></div>` +
     opts.map(([a,label,k])=>`<button data-a="${a}">${label}<span class="k">${k.slice(5)}</span></button>`).join('') +
     `<input type="date" id="menuDate" value="${isDateKey(from)?from:tk}">
-     ${from!=='later' && !teamOn ? `<button data-a="later">${T('later')}</button>` : ''}
+     ${from!=='later' ? `<button data-a="later">${T('later')}</button>` : ''}
      <div class="timerow"><span>${T('timeSet')}</span>${timeSelHTML('menuT', t.tm)}</div>
      <div class="sep"></div>
      <button data-a="cats">${T('category')}<span class="k">${esc(catOf(t.c)?.n || T('noCat'))}</span></button>
-     ${teamOn && canAssign() ? `<button data-a="who">${TM('who')}<span class="k">${esc(whoLabel(t.a))}</span></button>` : ''}
      <button data-a="more">${T(menuMore ? 'menuLess' : 'menuMore')}<span class="k">${menuMore ? '▴' : '▾'}</span></button>
      ${menuMore ? `<button data-a="sub">${T('subs')}</button>
        <button data-a="note">${T('note')}</button>
        ${t.r && !t.d ? `<button data-a="skip">${T('skip')}</button>` : ''}
-       ${from!=='ideas' && !teamOn ? `<button data-a="ideas">${T('toIdeas')}</button>` : ''}` : ''}
+       ${from!=='ideas' ? `<button data-a="ideas">${T('toIdeas')}</button>` : ''}` : ''}
      <div class="sep"></div>
      <button data-a="del" class="rm">${T('del')}</button>`;
 
@@ -4031,7 +3981,6 @@ const onTodoAction = e=>{
     todoSheet = false; closeSheet();               // 다른 화면으로 넘어가는 동작은 시트를 걷는다
   }
   if(a === 'newcat'){ closeMenu(); catForTodo = {from, id}; return openCat(null); }
-  if(a === 'who'){ closeMenu(); return openWho({from, id}); }
   if(a === 'edit'){ closeMenu(); return startEdit(from, id); }
   if(a === 'skip' || a === 'sub' || a === 'note'){
     closeMenu();
@@ -4314,7 +4263,6 @@ const actionable = k => bucket(k).filter(t => !t.d && !t.sk && !t.w);
 function moveTodos(from, ids, to){
   const list = doc.todos[from];
   if(!list || from === to) return 0;
-  if(teamOn && to !== null && !isDateKey(to)) return 0;        // 팀 일정은 날짜가 있어야 한다 ('나중에·보관함'으로는 못 보낸다)
   const set = new Set(ids);
   const moving = list.filter(t => set.has(t.id));
   if(!moving.length) return 0;
@@ -4558,12 +4506,11 @@ async function renderCfg(){
     ? `<div class="cfgsec">${T('secApp')}</div><div class="grid2"><div class="grp wide">
         <div class="hint">${/iPhone|iPad/.test(navigator.userAgent) ? T('installIos') : T('installAndroid')}</div>
         </div></div>` : '';
-  const modeBlock = !user ? '' : `<div class="cfgsec">${TM('modeLbl')}</div><div class="grid2"><div class="grp wide">
-      <div class="mseg" id="modeSeg">
-        <button data-v="personal" class="${teamOn ? '' : 'on'}">${TM('modePers')}</button>
-        <button data-v="team" class="${teamOn ? 'on' : ''}">${TM('modeTeam')}</button>
+  const modeBlock = `<div class="cfgsec">${SPT('lbl')}</div><div class="grid2"><div class="grp wide">
+      <div class="mseg" id="spSeg">
+        <button data-s="me" class="${space === 'me' ? 'on' : ''}">${SPT('me')}</button>
+        <button data-s="work" class="${space === 'work' ? 'on' : ''}">${SPT('work')}</button>
       </div>
-      ${teamOn ? `<button class="chip" id="openTeam" style="margin-top:10px">${SI.users} ${esc(team.name)} · ${TM('teamSettings')}</button>` : ''}
     </div></div>`;
   $('#cfgBody').innerHTML = `${modeBlock}${installBlock}<div class="cfgsec">${T('secLook')}</div><div class="grid2">
     <div class="grp"><span class="lbl">${T('theme')}</span>
@@ -4599,13 +4546,13 @@ async function renderCfg(){
       <select id="selCountry">${opt('', T('none'), !doc.ui.country)}
         ${cs.map(c=>opt(c.countryCode, (()=>{try{return cname.of(c.countryCode)||c.name}catch{return c.name}})(),
           doc.ui.country===c.countryCode)).join('')}</select></div>
-    <div class="grp wide" ${teamOn ? 'hidden' : ''}><span class="lbl">${T('rollLbl')}</span>
+    <div class="grp wide"><span class="lbl">${T('rollLbl')}</span>
       <div class="seg" data-k="rollover">
         <button data-v="0" class="${doc.ui.rollover?'':'on'}">${T('rollKeep')}</button>
         <button data-v="1" class="${doc.ui.rollover?'on':''}">${T('rollMove')}</button>
       </div>
       <div class="hint">${T('rollHint')}</div></div>
-    <div class="grp" ${teamOn ? 'hidden' : ''}><span class="lbl">${T('routines')}</span>
+    <div class="grp"><span class="lbl">${T('routines')}</span>
       <button class="chip" id="openRout">${T('manage')} (${doc.rout.length})</button></div>
     </div>
     <div class="cfgsec">${T('secNoti')}</div><div class="grid2">
@@ -4632,7 +4579,7 @@ async function renderCfg(){
       : `<button type="button" class="leadbtn" id="leadBtn" data-title="${esc(T('timeAlertLbl'))}">${T('timeLead')[[-1, 0, 10, 30, 60].indexOf(doc.ui.timeLead ?? 0)]}${ICON.chev}</button>`}
       <div class="hint">${T('timeAlertHint')}${APP ? '' : T('timeHintWeb')}</div></div>
     </div>
-    <div class="cfgsec" ${teamOn ? 'hidden' : ''}>${T('secData')}</div><div class="grid2" ${teamOn ? 'hidden' : ''}>
+    <div class="cfgsec">${T('secData')}</div><div class="grid2">
     <div class="grp wide">
       <button class="chip" id="expBtn">${T('export')}</button>
       <button class="chip" id="impBtn">${T('import')}</button>
@@ -4648,11 +4595,10 @@ async function renderCfg(){
     </div>
     <div class="ver">v${BUILD}</div>`;
 
-  $('#modeSeg')?.addEventListener('click', e => {
-    const v = e.target.dataset.v; if(!v || (v === 'team') === teamOn) return;
-    $('#cfg').close(); setMode(v);
+  $('#spSeg')?.addEventListener('click', e => {
+    const s = e.target.dataset.s; if(!s || s === space) return;
+    $('#cfg').close(); setSpace(s);
   });
-  $('#openTeam')?.addEventListener('click', () => { $('#cfg').close(); openTeamDlg(); });
   $('#instBtn')?.addEventListener('click', async ()=>{
     const ev = installEvt; installEvt = null;           // 이벤트는 한 번밖에 못 쓴다
     try{ await ev.prompt(); await ev.userChoice; }catch{}
@@ -4874,11 +4820,10 @@ function timedList(){
   const lead = doc.ui.timeLead ?? 0;
   if(lead < 0) return [];                              // '알림 없음'
   const now = Date.now(), out = [];
-  /* 개인 일정 + (저장해 둔) 팀 일정 — 어느 모드에 있든 두 쪽 알람이 다 울린다.
-     팀 일정은 '나에게 지정됐거나 전체'인 것만, 제목 앞에 팀 이름을 붙인다. */
-  const mine = teamOn ? pdoc : doc, tdoc = teamOn ? doc : savedTeamDoc();
-  const srcs = [[mine, '']];
-  if(tdoc?.team) srcs.push([tdoc, `[${tdoc.team.name}] `]);
+  /* 지금 공간 + 다른 공간(저장해 둔 것) — 어느 쪽에 있든 개인·회사 알람이 다 울린다. 회사 일정은 제목 앞에 [회사] 를 붙인다. */
+  const tag = SPT('tag'), other = otherDoc();
+  const srcs = [[doc, space === 'work' ? tag : '']];
+  if(other?.todos) srcs.push([other, space === 'work' ? '' : tag]);
   for(const [src, pre] of srcs)
     for(const [k, list] of Object.entries(src.todos)){
       if(!isDateKey(k)) continue;
@@ -4886,7 +4831,6 @@ function timedList(){
       if(day < now - 864e5 || day > now + 14 * 864e5) continue;
       for(const t of list){
         if(!t.tm || t.d || t.sk || t.w) continue;
-        if(pre && t.a?.length && !t.a.includes(tdoc.team.me)) continue;     // 남에게 지정된 팀 일정
         const [h, m] = t.tm.split(':').map(Number);
         const at = new Date(dOf(k)).setHours(h || 0, m || 0, 0, 0) - lead * 60000;
         if(at > now) out.push({id:t.id, at, title:pre + t.t, body:T('timeBody')(fmtTm(t.tm), lead)});
@@ -4894,16 +4838,15 @@ function timedList(){
     }
   return out.sort((a,b) => a.at - b.at).slice(0, 60);
 }
-/* 팀 모드가 아닐 때도 알람을 이어가려고, 마지막으로 보던 팀의 저장본을 읽어 둔다 */
-let savedTeamRaw = null, savedTeamParsed = null;
-function savedTeamDoc(){
-  const tid = localStorage.getItem('daynua.team'); if(!tid) return null;
-  const raw = localStorage.getItem('daynua.doc.team.' + tid);
-  if(raw !== savedTeamRaw){ savedTeamRaw = raw; try{ savedTeamParsed = raw ? JSON.parse(raw) : null; }catch{ savedTeamParsed = null; } }
-  return savedTeamParsed;
+/* 다른 공간의 저장본 — 그쪽 알람도 이어가려고 읽어 둔다 (바뀌었을 때만 다시 푼다) */
+let otherRaw = null, otherParsed = null;
+function otherDoc(){
+  const raw = localStorage.getItem(space === 'work' ? slot : slot + '.work');
+  if(raw !== otherRaw){ otherRaw = raw; try{ otherParsed = raw ? JSON.parse(raw) : null; }catch{ otherParsed = null; } }
+  return otherParsed;
 }
 /* 위젯·알림 요약은 늘 개인 할 일로 */
-const personalOpen = () => ((teamOn ? pdoc : doc).todos[todayKey()] || []).filter(t => !t.d && !t.sk && !t.w);
+const personalOpen = () => (((space === 'me' ? doc : otherDoc())?.todos?.[todayKey()]) || []).filter(t => !t.d && !t.sk && !t.w);
 function syncTimed(){
   const list = timedList();
   if(APP){
@@ -5102,9 +5045,9 @@ function watch(){
   if(chan){ try{ sb.removeChannel(chan); }catch{} chan = null; }
   live = false;
   if(!sb || !user) return setAcct();
-  chan = sb.channel('state-' + user.id)
+  chan = sb.channel('state-' + space + '-' + user.id)
     .on('postgres_changes',
-        {event:'*', schema:'public', table:'state', filter:'user_id=eq.' + user.id},
+        {event:'*', schema:'public', table:tbl(), filter:'user_id=eq.' + user.id},
         pullSoon)
     .subscribe(st => { live = (st === 'SUBSCRIBED'); setAcct(); });
 }
@@ -5136,17 +5079,18 @@ setAcct();
 async function useSlot(){
   const next = slotOf(user);
   if(next === slot) return;
-  if(teamOn) teamLeave(true);                     // 다른 계정으로 바뀌면 팀 화면부터 걷는다
   save();
-  const carry = slot === GUEST_SLOT && hasContent(doc) ? doc : null;
+  const carry = slot === GUEST_SLOT && space === 'me' && hasContent(doc) ? doc : null;   // 게스트의 개인 기록만 따라간다
   slot = next; undoStack.length = 0;
   localStorage.setItem('daynua.slot', slot);
-  doc = migrate(readSlot(slot) || FRESH());
+  space = localStorage.getItem(spaceKey()) === 'work' ? 'work' : 'me';        // 이 계정이 마지막으로 쓰던 공간으로
+  doc = migrate(readSlot(docKey()) || FRESH());
   if(carry){
     snapRing('merge');
-    doc = migrate(mergeDocs(doc, carry));
+    const merged = migrate(mergeDocs(migrate(readSlot(slot) || FRESH()), carry));
+    merged.ts = Date.now();
+    if(space === 'me') doc = merged; else { try{ localStorage.setItem(slot, JSON.stringify(merged)); }catch{} }
     localStorage.removeItem(GUEST_SLOT);          // 다음 계정으로 또 따라가지 않게
-    doc.ts = Date.now();
   }
   quickCat = catOf(quickCat) ? quickCat : '';
   applyUI(); runRollover(); render();
@@ -5161,7 +5105,6 @@ document.addEventListener('visibilitychange', ()=>{
   if(tz !== lastTz){ lastTz = tz; syncPush(); }
   if(user && !live) watch();                     // 자는 동안 끊긴 연결을 되살린다
   if(user && pushDirty) push();                  // 못 올린 것이 있으면 지금 다시
-  if(teamOn) return void teamPull();
   if(user) pull(); else render();
 });
 
@@ -5169,7 +5112,7 @@ function setAcct(){
   const on = !!(user && sb);
   const name = on ? user.email.split('@')[0] : (sb ? T('login') : T('guest'));
   $('#acct').classList.toggle('out', !on);
-  const bad = on && (pushFails >= 2 || tfails >= 2);
+  const bad = on && pushFails >= 2;
   $('#acct').classList.toggle('bad', bad);
   $('#acct').title = bad ? T('syncFail') : '';
   $('#acct').innerHTML =
@@ -5195,13 +5138,20 @@ function renderKeepInput(){
     try{ n.setSelectionRange(keep.s, keep.e); }catch{}
   }
 }
+/* 회사 공간의 표가 서버에 아직 없다 — 이 기기에만 저장되고, 한 번만 알린다 */
+function spaceMissing(e){
+  if(space !== 'work' || !isMissing(e)) return false;
+  if(!spaceWarned){ spaceWarned = true; flash(SPT('needSql')); }
+  return true;
+}
 async function pull(){
-  if(teamOn) return;                               // 팀 모드 동안 개인 문서는 가만히 둔다 (돌아오면 그때 맞춘다)
   if(!sb || !user || pulling) return;
   pulling = true;
+  const sp0 = space;
   try{
-    const { data, error } = await sb.from('state').select('doc').eq('user_id', user.id).maybeSingle();
-    if(error) return console.warn(error);
+    const { data, error } = await sb.from(tbl()).select('doc').eq('user_id', user.id).maybeSingle();
+    if(sp0 !== space) return;                          // 받는 사이 공간이 바뀌었다 — 이 답은 다른 문서의 것
+    if(error) return spaceMissing(error) || console.warn(error);
     syncAt = Date.now();
     const srv = data?.doc;
     if(!srv?.todos){ if(hasContent(doc)) push(); return; }
@@ -5220,7 +5170,6 @@ async function pull(){
 /* 올리기가 실패하면(오프라인 등) 그대로 두지 않는다 — 표시를 남기고, 연결이 돌아오거나 화면에 다시 돌아오면,
    아니면 점점 늘려가며 다시 시도한다. 안 그러면 다음에 또 고치기 전까지 서버에 영영 안 올라간다. */
 function push(){
-  if(teamOn) return teamPush();                    // 팀 문서는 서버의 팀 표로 따로 간다
   if(!sb || !user) return;
   pushDirty = true;
   clearTimeout(timer);
@@ -5238,15 +5187,17 @@ addEventListener('online', ()=>{ if(pushDirty) push(); });
 /* 쓰기 직전에 서버를 한 번 더 본다. 그 사이 다른 기기가 썼으면 합치고 나서 쓴다.
    순서 판정은 시계가 아니라 rev — 기기 시간이 틀려도 한쪽이 영원히 이기지 않는다. */
 async function pushNow(){
-  if(!sb || !user || teamOn) return;
+  if(!sb || !user) return;
   pushDirty = false;
   try{
     /* 쓰기 전에 서버의 개정 번호만 본다 — 문서 전체(수백 KB)를 매번 내려받지 않는다.
        내가 최신이면 그대로 쓰고, 뒤처졌을 때만 받아서 합친다.
        개정 번호만 읽는 게 실패하면 예전처럼 통째로 읽는다 (안전이 먼저). */
-    const full = () => sb.from('state').select('doc').eq('user_id', user.id).maybeSingle();
+    const sp0 = space, T0 = tbl();                          // 쓰는 도중 공간이 바뀌어도 이 문서는 제 표로만 간다
+    const full = () => sb.from(T0).select('doc').eq('user_id', user.id).maybeSingle();
     let srv = null, srvRev = 0;
-    const head = await sb.from('state').select('rev:doc->rev').eq('user_id', user.id).maybeSingle();
+    const head = await sb.from(T0).select('rev:doc->rev').eq('user_id', user.id).maybeSingle();
+    if(sp0 !== space) return;
     if(head.error){
       srv = (await full()).data?.doc; srvRev = srv?.rev|0;
     }else{
@@ -5260,9 +5211,10 @@ async function pushNow(){
       save(); if(changed) renderKeepInput();
     }
     doc.rev = Math.max(doc.rev|0, srvRev) + 1;
-    const { error } = await sb.from('state')
+    if(sp0 !== space) return;
+    const { error } = await sb.from(T0)
       .upsert({ user_id:user.id, doc, updated_at:new Date().toISOString() });
-    if(error){ console.warn(error); return pushFailed(); }
+    if(error){ if(spaceMissing(error)) return; console.warn(error); return pushFailed(); }
     syncAt = Date.now();
     if(pushFails){ pushFails = 0; setAcct(); }
     save();
@@ -5313,9 +5265,9 @@ function renderAcct(){
     $('#delAcct').disabled = false;
     if(!r?.ok){ delArmed = false; return acctMsg(T('delAcctFail')); }
     await sb.auth.signOut();
-    localStorage.removeItem(slot);
+    localStorage.removeItem(slot); localStorage.removeItem(slot + '.work'); localStorage.removeItem(spaceKey());
     localStorage.removeItem('daynua.slot');
-    slot = GUEST_SLOT;
+    slot = GUEST_SLOT; space = 'me';
     localStorage.removeItem(GUEST_SLOT);
     doc = migrate(FRESH());
     delArmed = false;
@@ -5420,621 +5372,61 @@ render();
    · 로그인돼 있고(자동 로그인 켬 또는 이번 실행에서 로그인) → 로고가 다 써지면 앱으로
    · 자동 로그인을 끈 채 새로 켰다 → 로그아웃시키고 로그인 화면
    · 로그인 안 함 → 로그인 화면 ('로그인 없이 시작'을 한 번 골랐으면 그대로 앱으로) */
-/* ═══════════════════════════════ 팀 ═══════════════════════════════
-   같은 앱의 두 번째 모드. 개인 문서(state 한 줄)는 그대로 두고, 팀 일정은 일정 1건 = 표의 1줄(team_items)로 따로 둔다.
-   화면은 개인용 코드를 그대로 쓴다: 팀 모드에서 doc 은 '서버의 팀 일정을 개인 문서 모양으로 펼친 것'이고,
-   고치면 마지막으로 서버와 맞춘 모습(tbase)과 비교해 바뀐 줄만 올린다 (teamFlush).
-   서버 쪽은 team.sql — 권한(누가 무엇을 보고 고치나)은 전부 거기서 막는다. 여기는 화면과 편의만. */
-const TX = {
-  ko:{
-    modeTitle:'어떻게 쓸까요?', modeSub:'나중에 설정에서 바꿀 수 있어요.',
-    modePers:'개인', modePersSub:'나 혼자 쓰는 할 일', modeTeam:'팀', modeTeamSub:'가족·친구와 함께 보는 일정',
-    modeLbl:'사용 방식', teamSettings:'팀 설정',
-    newTitle:'팀 시작하기', newSub:'새 팀을 만들거나, 받은 초대 코드로 들어가요.',
-    teamName:'팀 이름', teamNamePh:'예: 우리 가족', myName:'내 이름', myNamePh:'팀에서 보일 이름',
-    create:'팀 만들기', joinBtn:'코드로 들어가기', codePh:'초대 코드', or:'또는', later:'나중에',
-    who:'대상', whoAll:'전체', whoMe:'나', whoTitle:'누구의 일정인가요?',
-    whoSub:'고른 사람에게만 보이고 알림이 가요. 아무도 고르지 않으면 전체예요.', ok:'확인',
-    inbox:'알림함', inboxEmpty:'새 알림이 없어요.', markRead:'모두 읽음',
-    nNew:n=>`${n}님이 일정을 지정했어요`, nChange:n=>`${n}님이 일정을 바꿨어요`, nCancel:n=>`${n}님이 일정을 취소했어요`,
-    newN:n=>`새 알림 ${n}개`,
-    logTitle:'기록', logPh:'이날 한 일을 남겨요', logAdd:'남기기', logEmpty:'아직 기록이 없어요.',
-    mineOnly:'내 것만',
-    members:'멤버', rAdmin:'관리자', rEditor:'편집자', rMember:'멤버',
-    invite:'초대', inviteHint:'이 코드나 링크를 받은 사람이 로그인하면 팀에 들어와요.',
-    copyLink:'링크 공유', copied:'링크를 복사했어요', newCode:'코드 새로 만들기',
-    memberAdd:'멤버가 자기 일정 직접 추가', memberAddOn:'허용', memberAddOff:'관리자·편집자만',
-    leave:'팀 나가기', delTeam:'팀 삭제', switchTeam:'다른 팀', newTeam:'새 팀 · 코드로 들어가기',
-    leaveAsk:'이 팀에서 나갈까요? 내가 만든 일정은 팀에 그대로 남아요.',
-    delAsk:'팀을 삭제할까요? 모든 일정과 기록이 사라지고 되돌릴 수 없어요.',
-    kickAsk:n=>`${n}님을 팀에서 내보낼까요?`,
-    denied:'권한이 없어 저장되지 않았어요. 서버 내용으로 되돌렸어요.',
-    needSql:'서버에 팀 기능이 아직 준비되지 않았어요. (Supabase 에서 team.sql 을 실행해야 해요)',
-    badCode:'초대 코드를 찾을 수 없어요.', full:'이 팀은 가득 찼어요.', many:'팀은 5개까지 가능해요.',
-    needName:'이름을 적어 주세요.', offline:'인터넷에 연결돼 있어야 해요.',
-    loginNeed:'팀을 쓰려면 로그인이 필요해요.', teamGone:'이 팀에서 더 이상 볼 수 없어요.'
-  },
-  en:{
-    modeTitle:'How will you use it?', modeSub:'You can change this later in Settings.',
-    modePers:'Personal', modePersSub:'Just my own to-dos', modeTeam:'Team', modeTeamSub:'A shared calendar with family or friends',
-    modeLbl:'Mode', teamSettings:'Team settings',
-    newTitle:'Start a team', newSub:'Create a new team, or join with an invite code.',
-    teamName:'Team name', teamNamePh:'e.g. Our family', myName:'My name', myNamePh:'Name shown in the team',
-    create:'Create team', joinBtn:'Join with code', codePh:'Invite code', or:'or', later:'Later',
-    who:'For', whoAll:'Everyone', whoMe:'Me', whoTitle:'Who is this for?',
-    whoSub:'Only the people you pick see it and get notified. Pick nobody for everyone.', ok:'OK',
-    inbox:'Inbox', inboxEmpty:'No new notifications.', markRead:'Mark all read',
-    nNew:n=>`${n} assigned you an event`, nChange:n=>`${n} changed an event`, nCancel:n=>`${n} cancelled an event`,
-    newN:n=>`${n} new notifications`,
-    logTitle:'Log', logPh:'Write what you did today', logAdd:'Post', logEmpty:'Nothing logged yet.',
-    mineOnly:'Mine only',
-    members:'Members', rAdmin:'Admin', rEditor:'Editor', rMember:'Member',
-    invite:'Invite', inviteHint:'Anyone with this code or link joins the team after logging in.',
-    copyLink:'Share link', copied:'Link copied', newCode:'New code',
-    memberAdd:'Members add their own events', memberAddOn:'Allowed', memberAddOff:'Admins & editors only',
-    leave:'Leave team', delTeam:'Delete team', switchTeam:'Other teams', newTeam:'New team · join with code',
-    leaveAsk:'Leave this team? Events you created stay in the team.',
-    delAsk:'Delete the team? All events and logs are lost for good.',
-    kickAsk:n=>`Remove ${n} from the team?`,
-    denied:'Not allowed, so it was not saved. Reverted to the server version.',
-    needSql:'Team features are not set up on the server yet (run team.sql in Supabase).',
-    badCode:'Invite code not found.', full:'This team is full.', many:'You can be in up to 5 teams.',
-    needName:'Please enter a name.', offline:'You need to be online.',
-    loginNeed:'Log in to use teams.', teamGone:'You can no longer see this team.'
-  }
-};
-const TM = k => (TX[doc?.ui?.lang] || TX.ko)[k];
-const ROLE = {admin:'rAdmin', editor:'rEditor', member:'rMember'};
-const ini = n => esc([...String(n || '?')][0]);
-const hm = iso => new Intl.DateTimeFormat(loc(), {hour:'numeric', minute:'2-digit'}).format(new Date(iso));
-const isMissing = e => ['42P01','PGRST205','PGRST202','42883'].includes(e?.code) || /schema cache|does not exist/i.test(e?.message || '');
-const isNet = e => !e?.code && /Failed to fetch|NetworkError|network|Load failed/i.test(String(e?.message || e));
-const teamErr = e => { const m = String(e?.message || e || '');
-  return /bad code/.test(m) ? TM('badCode') : /team full/.test(m) ? TM('full') : /too many/.test(m) ? TM('many')
-       : isMissing(e) ? TM('needSql') : isNet(e) ? TM('offline') : m; };
+/* ═══════════════════════════════ 공간: 개인 · 회사 ═══════════════════════════════
+   같은 앱, 같은 기능. 기록만 둘로 나눈다 — 하나는 내가 하고 싶은 것, 하나는 회사에서 할 일.
+   회사 공간도 개인과 똑같은 문서(doc)다. 저장 칸만 따로 — 이 기기는 slot + '.work', 서버는 state_work 표(space.sql).
+   화면 그리는 코드는 그대로 doc 만 읽는다. 공간을 바꾸면 doc 을 다른 칸의 것으로 갈아 끼운다. */
+const spaceKey = () => 'daynua.space.' + slot;       // 이 계정(게스트)이 고른 공간 — 처음 로그인했을 때 한 번 묻는다
 
-const memOf = id => tmem.find(m => m.user_id === id);
-const canEdit = () => !!team && (team.role === 'admin' || team.role === 'editor');
-const canAssign = canEdit;                                  // 멤버의 일정은 늘 '나에게' (서버도 그렇게만 받는다)
-const defaultWho = () => canEdit() ? [] : [meId];
-const whoLabel = a => !a?.length ? TM('whoAll')
-  : a.length === 1 ? (a[0] === meId ? TM('whoMe') : memOf(a[0])?.name || '?')
-  : `${a.includes(meId) ? TM('whoMe') : memOf(a[0])?.name || '?'} +${a.length - 1}`;
-
-/* ── 서버에 올릴 모양과, 바뀌었는지 보는 지문 ── */
-const TSKIP = new Set(['id','a','by','dn','d','dd']);
-function payloadOf(k, t){
-  const data = {};
-  for(const x of Object.keys(t).sort()) if(!TSKIP.has(x) && t[x] !== undefined) data[x] = t[x];
-  return {day:k, data, assignees:[...(t.a || [])].sort()};
-}
-const hashStr = s => { let h = 2166136261; for(let i = 0; i < s.length; i++){ h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return (h >>> 0).toString(36) + s.length; };
-const hashOf = (k, t) => hashStr(JSON.stringify(payloadOf(k, t)));
-/* 순서는 ord 로 — 끼워 넣거나 옮긴 것만 이웃 사이의 값을 받는다 (나머지 줄은 안 바뀐다) */
-function fixOrd(list){
-  let prev = 0, changed = false;
-  for(let i = 0; i < list.length; i++){
-    const t = list[i];
-    if(t.ord > prev){ prev = t.ord; continue; }
-    let next; for(let j = i + 1; j < list.length; j++) if(list[j].ord > prev){ next = list[j].ord; break; }
-    t.ord = next ? (prev + next) / 2 : prev + 1024; prev = t.ord; changed = true;
-  }
-  return changed;
-}
-const baseKey = () => 'daynua.base.' + team.id;
-const saveBase = () => { try{ localStorage.setItem(baseKey(), JSON.stringify(tbase)); }catch{} };
-let tbaseOK = false;
-
-/* ── 팀 들어가기 · 나오기 ── */
-const modeKey = () => 'daynua.mode.' + (user?.id || localStorage.getItem('daynua.lastUid') || '');
-async function fetchMyTeams(){
-  const { data, error } = await sb.from('team_members')
-    .select('role,name,teams(id,name,code,cats,member_add)').eq('user_id', user.id);
-  if(error) throw error;
-  return data.filter(r => r.teams).map(r => ({...r.teams, role:r.role, myName:r.name}));
-}
-let entering = false;
-async function enterTeam(){
-  if(teamOn || entering) return;
-  entering = true;
-  try{ await enterTeam1(); } finally{ entering = false; }
-}
-async function enterTeam1(){
-  let list;
-  try{
-    if(!sb || !user) throw new Error('Failed to fetch');
-    list = await fetchMyTeams();
-    localStorage.setItem('daynua.teams', JSON.stringify(list));
-  }catch(e){
-    if(isMissing(e)){ flash(TM('needSql')); localStorage.setItem(modeKey(), 'personal'); return; }
-    try{ list = JSON.parse(localStorage.getItem('daynua.teams') || '[]'); }catch{ list = []; }   // 오프라인 — 저장해 둔 팀으로
-  }
-  if(!list.length){ if(sb && user) return openTeamNew(true); return; }
-  activateTeam(list.find(x => x.id === localStorage.getItem('daynua.team')) || list[0]);
-}
-function activateTeam(t){
-  localStorage.setItem('daynua.team', t.id);
-  pdoc = doc; teamOn = true; undoStack.length = 0;      // 다른 문서의 되돌리기가 이 문서를 덮지 않게
-  meId = user?.id || localStorage.getItem('daynua.lastUid') || '';
-  team = {id:t.id, name:t.name, code:t.code, role:t.role, myName:t.myName, member_add:t.member_add};
-  tslot = 'daynua.doc.team.' + t.id;
-  doc = migrate(readSlot(tslot) || FRESH());
-  doc.ui = {...pdoc.ui};
-  doc.team = {id:t.id, name:t.name, me:meId};
-  doc.cats = t.cats?.length || !doc.cats.length ? (t.cats || []) : doc.cats;
-  tcatBase = JSON.stringify(doc.cats);
-  tmem = doc.mem || []; tinbox = doc.inbox || []; tlogs = doc.logs || {};
-  try{ tbase = JSON.parse(localStorage.getItem(baseKey()) || 'null') || {}; tbaseOK = !!localStorage.getItem(baseKey()); }
-  catch{ tbase = {}; tbaseOK = false; }
-  if(!tbaseOK) for(const [k, l] of Object.entries(doc.todos)) if(isDateKey(k)) for(const x of l) tbase[x.id] = [hashOf(k, x), x.d ? 1 : 0];
-  qWho = defaultWho(); view = 'day';
-  applyUI(); render(); syncTimed();
-  teamWatch(); teamPull();
-}
-function teamLeave(quiet){
-  if(!teamOn) return;
-  teamUnwatch(); clearTimeout(tpushT); clearTimeout(tpullT);
+async function setSpace(s){
+  if(s === space) return;
+  if(user && pushDirty){ clearTimeout(timer); await pushNow(); }   // 떠나기 전에, 지금 공간의 표로 올려 둔다
   save();
-  const back = pdoc;
-  teamOn = false; team = null; pdoc = null; tbase = {}; tbaseOK = false; qWho = [];
-  doc = back; undoStack.length = 0;
-  if(!quiet){ applyUI(); render(); pull(); syncTimed(); }
-}
-function setMode(m){
-  if(!user){ flash(TM('loginNeed')); return; }
-  localStorage.setItem(modeKey(), m);
-  if(m === 'team'){ if(!teamOn) enterTeam(); }
-  else teamLeave();
-}
-function teamGone(){
-  flash(TM('teamGone'));
-  localStorage.removeItem('daynua.team');
-  teamLeave(true); enterTeam();
+  const ui = doc.ui;                                  // 테마·언어·강조색은 두 공간이 같게
+  space = s; localStorage.setItem(spaceKey(), s); undoStack.length = 0;
+  doc = migrate(readSlot(docKey()) || FRESH()); doc.ui = {...ui};
+  quickCat = catOf(quickCat) ? quickCat : '';
+  view = 'day'; dayAll = ''; editId = null;
+  watch(); applyUI(); runRollover(); render(); syncTimed();
+  if(user) pull();
 }
 
-/* ── 서버와 맞추기 ── */
-const teamPush = () => { if(!teamOn || !sb || !user) return; clearTimeout(tpushT); tpushT = setTimeout(teamFlush, 700); };
-const tpullSoon = force => { clearTimeout(tpullT); tpullT = setTimeout(() => teamPull(force), 500); };
-function tfail(e){
-  console.warn(e);
-  if(!isNet(e)){                                          // 서버가 거절했다 — 권한이 없거나 팀 표가 없다. 서버 내용으로 되돌린다.
-    flash(isMissing(e) ? TM('needSql') : TM('denied'));
-    return tpullSoon(true);
-  }
-  tfails++; clearTimeout(tpushT);
-  tpushT = setTimeout(teamFlush, Math.min(300000, 15000 * 2 ** (tfails - 1)));      // 15초 → 30초 → … 최대 5분
-  if(tfails === 2) flash(T('syncFail'));
-  setAcct();
+/* 화면 위쪽의 스위치 */
+function renderSpaceBar(){
+  const b = $('#spBar');
+  const h = ['me', 'work'].map(s =>
+    `<button type="button" data-s="${s}" class="${s}${space === s ? ' on' : ''}" aria-pressed="${space === s}">${SPT(s)}</button>`).join('');
+  if(b.dataset.h !== h){ b.dataset.h = h; b.setAttribute('aria-label', SPT('aria')); b.innerHTML = h; }
 }
-async function teamFlush(){
-  if(!teamOn || !sb || !user || !tbaseOK) return;
-  if(tflushing){ tagain = true; return; }
-  tflushing = true; clearTimeout(tpushT);
-  let touched = false;
-  try{
-    do{
-      tagain = false;
-      const cur = new Map();
-      for(const [k, list] of Object.entries(doc.todos)){
-        if(!isDateKey(k)) continue;
-        if(fixOrd(list)) touched = true;
-        for(const t of list) cur.set(t.id, [k, t]);
-      }
-      const ins = [], upd = [], dones = [], dels = [];
-      for(const [id, [k, t]] of cur){
-        const b = tbase[id], h = hashOf(k, t);
-        if(!b) ins.push([id, k, t, h]);
-        else{ if(b[0] !== h) upd.push([id, k, t, h]); if((b[1] ? 1 : 0) !== (t.d ? 1 : 0)) dones.push([id, t]); }
-      }
-      for(const id of Object.keys(tbase)) if(!cur.has(id)) dels.push(id);
-      const catsNow = JSON.stringify(doc.cats), catsChanged = catsNow !== tcatBase;
-      if(!ins.length && !upd.length && !dones.length && !dels.length && !catsChanged) break;
+$('#spBar').addEventListener('click', e => { const s = e.target.closest('button')?.dataset.s; if(s) setSpace(s); });
 
-      if(ins.length){
-        const { error } = await sb.from('team_items').insert(ins.map(([id, k, t]) => ({id, team_id:team.id, ...payloadOf(k, t)})));
-        if(error) throw error;
-        for(const [id, , t, h] of ins){ tbase[id] = [h, 0]; if(t.d) dones.push([id, t]); }
-      }
-      for(const [id, k, t, h] of upd){
-        const p = payloadOf(k, t);
-        const { data, error } = await sb.from('team_items').update(p).eq('id', id).select('id');
-        if(error) throw error;
-        if(!data?.length) throw {code:'42501', message:'no rows'};              // 서버가 안 받아 줬다 (권한)
-        tbase[id][0] = h;
-      }
-      for(const [id, t] of dones){
-        const { error } = await sb.rpc('set_done', {p_item:id, p_done:!!t.d});
-        if(error) throw error;
-        tbase[id][1] = t.d ? 1 : 0;
-      }
-      if(dels.length){
-        const { error } = await sb.from('team_items').delete().in('id', dels);
-        if(error) throw error;
-        for(const id of dels) delete tbase[id];
-      }
-      if(catsChanged){
-        const { data, error } = await sb.from('teams').update({cats: doc.cats}).eq('id', team.id).select('id');
-        if(error) throw error;
-        if(!data?.length) throw {code:'42501', message:'no rows'};
-        tcatBase = catsNow;
-      }
-      saveBase();
-    }while(tagain);
-    if(tfails){ tfails = 0; setAcct(); }
-    syncAt = Date.now();
-  }catch(e){ tfail(e); }
-  finally{
-    tflushing = false;
-    if(touched) save();
-  }
+/* 처음 로그인한 사람 — 어떻게 나눠 쓸지 */
+const sp = $('#spDlg');
+sp.addEventListener('cancel', e => { if(!localStorage.getItem(spaceKey())) e.preventDefault(); });
+function openSpacePick(){
+  $('#spT').textContent = SPT('title'); $('#spS').textContent = SPT('sub');
+  $('#spB').innerHTML = ['me', 'work'].map(s =>
+    `<button class="mode" data-s="${s}"><b>${SPT(s)}</b><span>${SPT(s + 'Sub')}</span></button>`).join('');
+  if(!sp.open) sp.showModal();
 }
-const fetchAll = async q => {
-  const out = [];
-  for(let i = 0; ; i += 1000){
-    const { data, error } = await q().range(i, i + 999);
-    if(error) throw error;
-    out.push(...data); if(data.length < 1000) return out;
-  }
-};
-function buildTodos(items){
-  const todos = {};
-  for(const r of items){
-    const db = r.done_by || {}, mine = db[meId];
-    const t = {...(r.data || {}), id:r.id, a:r.assignees || [], by:r.created_by, dn:Object.keys(db), d:!!mine};
-    t.t ??= ''; t.mv ??= 0;
-    if(mine) t.dd = key(new Date(mine)); else delete t.dd;
-    (todos[r.day] ||= []).push(t);
-  }
-  for(const l of Object.values(todos)) l.sort((a, b) => (a.ord ?? 1e18) - (b.ord ?? 1e18));
-  return todos;
-}
-async function teamPull(force){
-  if(!teamOn || !sb || !user || tpulling) return;
-  tpulling = true;
-  try{
-    if(!force){ await teamFlush(); if(tfails) return; }       // 못 올린 내 변경이 남았으면 서버 것으로 덮지 않는다
-    const ts0 = doc.ts, id = team.id;
-    const [tr, mem, itemsAll, logsAll, inbox] = await Promise.all([
-      sb.from('teams').select('*').eq('id', id).maybeSingle(),
-      sb.from('team_members').select('*').eq('team_id', id),
-      fetchAll(() => sb.from('team_items').select('*').eq('team_id', id).order('day').order('id')),
-      fetchAll(() => sb.from('team_logs').select('*').eq('team_id', id).order('created_at').order('id')),
-      sb.from('team_inbox').select('*').eq('team_id', id).eq('user_id', user.id).order('created_at', {ascending:false}).limit(50)
-    ]);
-    if(tr.error) throw tr.error;
-    if(mem.error) throw mem.error;
-    if(inbox.error) throw inbox.error;
-    if(!tr.data || !mem.data.some(m => m.user_id === meId)) return teamGone();
-    /* 아이디는 화면 속성에 그대로 들어간다 — 앱이 만든 모양(uuid)이 아니면 내려받지 않는다 */
-    const okId = r => /^[\w-]{1,64}$/.test(r?.id || '');
-    const items = itemsAll.filter(okId), logs = logsAll.filter(okId);
-    if(Array.isArray(tr.data.cats)) tr.data.cats = tr.data.cats.filter(c => /^[\w-]{1,64}$/.test(c?.id || ''));
-    if(!force && doc.ts !== ts0){ tpullSoon(); return; }       // 받는 사이 새로 적은 게 있다 — 지우지 않고 다음에
-    if(!teamOn || team.id !== id) return;
-
-    const prevMax = doc.seenId, newMax = inbox.data.reduce((m, x) => Math.max(m, x.id), prevMax || 0);
-    const fresh = prevMax === undefined ? [] : inbox.data.filter(x => !x.read_at && x.id > prevMax);
-    const lg = {}; for(const l of logs) (lg[l.day] ||= []).push(l);
-    const todos = buildTodos(items);
-    let localNew = false;
-    if(!tbaseOK){                                              // 처음 맞추는 팀 — 서버에 아직 없는 내 일정(오프라인에서 적은 것)은 지우지 않고 올린다
-      const onServer = new Set(items.map(r => r.id));
-      for(const [k, l] of Object.entries(doc.todos)) if(isDateKey(k))
-        for(const t of l) if(!onServer.has(t.id)){ (todos[k] ||= []).push(t); localNew = true; }
-    }
-    const me = mem.data.find(m => m.user_id === meId);
-    const sig = JSON.stringify([todos, tr.data.cats, mem.data, lg, inbox.data, tr.data.name, tr.data.code, tr.data.member_add, me.role]);
-    const changed = sig !== tsig;
-
-    tsig = sig;
-    doc.todos = todos; doc.cats = tr.data.cats || []; tcatBase = JSON.stringify(doc.cats);
-    tmem = mem.data; tinbox = inbox.data; tlogs = lg;
-    Object.assign(team, {name:tr.data.name, code:tr.data.code, member_add:tr.data.member_add, role:me.role, myName:me.name});
-    doc.team = {id, name:team.name, me:meId};
-    doc.mem = tmem; doc.inbox = tinbox; doc.logs = tlogs; doc.seenId = newMax;
-    tbase = {};
-    const onSrv = new Set(items.map(r => r.id));
-    for(const [k, l] of Object.entries(todos)) for(const t of l) if(onSrv.has(t.id)) tbase[t.id] = [hashOf(k, t), t.d ? 1 : 0];
-    tbaseOK = true; saveBase();
-    if(localNew) teamPush();
-    syncAt = Date.now();
-    save();
-    if(changed){ renderKeepInput(); if($('#tDlg').open && tdRefresh) tdRefresh(); }
-    if(fresh.length){ flash(TM('newN')(fresh.length)); pingNative('Daynua · ' + team.name, TM('newN')(fresh.length)); }
-  }catch(e){ console.warn(e); if(isMissing(e)) flash(TM('needSql')); }
-  finally{ tpulling = false; }
-}
-let tsig = '';
-function teamUnwatch(){ if(tchan){ try{ sb.removeChannel(tchan); }catch{} tchan = null; } }
-function teamWatch(){
-  teamUnwatch();
-  if(!sb || !user || !team) return;
-  const f = 'team_id=eq.' + team.id, on = (table, filter, fn) => ({event:'*', schema:'public', table, filter});
-  tchan = sb.channel('team-' + team.id)
-    .on('postgres_changes', on('team_items', f), () => tpullSoon())
-    .on('postgres_changes', on('team_logs', f), () => tpullSoon())
-    .on('postgres_changes', on('team_members', f), () => tpullSoon())
-    .on('postgres_changes', on('teams', 'id=eq.' + team.id), () => tpullSoon())
-    .on('postgres_changes', {event:'INSERT', schema:'public', table:'team_inbox', filter:'user_id=eq.' + user.id}, p => inboxPing(p.new))
-    .subscribe();
-}
-addEventListener('online', () => { if(teamOn){ teamPush(); tpullSoon(); } });
-function inboxPing(r){
-  if(!teamOn || r.team_id !== team.id || tinbox.some(x => x.id === r.id)) return;
-  tinbox.unshift(r); doc.inbox = tinbox; doc.seenId = Math.max(doc.seenId || 0, r.id); save();
-  const msg = inboxText(r);
-  flash(msg); renderTeamBar();
-  if(document.hidden) pingNative('Daynua · ' + team.name, msg);
-}
-function pingNative(title, body){
-  if(APP){ try{ if(APP.notifyAllowed()) APP.notifyNow(title, body); }catch{} return; }
-  if(typeof Notification === 'undefined' || Notification.permission !== 'granted') return;
-  navigator.serviceWorker?.getRegistration().then(reg => reg?.showNotification
-    ? reg.showNotification(title, {body, icon:'icon-192.png', badge:'icon-192.png'}) : new Notification(title, {body}));
-}
-const inboxText = r => `${TM(r.kind === 'new' ? 'nNew' : r.kind === 'change' ? 'nChange' : 'nCancel')(r.actor_name || '?')}: ${r.title || ''}`;
-
-/* ── 화면 조각: 줄 · 막대 · 기록 ── */
-function whoChips(t){
-  const ids = t.a || [];
-  const chips = ids.slice(0, 3).map(id => { const m = memOf(id);
-    return `<i class="wc" style="--c:${m?.color || '#999'}" title="${esc(m?.name || '')}">${ini(m?.name)}</i>`; }).join('');
-  const total = ids.length || tmem.length;
-  const n = (t.dn || []).filter(x => x !== meId).length + (t.d ? 1 : 0);        // 남이 끝낸 수 + 나
-  const prog = total > 1 && n ? `<span class="dcn mono">${n}/${total}</span>` : '';
-  return chips || prog ? `<span class="who">${chips}${prog}</span>` : '';
-}
-const qwBtnHTML = () => `<button type="button" id="qw" class="qwbtn${qWho.length ? ' set' : ''}" aria-label="${TM('who')}">${SI.users}${qWho.length ? `<b>${esc(whoLabel(qWho))}</b>` : ''}</button>`;
-function renderTeamBar(){
-  const b = $('#teamBar'); b.hidden = !teamOn;
-  if(!teamOn) return void (b.dataset.h = '');
-  const unread = tinbox.filter(x => !x.read_at).length;
-  const h = `<button class="tname" id="tbName">${SI.users}<b>${esc(team.name)}</b>${ICON.chev}</button>
-    <button class="chip ${teamMine ? 'on' : ''}" id="tbMine" aria-pressed="${teamMine}">${TM('mineOnly')}</button>
-    <button class="iconbtn tbell" id="tbBell" aria-label="${TM('inbox')}">${SI.bell}${unread ? `<span class="cnt">${unread}</span>` : ''}</button>`;
-  if(b.dataset.h !== h){ b.dataset.h = h; b.innerHTML = h; }
-}
-$('#teamBar').addEventListener('click', e => {
-  const b = e.target.closest('button'); if(!b) return;
-  if(b.id === 'tbName') openTeamDlg();
-  else if(b.id === 'tbBell') openInbox();
-  else if(b.id === 'tbMine'){ teamMine = !teamMine; localStorage.setItem('daynua.mine', teamMine ? '1' : '0'); render(); }
+$('#spB').addEventListener('click', async e => {
+  const s = e.target.closest('button')?.dataset.s; if(!s) return;
+  localStorage.setItem(spaceKey(), space);            // 어느 쪽을 골라도 '골랐다'는 표시부터 남긴다
+  sp.close(); await setSpace(s);
 });
-function teamLogHTML(k){
-  const list = tlogs[k] || [];
-  return `<div class="tlog"><div class="sec">${TM('logTitle')}${list.length ? ` · ${list.length}` : ''}</div>
-    ${list.map(l => { const m = memOf(l.author);
-      return `<div class="tl"><i class="wc" style="--c:${m?.color || '#999'}">${ini(m?.name)}</i><div class="tb">
-        <div class="th"><b>${esc(m?.name || '')}</b><span class="mono">${hm(l.created_at)}</span>${l.author === meId || canEdit()
-          ? `<button class="lx" data-lx="${l.id}" aria-label="${T('del')}">×</button>` : ''}</div>
-        <div class="tt">${esc(l.body)}</div></div></div>`; }).join('') || `<div class="empty">${TM('logEmpty')}</div>`}
-    <div class="qadd"><input id="tlogIn" maxlength="500" placeholder="${TM('logPh')}"><button class="chip" id="tlogGo">${TM('logAdd')}</button></div></div>`;
-}
-async function addLog(){
-  const el = $('#tlogIn'); if(!el || !teamOn) return;
-  const body = el.value.trim().slice(0, 2000); if(!body) return;
-  el.value = '';
-  const row = {id:uid(), team_id:team.id, day:sel, body};
-  (tlogs[sel] ||= []).push({...row, author:meId, created_at:new Date().toISOString()});
-  doc.logs = tlogs; save(); render();
-  const { error } = await sb.from('team_logs').insert(row);
-  if(error){ tlogs[sel] = tlogs[sel].filter(l => l.id !== row.id); doc.logs = tlogs; save(); render(); flash(teamErr(error)); }
-}
-async function delLog(id){
-  for(const k of Object.keys(tlogs)) tlogs[k] = tlogs[k].filter(l => l.id !== id);
-  doc.logs = tlogs; save(); render();
-  const { error } = await sb.from('team_logs').delete().eq('id', id);
-  if(error){ flash(teamErr(error)); tpullSoon(true); }
-}
-$('#side').addEventListener('click', e => {
-  if(!teamOn) return;
-  if(e.target.closest('#tlogGo')) return void addLog();
-  const x = e.target.closest('[data-lx]'); if(x) return void delLog(x.dataset.lx);
-  if(e.target.closest('#qw')) openWho({quick:true});
-});
-$('#side').addEventListener('keydown', e => { if(teamOn && e.target.id === 'tlogIn' && e.key === 'Enter' && !e.isComposing){ e.preventDefault(); addLog(); } });
 
-/* ── 창들 (한 개의 대화창을 돌려 쓴다) ── */
-const td = $('#tDlg');
-let tdLock = false, tdRefresh = null;
-td.addEventListener('cancel', e => { if(tdLock) e.preventDefault(); });
-td.addEventListener('close', () => { tdRefresh = null; });
-const tdErr = s => { const e = $('#tdE'); e.textContent = s || ''; e.hidden = !s; };
-function tdShow(o){
-  $('#tdT').textContent = o.title; $('#tdS').textContent = o.sub || ''; $('#tdS').hidden = !o.sub;
-  tdErr(''); $('#tdB').innerHTML = o.body || '';
-  const r = $('#tdR'); r.innerHTML = '';
-  for(const [label, cls, fn] of o.actions || []){
-    const b = document.createElement('button'); b.className = cls; b.textContent = label; b.onclick = fn; r.append(b);
-  }
-  tdLock = !!o.lock; tdRefresh = o.refresh || null;
-  o.wire?.($('#tdB'));
-  if(!td.open) td.showModal();
-}
-const tdClose = () => { tdLock = false; td.close(); };
-const myDefaultName = () => (user?.email || '').split('@')[0] || '';
+if(location.hash === '#test') window.__sp = {openSpacePick, setSpace};     // 로그인 없이 선택 창을 확인하는 자가검사용
 
-/* 처음 로그인한 사람 — 개인으로 쓸지 팀으로 쓸지 */
-function openModePick(){
-  tdShow({lock:true, title:TM('modeTitle'), sub:TM('modeSub'),
-    body:`<div class="modes"><button class="mode" id="mpP"><b>${TM('modePers')}</b><span>${TM('modePersSub')}</span></button>
-      <button class="mode" id="mpT"><b>${TM('modeTeam')}</b><span>${TM('modeTeamSub')}</span></button></div>`,
-    wire:b => {
-      b.querySelector('#mpP').onclick = () => { tdClose(); setMode('personal'); };
-      b.querySelector('#mpT').onclick = () => { tdClose(); setMode('team'); };
-    }});
-}
-/* 팀 만들기 · 코드로 들어가기. first=true 면 팀이 하나도 없어서 열린 것 */
-function openTeamNew(first, code){
-  tdShow({lock:false, title:TM('newTitle'), sub:TM('newSub'),
-    body:`<span class="lbl">${TM('myName')}</span>
-      <input type="text" id="tnMy" maxlength="30" placeholder="${TM('myNamePh')}" value="${esc(team?.myName || myDefaultName())}">
-      <span class="lbl">${TM('teamName')}</span>
-      <input type="text" id="tnName" maxlength="40" placeholder="${TM('teamNamePh')}">
-      <button class="primary chip" id="tnCreate" style="width:100%;padding:11px;font-size:14px">${TM('create')}</button>
-      <div class="tsep">${TM('or')}</div>
-      <input type="text" id="tnCode" maxlength="16" placeholder="${TM('codePh')}" value="${esc(code || '')}" autocapitalize="characters" style="text-transform:uppercase">
-      <button class="primary chip" id="tnJoin" style="width:100%;padding:11px;font-size:14px">${TM('joinBtn')}</button>`,
-    actions:[[TM('later'), 'plain', () => { tdClose(); if(first) setMode('personal'); }]],
-    wire:b => {
-      const go = async (fn, ...args) => {
-        const my = b.querySelector('#tnMy').value.trim();
-        if(!my) return tdErr(TM('needName'));
-        tdErr('');
-        try{
-          const { data, error } = await fn(my);
-          if(error) throw error;
-          tdClose();
-          localStorage.setItem('daynua.team', data.id);
-          localStorage.setItem(modeKey(), 'team');
-          if(teamOn) teamLeave(true);
-          enterTeam();
-        }catch(e){ tdErr(teamErr(e)); }
-      };
-      b.querySelector('#tnCreate').onclick = () => {
-        const n = b.querySelector('#tnName').value.trim();
-        if(!n) return tdErr(TM('needName'));
-        go(my => sb.rpc('create_team', {p_name:n, p_my_name:my}));
-      };
-      b.querySelector('#tnJoin').onclick = () => {
-        const c = b.querySelector('#tnCode').value.trim();
-        if(!c) return tdErr(TM('badCode'));
-        go(my => sb.rpc('join_team', {p_code:c, p_my_name:my}));
-      };
-    }});
-}
-/* 대상 고르기 — 빠른 입력(quick) 또는 이미 있는 일정 */
-function openWho(ctx){
-  const t = ctx.quick ? null : bucket(ctx.from).find(v => v.id === ctx.id);
-  if(!ctx.quick && !t) return;
-  const cur = new Set(ctx.quick ? qWho : (t.a || []));
-  tdShow({title:TM('whoTitle'), sub:TM('whoSub'),
-    body:tmem.map(m => `<label class="whor"><input type="checkbox" value="${m.user_id}" ${cur.has(m.user_id) ? 'checked' : ''}>
-      <i class="wc" style="--c:${m.color}">${ini(m.name)}</i><span>${esc(m.name)}${m.user_id === meId ? ` · ${TM('whoMe')}` : ''}</span></label>`).join(''),
-    actions:[[T('close'), 'plain', tdClose], [TM('ok'), 'primary', () => {
-      const ids = [...$('#tdB').querySelectorAll('input:checked')].map(i => i.value);
-      const a = ids.length === tmem.length ? [] : ids;                    // 모두 고르면 '전체'
-      if(ctx.quick){ qWho = a; const b = $('#qw'); if(b) b.outerHTML = qwBtnHTML(); }
-      else{ t.a = a; touch(); }
-      tdClose();
-    }]]});
-}
-/* 알림함 */
-function openInbox(){
-  const unread = tinbox.some(x => !x.read_at);
-  const body = tinbox.length ? tinbox.map(r => `<button class="ibx ${r.read_at ? '' : 'un'}" data-day="${r.day || ''}">
-      <span><b>${esc(r.actor_name || '?')}</b>${esc(inboxText(r).slice((r.actor_name || '?').length))}</span>
-      <small>${r.day ? md(r.day) : ''} · ${hm(r.created_at)}</small></button>`).join('')
-    : `<div class="empty">${TM('inboxEmpty')}</div>`;
-  tdShow({title:TM('inbox'), body, actions:[[T('close'), 'plain', tdClose]],
-    wire:b => b.querySelectorAll('.ibx').forEach(x => x.onclick = () => {
-      const k = x.dataset.day; tdClose();
-      if(isDateKey(k)){ cur = dOf(k); sel = k; view = 'day'; render(); }
-    })});
-  if(unread){                                                          // 열었으니 읽은 것으로 — 목록은 이번엔 그대로 보여 준다
-    const at = new Date().toISOString();
-    sb.from('team_inbox').update({read_at:at}).eq('user_id', user.id).eq('team_id', team.id).is('read_at', null)
-      .then(() => { for(const r of tinbox) r.read_at ||= at; doc.inbox = tinbox; save(); renderTeamBar(); });
-  }
-}
-/* 팀 설정 */
-function openTeamDlg(){
-  const admin = team.role === 'admin', me = memOf(meId);
-  const link = `${location.origin}${location.pathname}#join=${team.code}`;
-  const others = (() => { try{ return JSON.parse(localStorage.getItem('daynua.teams') || '[]'); }catch{ return []; } })()
-    .filter(x => x.id !== team.id);
-  const rows = tmem.map(m => `<div class="tmr"><i class="wc" style="--c:${m.color}">${ini(m.name)}</i>
-      <span class="nm">${esc(m.name)}${m.user_id === meId ? ` · ${TM('whoMe')}` : ''}</span>
-      ${admin && m.user_id !== meId
-        ? `<select data-role="${m.user_id}">${['admin','editor','member'].map(r =>
-            `<option value="${r}" ${m.role === r ? 'selected' : ''}>${TM(ROLE[r])}</option>`).join('')}</select>
-           <button class="kx" data-kick="${m.user_id}" aria-label="${T('del')}">×</button>`
-        : `<span class="rl">${TM(ROLE[m.role])}</span>`}</div>`).join('');
-  tdShow({title:team.name, sub:TM('teamSettings'), refresh:openTeamDlg,
-    body:`<span class="lbl">${TM('members')} · ${tmem.length}</span>${rows}
-      <div class="grp" style="margin-top:14px"><span class="lbl">${TM('myName')}</span>
-        <div style="display:flex;gap:8px"><input type="text" id="tdMy" maxlength="30" value="${esc(me?.name || '')}" style="margin:0">
-          <button class="chip" id="tdMySave">${TM('ok')}</button></div></div>
-      <div class="grp"><span class="lbl">${TM('invite')}</span>
-        <div class="tcode"><b class="mono">${esc(team.code)}</b><button class="chip" id="tdShare">${TM('copyLink')}</button>
-          ${admin ? `<button class="chip" id="tdRegen">${TM('newCode')}</button>` : ''}</div>
-        <input type="text" id="tdLink" readonly value="${esc(link)}" style="font-size:12px"><div class="hint">${TM('inviteHint')}</div></div>
-      ${admin ? `<div class="grp"><span class="lbl">${TM('memberAdd')}</span><div class="mseg" id="tdMA">
-        <button data-v="1" class="${team.member_add ? 'on' : ''}">${TM('memberAddOn')}</button>
-        <button data-v="0" class="${team.member_add ? '' : 'on'}">${TM('memberAddOff')}</button></div></div>` : ''}
-      ${others.length ? `<div class="grp"><span class="lbl">${TM('switchTeam')}</span>
-        ${others.map(x => `<button class="chip" data-sw="${x.id}">${esc(x.name)}</button>`).join(' ')}</div>` : ''}
-      <div class="grp"><button class="chip" id="tdNew">${TM('newTeam')}</button></div>
-      <div class="tdanger"><button class="chip" id="tdLeave">${TM('leave')}</button>
-        ${admin ? `<button class="chip" id="tdDel">${TM('delTeam')}</button>` : ''}</div>`,
-    actions:[[T('close'), 'plain', tdClose]],
-    wire:b => {
-      const rpc = async (fn, args) => { const { error } = await sb.rpc(fn, args); if(error){ tdErr(teamErr(error)); return false; } return true; };
-      const refresh = async () => { await teamPull(true); if(td.open && teamOn) openTeamDlg(); };
-      b.querySelectorAll('[data-role]').forEach(s => s.onchange = async () => {
-        if(await rpc('set_member_role', {p_team:team.id, p_user:s.dataset.role, p_role:s.value})) refresh(); else refresh();
-      });
-      b.querySelectorAll('[data-kick]').forEach(x => x.onclick = async () => {
-        const m = memOf(x.dataset.kick);
-        if(confirm(TM('kickAsk')(m?.name || '')) && await rpc('remove_member', {p_team:team.id, p_user:x.dataset.kick})) refresh();
-      });
-      b.querySelector('#tdMySave').onclick = async () => {
-        const n = b.querySelector('#tdMy').value.trim(); if(!n) return tdErr(TM('needName'));
-        if(await rpc('set_my_profile', {p_team:team.id, p_name:n, p_color:me?.color || '#c9502f'})) refresh();
-      };
-      b.querySelector('#tdShare').onclick = async () => {
-        try{ if(navigator.share){ await navigator.share({title:team.name, text:`${team.name} · Daynua`, url:link}); return; } }catch(e){ if(e?.name === 'AbortError') return; }
-        try{ await navigator.clipboard.writeText(link); flash(TM('copied')); }
-        catch{ const i = b.querySelector('#tdLink'); i.focus(); i.select(); }
-      };
-      b.querySelector('#tdLink').onfocus = e => e.target.select();
-      b.querySelector('#tdRegen')?.addEventListener('click', async () => {
-        const { data, error } = await sb.rpc('regen_code', {p_team:team.id});
-        if(error) return tdErr(teamErr(error));
-        team.code = data; refresh();
-      });
-      b.querySelectorAll('#tdMA button').forEach(x => x.onclick = async () => {
-        const { error } = await sb.rpc('set_member_add', {p_team: team.id, p_on: x.dataset.v === '1'});
-        if(error) return tdErr(teamErr(error));
-        refresh();
-      });
-      b.querySelectorAll('[data-sw]').forEach(x => x.onclick = () => {
-        tdClose(); localStorage.setItem('daynua.team', x.dataset.sw); teamLeave(true); enterTeam();
-      });
-      b.querySelector('#tdNew').onclick = () => openTeamNew(false);
-      b.querySelector('#tdLeave').onclick = async () => {
-        if(!confirm(TM('leaveAsk'))) return;
-        if(await rpc('remove_member', {p_team:team.id, p_user:meId})){ tdClose(); localStorage.removeItem('daynua.team'); teamLeave(true); enterTeam(); }
-      };
-      b.querySelector('#tdDel')?.addEventListener('click', async () => {
-        if(!confirm(TM('delAsk'))) return;
-        const { error } = await sb.from('teams').delete().eq('id', team.id);
-        if(error) return tdErr(teamErr(error));
-        tdClose(); localStorage.removeItem('daynua.team'); teamLeave(true); enterTeam();
-      });
-    }});
-}
-
-/* ── 앱을 열 때: 개인으로 열지 팀으로 열지 ── */
-{
-  const m = /[#&]join=([A-Za-z0-9]+)/.exec(location.hash);        // 초대 링크로 들어왔다 — 로그인한 뒤에 참여 화면을 연다
-  if(m){ localStorage.setItem('daynua.join', m[1].toUpperCase()); history.replaceState(null, '', location.pathname + location.search); }
-}
+/* ── 앱을 열 때: 처음이면 공간을 고르게 ── */
 let modeBusy = false;
 async function modeStart(){
-  if(modeBusy || teamOn) return;
+  if(modeBusy) return;
   modeBusy = true;
-  try{ await modeStart1(); } finally{ modeBusy = false; }
-}
-async function modeStart1(){
-  await syncReady; await wait(80);                                // 로그인 직후의 저장 칸 바꾸기가 끝난 뒤에
-  if(!user && !(!sb && localStorage.getItem('daynua.lastUid'))) return;       // 게스트
-  if(user) localStorage.setItem('daynua.lastUid', user.id);
-  const join = user && localStorage.getItem('daynua.join');
-  if(join){ localStorage.removeItem('daynua.join'); localStorage.setItem(modeKey(), 'team'); return openTeamNew(false, join); }
-  const m = localStorage.getItem(modeKey());
-  if(m === 'team') return enterTeam();
-  if(!m && user) return openModePick();
+  try{
+    await syncReady; await wait(80);                                // 로그인 직후의 저장 칸 바꾸기가 끝난 뒤에
+    if(user) localStorage.setItem('daynua.lastUid', user.id);
+    if(user && !localStorage.getItem(spaceKey())) openSpacePick();
+  }finally{ modeBusy = false; }
 }
 
 const gate = $('#gate'), gE = $('#gEmail'), gP = $('#gPw'), gA = $('#gAuto'), gGo = $('#gGo');
