@@ -414,6 +414,12 @@ li.dropB{box-shadow:inset 0 -2px 0 var(--accent)}
 /* 체크한 그 순간에만. 클래스는 animate() 가 그 render 한 번만 붙인다 */
 li.ckd .ck{animation:moCk 140ms var(--ease)}
 li.ckd .tx{animation:moFade 190ms var(--ease)}
+/* 끝낸 일이 '완료' 로 빠지기 전 — 체크가 차고 취소선이 그어지고 옅어진 뒤(.doing), 높이가 접히며 사라진다(.gone) */
+li.doing{overflow:hidden;transition:max-height 260ms var(--ease),opacity 260ms var(--ease),padding 260ms var(--ease),margin 260ms var(--ease)}
+li.doing .ck{background:currentColor;border-color:currentColor;animation:moCk 180ms var(--ease)}
+li.doing .ck::after{content:"✓";color:var(--card);font-size:11px;font-weight:800;line-height:1}
+li.doing .tx{color:var(--sub);text-decoration:line-through}
+li.doing.gone{opacity:0;padding-top:0;padding-bottom:0;margin-top:0;margin-bottom:0;pointer-events:none}
 li.edin{animation:moFade 150ms var(--ease)}
 /* 윗줄 버튼도 마찬가지 — 보이는 크기는 그대로 두고 위아래로만 넓힌다.
    (좌우로 넓히면 나란히 선 주/월/년이 서로의 터치를 가져간다) */
@@ -1326,7 +1332,7 @@ li .dcn{font-size:11px;font-weight:700;color:var(--sub);margin-left:3px}
 const SUPABASE_URL = 'https://cjhwxjznuleyfcbwwvtb.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_acxKbtekhqwFZwI0EUtArg_3FSj5AHh';
 const VAPID_PUBLIC = 'BItluVUoPAOjdIacpE7-6Ko45leNKobu8SbCNP1L6zdozMUrtFBNjh7ncFVZGSvwdHf4vNkYQKj5BarWq01G0hE';
-const BUILD = '2026-10-27.60';
+const BUILD = '2026-10-27.61';
 /* Daynua 앱(Android 껍데기) 안이면 위젯·알림·내보내기를 앱에 맡긴다. 아니면 null */
 const APP = typeof DaynuaApp !== 'undefined' ? DaynuaApp : null;
 const ARRIVED_BY_LINK = /access_token|type=(signup|recovery|magiclink|invite)|[?&]code=/.test(location.hash + location.search);
@@ -3367,6 +3373,16 @@ $('#side').addEventListener('click', e=>{
       /* ✓ 는 그날 마지막 하나를 끝냈을 때만. 체크 효과와 겹쳐 요란해지지 않게 */
       if(t.d && daySummary(bucket(from), doc.miss[from] || 0).complete)
         animate('.dayempty.done .chk, .cell.sel .chk, .wcard.sel .chk', 'pop');
+      /* 끝낸 일은 접힌 '완료' 로 빠진다 — 바로 사라지면 어색하니, 체크 · 취소선이 보인 다음 부드럽게 접는다.
+         저장은 지금 하고 화면만 늦춘다. 그 사이 다른 걸 눌러도 다시 그려지며 정리된다. */
+      if(t.d && !doneOpen && !reduceMo()){
+        doc.ts = Date.now(); save(); push();
+        li.classList.add('doing');
+        li.style.maxHeight = li.offsetHeight + 'px';
+        setTimeout(() => { li.classList.add('gone'); li.style.maxHeight = '0px'; }, 380);
+        setTimeout(render, 640);
+        return;
+      }
       return touch();
     }
     if(e.target.matches('.st')){
