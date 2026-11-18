@@ -1303,7 +1303,7 @@ li .tm{font-size:12px}
 const SUPABASE_URL = 'https://cjhwxjznuleyfcbwwvtb.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_acxKbtekhqwFZwI0EUtArg_3FSj5AHh';
 const VAPID_PUBLIC = 'BItluVUoPAOjdIacpE7-6Ko45leNKobu8SbCNP1L6zdozMUrtFBNjh7ncFVZGSvwdHf4vNkYQKj5BarWq01G0hE';
-const BUILD = '2026-10-27.65';
+const BUILD = '2026-11-14.66';
 /* Daynua 앱(Android 껍데기) 안이면 위젯·알림·내보내기를 앱에 맡긴다. 아니면 null */
 const APP = typeof DaynuaApp !== 'undefined' ? DaynuaApp : null;
 const ARRIVED_BY_LINK = /access_token|type=(signup|recovery|magiclink|invite)|[?&]code=/.test(location.hash + location.search);
@@ -4843,9 +4843,9 @@ function timedList(){
   const now = Date.now(), out = [];
   /* 지금 공간 + 다른 공간(저장해 둔 것) — 어느 쪽에 있든 개인·회사 알람이 다 울린다. 회사 일정은 제목 앞에 [회사] 를 붙인다. */
   const tag = SPT('tag'), other = otherDoc();
-  const srcs = [[doc, space === 'work' ? tag : '']];
-  if(other?.todos) srcs.push([other, space === 'work' ? '' : tag]);
-  for(const [src, pre] of srcs)
+  const srcs = [[doc, space === 'work' ? tag : '', space === 'me']];          // 셋째 값: 개인 공간 문서인가 (앱이 울리기 직전에 서버에서 다시 확인하는 대상)
+  if(other?.todos) srcs.push([other, space === 'work' ? '' : tag, space === 'work']);
+  for(const [src, pre, mine] of srcs)
     for(const [k, list] of Object.entries(src.todos)){
       if(!isDateKey(k)) continue;
       const day = dOf(k).getTime();
@@ -4854,7 +4854,7 @@ function timedList(){
         if(!t.tm || t.d || t.sk || t.w) continue;
         const [h, m] = t.tm.split(':').map(Number);
         const at = new Date(dOf(k)).setHours(h || 0, m || 0, 0, 0) - lead * 60000;
-        if(at > now) out.push({id:t.id, at, title:pre + t.t, body:T('timeBody')(fmtTm(t.tm), lead)});
+        if(at > now) out.push({id:t.id, at, title:pre + t.t, body:T('timeBody')(fmtTm(t.tm), lead), k, p: mine ? 1 : 0});
       }
     }
   return out.sort((a,b) => a.at - b.at).slice(0, 60);
@@ -4889,6 +4889,19 @@ function syncTimed(){
     syncTimed();
   }, Math.max(0, wait));
 }
+/* 위젯은 서버에서 받은 사본으로 그려서, 앱에서 끝낸 일이 사본이 새로고침될 때까지 위젯에 남아 있었다.
+   그래서 앱이 오늘의 개인 일정을 폰에 바로 넘겨 주고, 위젯은 서버 사본보다 새로운 쪽을 그린다. (옛 앱에는 setWidget 이 없다) */
+let widgetSent = '';
+function sendWidget(synced){                           // synced=true: 서버에 올라간 뒤 — 위젯이 15분마다 받아 오는 서버 사본과 같은 내용이라는 뜻
+  if(!APP || !APP.setWidget) return;
+  const pd = space === 'me' ? doc : otherDoc(), k = todayKey();
+  if(!pd?.todos) return;
+  const body = JSON.stringify({date:k, cats:(pd.cats || []).map(c => ({id:c.id, c:c.c})),
+    list:(pd.todos[k] || []).map(t => ({t:t.t, c:t.c, s:!!t.s, w:!!t.w, d:!!t.d, sk:!!t.sk}))});
+  if(!synced && body === widgetSent) return;
+  widgetSent = body;
+  try{ APP.setWidget(JSON.stringify({...JSON.parse(body), sy: !!synced})); }catch{}   // sy=false 인 동안은 위젯이 옛 서버 사본으로 되돌아가지 않는다
+}
 async function writeSummary(){
   syncTimed();
   if(!('caches' in window)) return;
@@ -4902,6 +4915,7 @@ async function writeSummary(){
       body: body || T('notifyEmpty'), stale: T('notifyStale')
     };
     if(APP) try{ APP.setSummary(JSON.stringify(sum)); }catch{}
+    sendWidget();
     const c = await caches.open('daynua-state');
     await c.put('/__summary', new Response(JSON.stringify(sum), {headers:{'Content-Type':'application/json'}}));
   }catch{}
@@ -5239,6 +5253,7 @@ async function pushNow(){
     syncAt = Date.now();
     if(pushFails){ pushFails = 0; setAcct(); }
     save();
+    sendWidget(true);                                  // 서버에 올라간 뒤의 모습으로 한 번 더 — 그 사이 받아 둔 옛 서버 사본을 위젯이 다시 고르지 않게
   }catch(e){ console.warn(e); pushFailed(); }
 }
 
